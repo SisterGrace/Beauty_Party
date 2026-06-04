@@ -13,6 +13,7 @@ namespace CoreLite
         Mintegral,
         TPN,
         Kwai,
+        Max,
         NULL
     }
 }
