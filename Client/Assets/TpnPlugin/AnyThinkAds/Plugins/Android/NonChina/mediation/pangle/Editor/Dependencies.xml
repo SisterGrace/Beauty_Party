@@ -1,0 +1,10 @@
+<dependencies>
+    <androidPackages>
+        <repositories>
+            <repository>https://artifact.bytedance.com/repository/pangle</repository>
+        </repositories>
+        <androidPackage spec="com.anythink.sdk:adapter-tpn-pangle:7.8.5.9.1.0"/>
+        <androidPackage spec="com.pangle.global:pag-sdk:7.8.5.9"/>
+        <androidPackage spec="com.google.android.gms:play-services-ads-identifier:18.2.0"/>
+    </androidPackages>
+</dependencies>

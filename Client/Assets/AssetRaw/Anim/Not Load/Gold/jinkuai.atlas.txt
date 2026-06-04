@@ -1,0 +1,16 @@
+jinkuai.png
+size:1024,512
+filter:Linear,Linear
+pma:true
+01
+bounds:753,103,221,206
+offsets:105,111,479,563
+02
+bounds:531,2,220,307
+offsets:105,111,479,563
+03
+bounds:2,2,263,307
+offsets:105,111,479,563
+04
+bounds:267,2,262,307
+offsets:105,111,479,563

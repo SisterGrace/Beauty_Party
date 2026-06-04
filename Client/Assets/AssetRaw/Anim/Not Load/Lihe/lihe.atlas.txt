@@ -1,0 +1,7 @@
+lihe.png
+size:1024,1024
+filter:Linear,Linear
+pma:true
+礼物盒子
+bounds:2,2,738,832
+offsets:143,120,1024,1024

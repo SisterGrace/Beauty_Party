@@ -1,0 +1,16 @@
+heart.png
+size:512,256
+filter:Linear,Linear
+pma:true
+-1
+bounds:2,2,70,64
+offsets:1,1,72,66
+heart1
+bounds:2,68,209,176
+offsets:5,6,217,183
+heart2_1
+bounds:332,70,113,174
+offsets:1,5,117,180
+heart2_2
+bounds:213,68,117,176
+offsets:5,6,124,183

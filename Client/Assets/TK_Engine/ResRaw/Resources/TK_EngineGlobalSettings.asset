@@ -1,0 +1,115 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29ba4d7c4a4b4c018116005145021a90, type: 3}
+  m_Name: TK_EngineGlobalSettings
+  m_EditorClassIdentifier: 
+  m_FrameworkGlobalSettings:
+    m_ScriptAuthor: Default
+    m_ScriptVersion: 0.0.1
+    mAppStageEnum: 1
+    m_DefaultFont: Arial
+    m_ResourcesArea:
+      m_ResAdminType: Default
+      m_ResAdminCode: 0
+      m_ServerType: 1
+      m_CleanCommitPathRes: 1
+      m_InnerResourceSourceUrl: https://res.hmsweet.com/HeartbloomMagic/StreamingAssets
+      m_ExtraResourceSourceUrl: http://127.0.0.1:8088
+      m_FormalResourceSourceUrl: http://127.0.0.1:8088
+    m_AtlasFolder: Assets/AssetRaw/Atlas
+    HostServerURL: https://res.hmsweet.com/magicmatch/StreamingAssets
+    FallbackHostServerURL: https://res.hmsweet.com/magicmatch/StreamingAssets
+    EnableUpdateData: 1
+    WindowsUpdateDataUrl: https://res.hmsweet.com/HeartbloomMagic/UpdateConfig/UpdateData.json
+    MacOSUpdateDataUrl: https://res.hmsweet.com/HeartbloomMagic/UpdateConfig/UpdateData.json
+    IOSUpdateDataUrl: http://127.0.0.1
+    AndroidUpdateDataUrl: https://res.hmsweet.com/HeartbloomMagic/UpdateConfig/UpdateData.json
+    WebGLUpdateDataUrl: http://127.0.0.1
+    m_CurUseServerChannel: 
+    m_ServerChannelInfos: []
+    m_ConfigFolderName: Assets/AssetRaw/Configs/
+    namespace: GameLogic
+    scriptGenerateRule:
+    - uiElementRegex: Obj
+      componentName: GameObject
+    - uiElementRegex: m_item
+      componentName: GameObject
+    - uiElementRegex: Trans
+      componentName: Transform
+    - uiElementRegex: Rect
+      componentName: RectTransform
+    - uiElementRegex: Text
+      componentName: Text
+    - uiElementRegex: TMP
+      componentName: TextMeshProUGUI
+    - uiElementRegex: Btn
+      componentName: UIButton
+    - uiElementRegex: Img
+      componentName: Image
+    - uiElementRegex: Rimg
+      componentName: RawImage
+    - uiElementRegex: ScrollBar
+      componentName: Scrollbar
+    - uiElementRegex: Scroll
+      componentName: ScrollRect
+    - uiElementRegex: Input
+      componentName: TMP_InputField
+    - uiElementRegex: Grid
+      componentName: GridLayoutGroup
+    - uiElementRegex: Hlay
+      componentName: HorizontalLayoutGroup
+    - uiElementRegex: Vlay
+      componentName: VerticalLayoutGroup
+    - uiElementRegex: Red
+      componentName: RedNoteBehaviour
+    - uiElementRegex: Slider
+      componentName: Slider
+    - uiElementRegex: Tgroup
+      componentName: ToggleGroup
+    - uiElementRegex: Curve
+      componentName: AnimationCurve
+    - uiElementRegex: CanvasGroup
+      componentName: CanvasGroup
+    - uiElementRegex: Btn2
+      componentName: UIButton2
+    - uiElementRegex: ListView
+      componentName: LoopListViewItem
+    - uiElementRegex: Dropdo
+      componentName: TMP_Dropdown
+    - uiElementRegex: Tog
+      componentName: Toggle
+    - uiElementRegex: AV
+      componentName: MediaPlayer
+    _isServerTime: 1
+    _isLocalize: 1
+    DebugMode: 1
+    mCloseIAP: 0
+    mIsWhitePackage: 0
+    mEnableSecureScreen: 0
+    mHttpDataEncrypt: 1
+  m_HybridCLRCustomGlobalSettings:
+    HotUpdateAssemblies:
+    - GameBase.dll
+    - GameProto.dll
+    - GameLogic.dll
+    AOTMetaAssemblies:
+    - mscorlib.dll
+    - System.dll
+    - System.Core.dll
+    - UnityEngine.CoreModule.dll
+    - YooAsset.dll
+    - UniTask.dll
+    - TEngine.Runtime.dll
+    LogicMainDllName: GameLogic.dll
+    AssemblyTextAssetExtension: .bytes
+    AssemblyTextAssetPath: AssetRaw/DLL
+    HybridCLRGlobalSettings: Settings/HybridCLRGlobalSettings

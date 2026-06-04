@@ -1,0 +1,286 @@
+using System;
+using System.Collections.Generic;
+using AnyThinkAds.Api;
+using UnityEngine;
+using Up2SDK;
+
+namespace CoreLite
+{
+    /// <summary>
+    /// TPN(TopOn) 开屏广告封装，手动加载，支持多广告位。使用 ATSplashAd。
+    /// </summary>
+    public class CoreTpnSplash : CoreSingleton<CoreTpnSplash>
+    {
+        private List<string> _placementIds = new List<string>();
+        private Dictionary<string, float> _startLoadTimes = new Dictionary<string, float>();
+        private Dictionary<string, int> _retryAttempts = new Dictionary<string, int>();
+        private Dictionary<string, double> _placementRevenue = new Dictionary<string, double>();
+        private bool _callbacksRegistered;
+        private const string PlatformName = "TPN";
+        private const int MaxRetry = 6;
+        private const int FetchAdTimeoutMs = 5000;
+
+        public void SetPlacementIds(List<string> placementIds)
+        {
+            _placementIds = placementIds != null ? new List<string>(placementIds) : new List<string>();
+        }
+
+        public void LoadSplash()
+        {
+            if (!_callbacksRegistered)
+            {
+                RegisterCallbacks();
+                _callbacksRegistered = true;
+            }
+            foreach (var placementId in _placementIds)
+            {
+                if (string.IsNullOrEmpty(placementId)) continue;
+                LoadSplash(placementId);
+            }
+        }
+
+        private void LoadSplash(string placementId)
+        {
+            if (string.IsNullOrEmpty(placementId)) return;
+            CoreAdsEvents.LogStartLoadEvent(placementId, PlatformName, AdLoadType.Splash);
+            var jsonmap = new Dictionary<string, object>();
+            ATSplashAd.Instance.loadSplashAd(placementId, jsonmap, FetchAdTimeoutMs);
+            _startLoadTimes[placementId] = Time.realtimeSinceStartup;
+            CoreLogUtils.Debug("[CoreLiteTpn] Load splash placement: " + placementId);
+        }
+
+        public bool IsSplashReady()
+        {
+            foreach (var placementId in _placementIds)
+            {
+                if (!string.IsNullOrEmpty(placementId) && ATSplashAd.Instance.hasSplashAdReady(placementId))
+                    return true;
+            }
+            return false;
+        }
+
+        /// <summary>返回当前已就绪广告位中收益最高的 eCPM，无则返回 -1。已就绪但尚未写入 revenue 的按 0 参与比较。</summary>
+        public double GetSplashRevenue()
+        {
+            double maxRevenue = -1;
+            foreach (var placementId in _placementIds)
+            {
+                if (string.IsNullOrEmpty(placementId)) continue;
+                if (!ATSplashAd.Instance.hasSplashAdReady(placementId)) continue;
+                double rev = _placementRevenue.TryGetValue(placementId, out var r) ? r : 0;
+                if (rev > maxRevenue)
+                    maxRevenue = rev;
+            }
+            return maxRevenue;
+        }
+
+        /// <summary>获取当前收益最高的已就绪广告位 ID，无则返回 null。已就绪但尚未写入 revenue 的按 0 参与比较。</summary>
+        public string GetHighestPayingPlacement()
+        {
+            string best = null;
+            double maxRevenue = -1;
+            foreach (var placementId in _placementIds)
+            {
+                if (string.IsNullOrEmpty(placementId)) continue;
+                if (!ATSplashAd.Instance.hasSplashAdReady(placementId)) continue;
+                double rev = _placementRevenue.TryGetValue(placementId, out var r) ? r : 0;
+                if (rev > maxRevenue)
+                {
+                    maxRevenue = rev;
+                    best = placementId;
+                }
+            }
+            return best;
+        }
+
+        public void ShowSplash(string placementId)
+        {
+            if (string.IsNullOrEmpty(placementId)) return;
+            ATSplashAd.Instance.showSplashAd(placementId, new Dictionary<string, object>());
+            CoreLogUtils.Debug("[CoreLiteTpn] Show splash: " + placementId);
+        }
+
+        private void RegisterCallbacks()
+        {
+            ATSplashAd.Instance.client.onAdLoadEvent += OnAdLoad;
+            ATSplashAd.Instance.client.onAdLoadFailureEvent += OnAdLoadFail;
+            ATSplashAd.Instance.client.onAdLoadTimeoutEvent += OnAdLoadTimeout;
+            ATSplashAd.Instance.client.onAdShowEvent += OnAdShow;
+            ATSplashAd.Instance.client.onAdShowFailureEvent += OnAdShowFail;
+            ATSplashAd.Instance.client.onAdCloseEvent += OnAdClose;
+            ATSplashAd.Instance.client.onAdClickEvent += OnAdClick;
+        }
+
+        private void OnAdLoad(object sender, ATAdEventArgs e)
+        {
+            // TopOn 各 Network 回调线程不一致，统一通过 Loom 转主线程，避免在子线程调用 Unity API。
+            Loom.QueueOnMainThread(_ =>
+            {
+                var placementId = e?.placementId ?? "";
+                if (!_placementIds.Contains(placementId)) return;
+                float loadTime = Mathf.Ceil(Time.realtimeSinceStartup - (_startLoadTimes.TryGetValue(placementId, out var t) ? t : 0));
+                double revenue = 0;
+                string adId = "";
+                string source = "";
+                try
+                {
+                    var statusJson = ATSplashAd.Instance.checkAdStatus(placementId);
+                    var status = JsonUtility.FromJson<CoreLiteTpnAdStatus>(statusJson);
+                    if (status?.adInfo != null)
+                    {
+                        revenue = status.adInfo.publisher_revenue;
+                        _placementRevenue[placementId] = revenue;
+                        adId = status.adInfo.network_placement_id;
+                        source = "Topon_" + status.adInfo.network_firm_id.ToString();
+                    }
+                }
+                catch { }
+                CoreAdsEvents.LogLoadedEvent(adId, source, PlatformName, loadTime, AdLoadType.Splash, placementId, revenue);
+                _retryAttempts[placementId] = 0;
+                CoreLogUtils.Debug("[CoreLiteTpn] Splash OnAdLoad: " + placementId + " timeout:" + (e?.isTimeout ?? false));
+            }, null);
+        }
+
+        private void OnAdLoadFail(object sender, ATAdErrorEventArgs e)
+        {
+            Loom.QueueOnMainThread(_ =>
+            {
+                var placementId = e?.placementId ?? "";
+                if (!_placementIds.Contains(placementId)) return;
+                float loadTime = Mathf.Ceil(Time.realtimeSinceStartup - (_startLoadTimes.TryGetValue(placementId, out var t) ? t : 0));
+                string error = e?.errorMessage ?? "";
+                CoreAdsEvents.LogFailToLoadEvent(placementId, PlatformName, error, loadTime, AdLoadType.Splash);
+                CoreLogUtils.Debug("[CoreLiteTpn] Splash OnAdLoadFail: " + placementId + " " + error);
+                ScheduleRetry(placementId, LoadSplash);
+            }, null);
+        }
+
+        private void OnAdLoadTimeout(object sender, ATAdEventArgs e)
+        {
+            Loom.QueueOnMainThread(_ =>
+            {
+                var placementId = e?.placementId ?? "";
+                CoreLogUtils.Debug("[CoreLiteTpn] Splash OnAdLoadTimeout: " + placementId);
+            }, null);
+        }
+
+        private void OnAdShow(object sender, ATAdEventArgs e)
+        {
+            Loom.QueueOnMainThread(_ =>
+            {
+                var placementId = e?.placementId ?? "";
+                int firmId = e?.callbackInfo?.network_firm_id ?? 0;
+                string adSource = e?.callbackInfo?.network_firm_id != null ? "Topon_" + firmId : PlatformName;
+                string adId = e?.callbackInfo?.network_placement_id ?? "";
+                double revenue = e?.callbackInfo?.publisher_revenue ?? 0;
+                if (!_placementRevenue.ContainsKey(placementId)) _placementRevenue[placementId] = revenue;
+                string format = CoreLiteAdsType.Splash.ToString();
+                int formatNumber = CoreAdsPrefs.GetAndIncrementFormatPlayCount(format);
+                int positionNumber = CoreAdsPrefs.GetAndIncrementPositionPlayCount(format);
+                string launchType = CoreLiteSplashAdsMgr.Instance != null ? CoreLiteSplashAdsMgr.Instance.CurrentLaunchType : "unknown";
+                CoreLiteSplashAdsMgr.TrackSplashEvent("SP_Show", new Dictionary<string, object>
+                {
+                    { "launch_type", launchType },
+                    { "ad_source", adSource },
+                    { "ad_id", adId },
+                    { "ad_platform", PlatformName },
+                    { "unitId", placementId },
+                    { "revenue", revenue }
+                });
+                if (revenue > 0)
+                {
+                    CoreAnalyticsMgr.TrackAdImpressionEvent(
+                        revenue, adSource, adId, placementId,
+                        format, PlatformName,
+                        launchType,
+                        formatNumber,
+                        positionNumber);
+                }
+#if UNITY_ANDROID
+                CoreAnalyticsMgr.TrackEvent("Up2SDK_ToponAdShow", new Dictionary<string, object>
+                {
+                    { "ad_platform", "Topon" },
+                    { "topon_firm_id", firmId },
+                    { "ads_type", "SPLASH" },
+                    { "ad_id", placementId },
+                    { "ecpm", revenue * 1000 },
+                    { "show_id", "" }
+                });
+                Up2SDKManager.Instance.OnToponAdShow(firmId, AdsType.Splash, placementId, revenue * 1000, "");
+#endif
+                CoreLogUtils.Debug("[CoreLiteTpn] Splash OnAdShow: " + placementId);
+            }, null);
+        }
+
+        private void OnAdShowFail(object sender, ATAdErrorEventArgs e)
+        {
+            Loom.QueueOnMainThread(_ =>
+            {
+                var placementId = e?.placementId ?? "";
+                CoreLogUtils.Debug("[CoreLiteTpn] Splash OnAdShowFail: " + placementId + " " + (e?.errorMessage ?? ""));
+                CoreLiteSplashAdsMgr.Instance?.NotifyAppOpenAdDismissedFromSdk();
+                LoadSplash(placementId);
+            }, null);
+        }
+
+        private void OnAdClose(object sender, ATAdEventArgs e)
+        {
+            Loom.QueueOnMainThread(_ =>
+            {
+                var placementId = e?.placementId ?? "";
+                CoreLogUtils.Debug("[CoreLiteTpn] Splash OnAdClose: " + placementId);
+                _placementRevenue.Remove(placementId);
+                CoreLiteSplashAdsMgr.Instance?.NotifyAppOpenAdDismissedFromSdk();
+                LoadSplash(placementId);
+            }, null);
+        }
+
+        private void OnAdClick(object sender, ATAdEventArgs e)
+        {
+            Loom.QueueOnMainThread(_ =>
+            {
+                var placementId = e?.placementId ?? "";
+                if (!_placementIds.Contains(placementId)) return;
+                int firmId = e?.callbackInfo?.network_firm_id ?? 0;
+                string adSource = e?.callbackInfo?.network_firm_id != null ? "Topon_" + firmId : PlatformName;
+                string adId = e?.callbackInfo?.network_placement_id ?? "";
+                CoreLogUtils.Debug("[CoreLiteTpn] Splash OnAdClick: " + placementId);
+                CoreAdsEvents.LogClickEvent(
+                    AdLoadType.Splash,
+                    GetSplashRevenue(),
+                    CoreLiteSplashAdsMgr.Instance != null ? CoreLiteSplashAdsMgr.Instance.CurrentLaunchType : "",
+                    adId,
+                    adSource,
+                    PlatformName,
+                    placementId
+                );
+#if UNITY_ANDROID
+                CoreAnalyticsMgr.TrackEvent("Up2SDK_ToponAdClick", new Dictionary<string, object>
+                {
+                    { "ad_platform", "Topon" },
+                    { "topon_firm_id", firmId },
+                    { "ads_type", "SPLASH" },
+                    { "ad_id", placementId },
+                    { "show_id", "" }
+                });
+                Up2SDKManager.Instance.OnToponAdClick(firmId, AdsType.Splash, placementId, "");
+#endif
+            }, null);
+        }
+
+        private void ScheduleRetry(string placementId, Action<string> loadAction)
+        {
+            if (!_retryAttempts.TryGetValue(placementId, out var count))
+                _retryAttempts[placementId] = 0;
+            _retryAttempts[placementId]++;
+            count = _retryAttempts[placementId];
+            if (count >= MaxRetry)
+            {
+                CoreLogUtils.Debug("[CoreLiteTpn] Splash placement " + placementId + " max retry " + MaxRetry + " reached");
+                return;
+            }
+            double delay = Math.Pow(2, Math.Min(MaxRetry, count));
+            CoreFuncDelayExecuteUtils.Instance.DelayExecute((float)delay, () => loadAction(placementId));
+        }
+    }
+}

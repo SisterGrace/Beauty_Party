@@ -1,0 +1,16 @@
+cao-dianji.png
+size:512,512
+filter:Linear,Linear
+pma:true
+方块
+bounds:2,2,222,289
+offsets:1,1,224,291
+rotate:90
+方块1
+bounds:267,361,222,120
+offsets:1,1,224,122
+草方块1
+bounds:2,226,263,255
+草方块2
+bounds:293,90,269,144
+rotate:90

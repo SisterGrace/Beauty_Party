@@ -1,0 +1,42 @@
+{
+    "name": "TK_Engine.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:24c092aee38482f4e80715eaa8148782",
+        "GUID:e34a5702dd353724aa315fb8011f08c3",
+        "GUID:4d1926c9df5b052469a1c63448b7609a",
+        "GUID:6e76b07590314a543b982daed6af2509",
+        "GUID:6055be8ebefd69e48b49212b09b47b2f",
+        "GUID:478a2357cc57436488a56e564b08d223",
+        "GUID:13ba8ce62aa80c74598530029cb2d649",
+        "GUID:2373f786d14518f44b0f475db77ba4de",
+        "GUID:57099a0d579ae4f2da4688b42cc1ae97",
+        "GUID:7d8924c6e6beb44e18f19e8c0b5068cd",
+        "GUID:3ca842002c51d0a43b73e45298809a13",
+        "GUID:6f1ae7647f6d418488003de285edc3b5",
+        "GUID:6824e98e6ad23564a8009ba4d0c4da02",
+        "GUID:cbb0d51b565003841ae81cdbaf747114",
+        "GUID:8f58f15387c7a6f4fad9857024eb47f7",
+        "GUID:6e5063adab271564ba0098a06a8cebda",
+        "GUID:72d1fea872bd7a449bf3818f2b0a6708",
+        "GUID:68765d262e2128e4ab49c983f3411946",
+        "GUID:bcc75752368a72b4aba4043ea13b2a1a",
+        "GUID:05dbf8cd246c9274c8a78a65142e5f8a",
+        "GUID:ff4bf6c59d1ac413a8f34ced5be76ecd",
+        "GUID:0a958a7eb80a248e1b8bc4553787c209",
+        "GUID:f51ebe6a0ceec4240a699833d6309b23",
+        "GUID:d5db569871f08164ea7c2f31c6d9e869",
+        "GUID:f8b2d4e6a1c3057b9e4d6f8a2c1b3e5d"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

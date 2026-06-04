@@ -1,0 +1,123 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &4343727234628468602
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: UIRaw_Atlas_Gache
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 0
+      compressionQuality: 0
+      maxTextureSize: 0
+      textureCompression: 0
+      filterMode: 1
+      generateMipMaps: 0
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings:
+    - serializedVersion: 3
+      m_BuildTarget: iPhone
+      m_MaxTextureSize: 2048
+      m_ResizeAlgorithm: 0
+      m_TextureFormat: 49
+      m_TextureCompression: 1
+      m_CompressionQuality: 100
+      m_CrunchedCompression: 0
+      m_AllowsAlphaSplitting: 0
+      m_Overridden: 1
+      m_IgnorePlatformSupport: 0
+      m_AndroidETC2FallbackOverride: 0
+      m_ForceMaximumCompressionQuality_BC6H_BC7: 0
+    - serializedVersion: 3
+      m_BuildTarget: Android
+      m_MaxTextureSize: 2048
+      m_ResizeAlgorithm: 0
+      m_TextureFormat: 50
+      m_TextureCompression: 1
+      m_CompressionQuality: 100
+      m_CrunchedCompression: 0
+      m_AllowsAlphaSplitting: 0
+      m_Overridden: 1
+      m_IgnorePlatformSupport: 0
+      m_AndroidETC2FallbackOverride: 0
+      m_ForceMaximumCompressionQuality_BC6H_BC7: 0
+    - serializedVersion: 3
+      m_BuildTarget: WebGL
+      m_MaxTextureSize: 2048
+      m_ResizeAlgorithm: 0
+      m_TextureFormat: 50
+      m_TextureCompression: 1
+      m_CompressionQuality: 50
+      m_CrunchedCompression: 0
+      m_AllowsAlphaSplitting: 0
+      m_Overridden: 1
+      m_IgnorePlatformSupport: 0
+      m_AndroidETC2FallbackOverride: 0
+      m_ForceMaximumCompressionQuality_BC6H_BC7: 0
+    packingSettings:
+      serializedVersion: 2
+      padding: 2
+      blockOffset: 1
+      allowAlphaSplitting: 0
+      enableRotation: 1
+      enableTightPacking: 0
+      enableAlphaDilation: 0
+    secondaryTextureSettings: {}
+    variantMultiplier: 1
+    packables:
+    - {fileID: 21300000, guid: 43e3004b3bc9b29458444b85c131b95b, type: 3}
+    - {fileID: 21300000, guid: 5d9cd95cea2e1294cb42d77cab62305d, type: 3}
+    - {fileID: 21300000, guid: 34f2cada55850064cbe1d6589c3a577a, type: 3}
+    - {fileID: 21300000, guid: e102a444157924542bb88ec56b1d0f3e, type: 3}
+    - {fileID: 21300000, guid: e187820d7e1075a48afbd9ad228fba34, type: 3}
+    - {fileID: 21300000, guid: 67dec9fb13513b64da0f4eded6fa9191, type: 3}
+    - {fileID: 21300000, guid: 6c6f6aea045c0b24bb12318687d780eb, type: 3}
+    - {fileID: 21300000, guid: caae37bd0730ebb4595ab9c7f3632c96, type: 3}
+    - {fileID: 21300000, guid: 05bbd90684d98244a8a6f51236e75311, type: 3}
+    - {fileID: 21300000, guid: 38a2bdad6b0156442858bd7c8fae3816, type: 3}
+    bindAsDefault: 1
+    isAtlasV2: 0
+    cachedData: {fileID: 0}
+    packedSpriteRenderDataKeys:
+    - e102a444157924542bb88ec56b1d0f3e: 21300000
+    - 05bbd90684d98244a8a6f51236e75311: 21300000
+    - 34f2cada55850064cbe1d6589c3a577a: 21300000
+    - 6c6f6aea045c0b24bb12318687d780eb: 21300000
+    - 43e3004b3bc9b29458444b85c131b95b: 21300000
+    - 67dec9fb13513b64da0f4eded6fa9191: 21300000
+    - 5d9cd95cea2e1294cb42d77cab62305d: 21300000
+    - e187820d7e1075a48afbd9ad228fba34: 21300000
+    - 38a2bdad6b0156442858bd7c8fae3816: 21300000
+    - caae37bd0730ebb4595ab9c7f3632c96: 21300000
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300000, guid: e102a444157924542bb88ec56b1d0f3e, type: 3}
+  - {fileID: 21300000, guid: 05bbd90684d98244a8a6f51236e75311, type: 3}
+  - {fileID: 21300000, guid: 34f2cada55850064cbe1d6589c3a577a, type: 3}
+  - {fileID: 21300000, guid: 6c6f6aea045c0b24bb12318687d780eb, type: 3}
+  - {fileID: 21300000, guid: 43e3004b3bc9b29458444b85c131b95b, type: 3}
+  - {fileID: 21300000, guid: 67dec9fb13513b64da0f4eded6fa9191, type: 3}
+  - {fileID: 21300000, guid: 5d9cd95cea2e1294cb42d77cab62305d, type: 3}
+  - {fileID: 21300000, guid: e187820d7e1075a48afbd9ad228fba34, type: 3}
+  - {fileID: 21300000, guid: 38a2bdad6b0156442858bd7c8fae3816, type: 3}
+  - {fileID: 21300000, guid: caae37bd0730ebb4595ab9c7f3632c96, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - bg_cd_banner_01
+  - icon_cd_02
+  - bg_cd_03
+  - btn_room_skip
+  - bg_cd_01
+  - bg_common_qipao
+  - bg_cd_02
+  - bg_cd_banner_02
+  - icon_zd_qz_big
+  - icon_cd_01
+  m_RenderDataMap: {}
+  m_Tag: UIRaw_Atlas_Gache
+  m_IsVariant: 0

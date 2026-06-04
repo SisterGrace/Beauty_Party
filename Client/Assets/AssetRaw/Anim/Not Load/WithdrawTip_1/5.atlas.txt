@@ -1,0 +1,11 @@
+5.png
+size:512,512
+filter:Linear,Linear
+pma:true
+scale:0.35
+pop
+bounds:2,90,363,410
+offsets:1,1,365,412
+titleBG
+bounds:2,2,332,86
+offsets:2,2,336,90

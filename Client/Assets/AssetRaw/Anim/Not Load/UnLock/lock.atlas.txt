@@ -1,0 +1,8 @@
+lock.png
+	size: 128, 128
+	filter: Linear, Linear
+	pma: true
+img/lock/lock1
+	bounds: 1, 32, 43, 44
+img/lock/lock2
+	bounds: 1, 1, 37, 29

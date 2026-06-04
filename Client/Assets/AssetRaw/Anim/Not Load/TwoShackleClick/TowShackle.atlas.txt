@@ -1,0 +1,6 @@
+TowShackle.png
+size:512,512
+filter:Linear,Linear
+pma:true
+2
+bounds:2,2,277,273

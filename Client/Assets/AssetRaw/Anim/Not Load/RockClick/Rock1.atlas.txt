@@ -1,0 +1,7 @@
+Rock1.png
+size:256,256
+filter:Linear,Linear
+pma:true
+icon_gaming_stone
+bounds:2,2,250,249
+offsets:7,57,265,310

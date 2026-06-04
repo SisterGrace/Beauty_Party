@@ -1,0 +1,12 @@
+chest.png
+	size: 1024, 1024
+	filter: Linear, Linear
+	pma: true
+img/chest/chest0
+	bounds: 1, 423, 785, 407
+	offsets: 1, 42, 786, 500
+img/chest/chest01
+	bounds: 1, 123, 769, 298
+	offsets: 0, 0, 769, 300
+img/chest/chest02
+	bounds: 788, 786, 42, 44

@@ -1,0 +1,11 @@
+vip.png
+	size: 1024, 1024
+	filter: Linear, Linear
+	pma: true
+img/vip/vip0
+	bounds: 1, 562, 675, 175
+	offsets: 4, 4, 683, 182
+img/vip/vip1
+	bounds: 1, 414, 627, 146
+img/vip/vip2
+	bounds: 678, 682, 59, 55

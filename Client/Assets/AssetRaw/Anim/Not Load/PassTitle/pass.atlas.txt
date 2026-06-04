@@ -1,0 +1,13 @@
+pass.png
+	size: 1024, 1024
+	filter: Linear, Linear
+	pma: true
+img/pass/pass0
+	bounds: 1, 482, 985, 504
+	offsets: 23, 23, 1052, 536
+img/pass/pass1
+	bounds: 1, 2, 308, 336
+	offsets: 0, 0, 520, 336
+img/pass/pass2
+	bounds: 1, 340, 890, 140
+	offsets: 2, 12, 894, 152

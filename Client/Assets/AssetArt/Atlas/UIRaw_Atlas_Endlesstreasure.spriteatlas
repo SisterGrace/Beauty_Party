@@ -1,0 +1,111 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &4343727234628468602
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: UIRaw_Atlas_Endlesstreasure
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 0
+      compressionQuality: 0
+      maxTextureSize: 0
+      textureCompression: 0
+      filterMode: 1
+      generateMipMaps: 0
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings:
+    - serializedVersion: 3
+      m_BuildTarget: iPhone
+      m_MaxTextureSize: 2048
+      m_ResizeAlgorithm: 0
+      m_TextureFormat: 49
+      m_TextureCompression: 1
+      m_CompressionQuality: 100
+      m_CrunchedCompression: 0
+      m_AllowsAlphaSplitting: 0
+      m_Overridden: 1
+      m_IgnorePlatformSupport: 0
+      m_AndroidETC2FallbackOverride: 0
+      m_ForceMaximumCompressionQuality_BC6H_BC7: 0
+    - serializedVersion: 3
+      m_BuildTarget: Android
+      m_MaxTextureSize: 2048
+      m_ResizeAlgorithm: 0
+      m_TextureFormat: 50
+      m_TextureCompression: 1
+      m_CompressionQuality: 100
+      m_CrunchedCompression: 0
+      m_AllowsAlphaSplitting: 0
+      m_Overridden: 1
+      m_IgnorePlatformSupport: 0
+      m_AndroidETC2FallbackOverride: 0
+      m_ForceMaximumCompressionQuality_BC6H_BC7: 0
+    - serializedVersion: 3
+      m_BuildTarget: WebGL
+      m_MaxTextureSize: 2048
+      m_ResizeAlgorithm: 0
+      m_TextureFormat: 50
+      m_TextureCompression: 1
+      m_CompressionQuality: 50
+      m_CrunchedCompression: 0
+      m_AllowsAlphaSplitting: 0
+      m_Overridden: 1
+      m_IgnorePlatformSupport: 0
+      m_AndroidETC2FallbackOverride: 0
+      m_ForceMaximumCompressionQuality_BC6H_BC7: 0
+    packingSettings:
+      serializedVersion: 2
+      padding: 2
+      blockOffset: 1
+      allowAlphaSplitting: 0
+      enableRotation: 1
+      enableTightPacking: 0
+      enableAlphaDilation: 0
+    secondaryTextureSettings: {}
+    variantMultiplier: 1
+    packables:
+    - {fileID: 21300000, guid: a40e8ce1d0d5d6743b2e0ed621b6afda, type: 3}
+    - {fileID: 21300000, guid: bf32f5a1b98f7774cb0000eef88bd535, type: 3}
+    - {fileID: 21300000, guid: 9d3c81035ca035c4ca0045062fc667f3, type: 3}
+    - {fileID: 21300000, guid: 18a2bf38fa498564ca54c89ea117c818, type: 3}
+    - {fileID: 21300000, guid: 416d0954652e90446b8ea2426ea0bd09, type: 3}
+    - {fileID: 21300000, guid: 58a84995a34055c4387b9aed9750a4df, type: 3}
+    - {fileID: 21300000, guid: 5ac086d0a0bddb740a6c0a5c6a907f21, type: 3}
+    bindAsDefault: 1
+    isAtlasV2: 0
+    cachedData: {fileID: 0}
+    packedSpriteRenderDataKeys:
+    - 5ac086d0a0bddb740a6c0a5c6a907f21: 21300000
+    - bf32f5a1b98f7774cb0000eef88bd535: 21300000
+    - a40e8ce1d0d5d6743b2e0ed621b6afda: 21300000
+    - 9d3c81035ca035c4ca0045062fc667f3: 21300000
+    - 416d0954652e90446b8ea2426ea0bd09: 21300000
+    - 58a84995a34055c4387b9aed9750a4df: 21300000
+    - 18a2bf38fa498564ca54c89ea117c818: 21300000
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300000, guid: 5ac086d0a0bddb740a6c0a5c6a907f21, type: 3}
+  - {fileID: 21300000, guid: bf32f5a1b98f7774cb0000eef88bd535, type: 3}
+  - {fileID: 21300000, guid: a40e8ce1d0d5d6743b2e0ed621b6afda, type: 3}
+  - {fileID: 21300000, guid: 9d3c81035ca035c4ca0045062fc667f3, type: 3}
+  - {fileID: 21300000, guid: 416d0954652e90446b8ea2426ea0bd09, type: 3}
+  - {fileID: 21300000, guid: 58a84995a34055c4387b9aed9750a4df, type: 3}
+  - {fileID: 21300000, guid: 18a2bf38fa498564ca54c89ea117c818, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - icon_wjbz_xz
+  - bg_wjbz_02
+  - bg_wjbz_01
+  - bg_wjbz_05
+  - icon_wjbz_jt
+  - icon_wjbz_jt2
+  - bg_wjbz_guidao
+  m_RenderDataMap: {}
+  m_Tag: UIRaw_Atlas_Endlesstreasure
+  m_IsVariant: 0

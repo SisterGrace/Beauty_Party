@@ -1,0 +1,7 @@
+Honey1.png
+size:512,512
+filter:Linear,Linear
+pma:true
+蜂蜜
+bounds:2,2,323,311
+offsets:0,84,323,395

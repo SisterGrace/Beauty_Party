@@ -1,0 +1,159 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &4343727234628468602
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: UIRaw_Atlas_VIP
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 0
+      compressionQuality: 0
+      maxTextureSize: 0
+      textureCompression: 0
+      filterMode: 1
+      generateMipMaps: 0
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings:
+    - serializedVersion: 3
+      m_BuildTarget: iPhone
+      m_MaxTextureSize: 2048
+      m_ResizeAlgorithm: 0
+      m_TextureFormat: 49
+      m_TextureCompression: 1
+      m_CompressionQuality: 100
+      m_CrunchedCompression: 0
+      m_AllowsAlphaSplitting: 0
+      m_Overridden: 1
+      m_IgnorePlatformSupport: 0
+      m_AndroidETC2FallbackOverride: 0
+      m_ForceMaximumCompressionQuality_BC6H_BC7: 0
+    - serializedVersion: 3
+      m_BuildTarget: Android
+      m_MaxTextureSize: 2048
+      m_ResizeAlgorithm: 0
+      m_TextureFormat: 50
+      m_TextureCompression: 1
+      m_CompressionQuality: 100
+      m_CrunchedCompression: 0
+      m_AllowsAlphaSplitting: 0
+      m_Overridden: 1
+      m_IgnorePlatformSupport: 0
+      m_AndroidETC2FallbackOverride: 0
+      m_ForceMaximumCompressionQuality_BC6H_BC7: 0
+    - serializedVersion: 3
+      m_BuildTarget: WebGL
+      m_MaxTextureSize: 2048
+      m_ResizeAlgorithm: 0
+      m_TextureFormat: 50
+      m_TextureCompression: 1
+      m_CompressionQuality: 50
+      m_CrunchedCompression: 0
+      m_AllowsAlphaSplitting: 0
+      m_Overridden: 1
+      m_IgnorePlatformSupport: 0
+      m_AndroidETC2FallbackOverride: 0
+      m_ForceMaximumCompressionQuality_BC6H_BC7: 0
+    packingSettings:
+      serializedVersion: 2
+      padding: 2
+      blockOffset: 1
+      allowAlphaSplitting: 0
+      enableRotation: 1
+      enableTightPacking: 0
+      enableAlphaDilation: 0
+    secondaryTextureSettings: {}
+    variantMultiplier: 1
+    packables:
+    - {fileID: 21300000, guid: 7c7f5e25b83b072429ec46d8bfaa8288, type: 3}
+    - {fileID: 21300000, guid: 1d0e4ec0ec8b2b441baecaf72e10f628, type: 3}
+    - {fileID: 21300000, guid: 08fa99d080e01e14a9d49760b8e1bedf, type: 3}
+    - {fileID: 21300000, guid: b39d42f1091727e47a1ebd4bb30ea57f, type: 3}
+    - {fileID: 21300000, guid: 1b50db47679a0134380637b0d7759ab9, type: 3}
+    - {fileID: 21300000, guid: 8bed33ea92cefc741ac5c10df062bfee, type: 3}
+    - {fileID: 21300000, guid: 20b9a02aeadb90e429f458cc170aef4c, type: 3}
+    - {fileID: 21300000, guid: a46446e11045a6a4997e9d73532b3bc5, type: 3}
+    - {fileID: 21300000, guid: c486c6f3106dcde43b00aa5d07ec70e8, type: 3}
+    - {fileID: 21300000, guid: fbf48d9a853d3d54cb30ff3c8fe13ad9, type: 3}
+    - {fileID: 21300000, guid: 403d3549e8bfb9a40a510c504e7095a7, type: 3}
+    - {fileID: 21300000, guid: 26e5a2c4d8c399949bdb528357aeca0e, type: 3}
+    - {fileID: 21300000, guid: 7e508fd4c0694e94c960fd25be808b99, type: 3}
+    - {fileID: 21300000, guid: f59007f5e7c6997498fa9c29e829abdf, type: 3}
+    - {fileID: 21300000, guid: 176c89cf1f0d6fa45afbbbfc3ad653b1, type: 3}
+    - {fileID: 21300000, guid: 33578fdcdbb3a9f4d9f41a07924f5a0f, type: 3}
+    - {fileID: 21300000, guid: 99c7af0aec8646d4a89c53ba065a171a, type: 3}
+    - {fileID: 21300000, guid: 4991deb50bc84334d82acd3851b9c246, type: 3}
+    - {fileID: 21300000, guid: 83b386f69c0508b41adeb43b4e7f1636, type: 3}
+    bindAsDefault: 1
+    isAtlasV2: 0
+    cachedData: {fileID: 0}
+    packedSpriteRenderDataKeys:
+    - 1d0e4ec0ec8b2b441baecaf72e10f628: 21300000
+    - 08fa99d080e01e14a9d49760b8e1bedf: 21300000
+    - a46446e11045a6a4997e9d73532b3bc5: 21300000
+    - b39d42f1091727e47a1ebd4bb30ea57f: 21300000
+    - c486c6f3106dcde43b00aa5d07ec70e8: 21300000
+    - 26e5a2c4d8c399949bdb528357aeca0e: 21300000
+    - 7e508fd4c0694e94c960fd25be808b99: 21300000
+    - 7c7f5e25b83b072429ec46d8bfaa8288: 21300000
+    - 4991deb50bc84334d82acd3851b9c246: 21300000
+    - f59007f5e7c6997498fa9c29e829abdf: 21300000
+    - 83b386f69c0508b41adeb43b4e7f1636: 21300000
+    - 1b50db47679a0134380637b0d7759ab9: 21300000
+    - 403d3549e8bfb9a40a510c504e7095a7: 21300000
+    - 99c7af0aec8646d4a89c53ba065a171a: 21300000
+    - 20b9a02aeadb90e429f458cc170aef4c: 21300000
+    - fbf48d9a853d3d54cb30ff3c8fe13ad9: 21300000
+    - 8bed33ea92cefc741ac5c10df062bfee: 21300000
+    - 33578fdcdbb3a9f4d9f41a07924f5a0f: 21300000
+    - 176c89cf1f0d6fa45afbbbfc3ad653b1: 21300000
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300000, guid: 1d0e4ec0ec8b2b441baecaf72e10f628, type: 3}
+  - {fileID: 21300000, guid: 08fa99d080e01e14a9d49760b8e1bedf, type: 3}
+  - {fileID: 21300000, guid: a46446e11045a6a4997e9d73532b3bc5, type: 3}
+  - {fileID: 21300000, guid: b39d42f1091727e47a1ebd4bb30ea57f, type: 3}
+  - {fileID: 21300000, guid: c486c6f3106dcde43b00aa5d07ec70e8, type: 3}
+  - {fileID: 21300000, guid: 26e5a2c4d8c399949bdb528357aeca0e, type: 3}
+  - {fileID: 21300000, guid: 7e508fd4c0694e94c960fd25be808b99, type: 3}
+  - {fileID: 21300000, guid: 7c7f5e25b83b072429ec46d8bfaa8288, type: 3}
+  - {fileID: 21300000, guid: 4991deb50bc84334d82acd3851b9c246, type: 3}
+  - {fileID: 21300000, guid: f59007f5e7c6997498fa9c29e829abdf, type: 3}
+  - {fileID: 21300000, guid: 83b386f69c0508b41adeb43b4e7f1636, type: 3}
+  - {fileID: 21300000, guid: 1b50db47679a0134380637b0d7759ab9, type: 3}
+  - {fileID: 21300000, guid: 403d3549e8bfb9a40a510c504e7095a7, type: 3}
+  - {fileID: 21300000, guid: 99c7af0aec8646d4a89c53ba065a171a, type: 3}
+  - {fileID: 21300000, guid: 20b9a02aeadb90e429f458cc170aef4c, type: 3}
+  - {fileID: 21300000, guid: fbf48d9a853d3d54cb30ff3c8fe13ad9, type: 3}
+  - {fileID: 21300000, guid: 8bed33ea92cefc741ac5c10df062bfee, type: 3}
+  - {fileID: 21300000, guid: 33578fdcdbb3a9f4d9f41a07924f5a0f, type: 3}
+  - {fileID: 21300000, guid: 176c89cf1f0d6fa45afbbbfc3ad653b1, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - bg_vip_02
+  - bg_vip_03
+  - bg_vip_djs01
+  - bg_vip_04
+  - bg_vip_djs02
+  - icon_vip_02
+  - icon_vip_03
+  - bg_vip_01
+  - icon_vip_08
+  - icon_vip_04
+  - icon_vip_djs
+  - bg_vip_05
+  - icon_vip_01
+  - icon_vip_07
+  - bg_vip_07
+  - bg_vip_djs03
+  - bg_vip_06
+  - icon_vip_06
+  - icon_vip_05
+  m_RenderDataMap: {}
+  m_Tag: UIRaw_Atlas_VIP
+  m_IsVariant: 0

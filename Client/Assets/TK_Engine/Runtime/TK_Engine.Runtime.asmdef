@@ -1,0 +1,22 @@
+{
+    "name": "TK_Engine.Runtime",
+    "rootNamespace": "TK_Engine",
+    "references": [
+        "GUID:e34a5702dd353724aa315fb8011f08c3",
+        "GUID:f51ebe6a0ceec4240a699833d6309b23",
+        "GUID:6055be8ebefd69e48b49212b09b47b2f",
+        "GUID:bcc75752368a72b4aba4043ea13b2a1a",
+        "GUID:6f1ae7647f6d418488003de285edc3b5",
+        "GUID:3ca842002c51d0a43b73e45298809a13",
+        "GUID:05dbf8cd246c9274c8a78a65142e5f8a"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

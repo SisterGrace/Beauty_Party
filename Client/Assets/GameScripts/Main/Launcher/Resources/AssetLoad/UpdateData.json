@@ -1,0 +1,8 @@
+{
+    "CurrentVersion" : "1.0.0",
+    "UpdateType": 1,
+    "UpdateStyle": 1,
+    "UpdateNotice": 2,
+    "HostServerURL": "https://s.akshakya.com/dreamtile/StreamingAssets",
+    "FallbackHostServerURL" : "https://s.akshakya.com/dreamtile/StreamingAssets"
+}

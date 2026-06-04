@@ -1,0 +1,10 @@
+Honey2.png
+size:1024,512
+filter:Linear,Linear
+pma:true
+蜂蜜
+bounds:327,3,323,311
+offsets:0,84,323,395
+蜂蜜-半透明
+bounds:2,2,323,312
+offsets:0,83,323,395

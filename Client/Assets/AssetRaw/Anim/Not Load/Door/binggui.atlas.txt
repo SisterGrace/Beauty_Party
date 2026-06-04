@@ -1,0 +1,15 @@
+binggui.png
+size:4096,1024
+filter:Linear,Linear
+pma:true
+01
+bounds:2,2,734,846
+offsets:2,2,738,850
+02
+bounds:738,28,712,820
+offsets:1,1,714,822
+03
+bounds:2149,159,634,689
+04
+bounds:1452,40,695,808
+offsets:1,1,697,810

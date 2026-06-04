@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a34d63c6860f744b28df88fea6bdd886, type: 3}
+  m_Name: CoreGameConfigData
+  m_EditorClassIdentifier: 
+  serverConfig:
+    BaseUrl: https://pee66.syntacticdrift.com
+    AsnUrl: https://syntacticdrift.com/create/writer
+  analyticsConfig:
+    SSAppID_Android: 870108b9b77a46508d6f47f3850fcbb0
+    SSAppID_iOS: 
+    SSUrl: https://lexto.syntacticdrift.com
+    AdjustToken_Android: 
+    AdjustToken_iOS: 
+    AdmobAppID_Android: 
+    AdmobAppID_iOS: 
+  toponLocalConfig:
+    appId: h69ff1b3dda79f
+    appKey: 67633c42a1f54d92bcde864a130787ba
+    interstitialPlacementId: n69ff1bcf89f04
+    rewardedPlacementId: n69ff1bee70ca8
+    bannerPlacementId: n69ff1c185235c
+    splashPlacementId: n69ff1c51e6544
+  mtgLocalConfig:
+    appId: 474266
+    appKey: 5aecaacbde96820998642782c1cbf2aa
+    interstitialPlacementId: 3644170
+    interstitialUnitId: 6007677
+    rewardedPlacementId: 3644172
+    rewardedUnitId: 6007679
+  up2LocalConfig:
+    appId: 3035

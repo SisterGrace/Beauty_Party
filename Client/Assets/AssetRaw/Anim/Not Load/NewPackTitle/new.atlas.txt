@@ -1,0 +1,28 @@
+new.png
+	size: 256, 256
+	filter: Linear, Linear
+	pma: true
+img/new/new00
+	bounds: 1, 73, 70, 67
+	offsets: 6, 6, 82, 79
+img/new/new01
+	bounds: 74, 152, 74, 72
+	offsets: 1, 1, 76, 74
+img/new/new11
+	bounds: 1, 4, 70, 67
+	offsets: 6, 6, 82, 79
+img/new/new12
+	bounds: 150, 152, 74, 72
+	offsets: 1, 1, 76, 74
+img/new/piece
+	bounds: 73, 32, 59, 55
+	offsets: 7, 6, 74, 70
+img/new/piece2
+	bounds: 1, 142, 71, 82
+	offsets: 6, 6, 83, 98
+img/new/piece3
+	bounds: 152, 97, 72, 53
+	offsets: 8, 7, 86, 65
+img/new/piece4
+	bounds: 74, 89, 76, 61
+	offsets: 10, 6, 93, 74

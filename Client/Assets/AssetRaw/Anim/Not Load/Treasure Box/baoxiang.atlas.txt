@@ -1,0 +1,10 @@
+baoxiang.png
+size:1024,512
+filter:Linear,Linear
+pma:true
+164313179cf16014e8dc1292d96091b
+bounds:2,2,352,348
+offsets:2,2,354,350
+9731dfc561ffd9ece87997e3965e7fe
+bounds:356,76,338,274
+offsets:0,1,338,275

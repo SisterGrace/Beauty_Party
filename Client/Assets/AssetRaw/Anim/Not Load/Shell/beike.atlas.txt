@@ -1,0 +1,7 @@
+beike.png
+size:256,256
+filter:Linear,Linear
+pma:true
+贝壳
+bounds:2,2,220,210
+offsets:15,24,256,256

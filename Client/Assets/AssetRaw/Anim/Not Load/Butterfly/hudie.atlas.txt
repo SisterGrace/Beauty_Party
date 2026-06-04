@@ -1,0 +1,13 @@
+hudie.png
+size:2048,1024
+filter:Linear,Linear
+pma:true
+右翅
+bounds:526,5,408,655
+offsets:1,1,410,657
+左翅
+bounds:936,5,408,655
+offsets:1,1,410,657
+身体
+bounds:2,2,522,658
+offsets:1,1,524,660

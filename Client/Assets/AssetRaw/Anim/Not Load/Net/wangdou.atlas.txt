@@ -1,0 +1,10 @@
+wangdou.png
+size:1024,1024
+filter:Linear,Linear
+pma:true
+icon_gaming_net
+bounds:2,2,183,452
+rotate:90
+图层 1-fly_00
+bounds:2,187,816,679
+offsets:1,2,817,682

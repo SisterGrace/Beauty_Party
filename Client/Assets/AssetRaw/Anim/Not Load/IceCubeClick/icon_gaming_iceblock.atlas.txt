@@ -1,0 +1,13 @@
+icon_gaming_iceblock.png
+size:512,512
+filter:Linear,Linear
+pma:true
+icon_gaming_iceblock1
+bounds:257,203,252,294
+offsets:1,1,254,296
+icon_gaming_iceblock2
+bounds:2,203,253,294
+offsets:2,1,256,296
+icon_gaming_iceblock3
+bounds:2,2,252,199
+offsets:1,1,254,201

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dependencies>
+    <androidPackages>
+        <androidPackage spec="androidx.constraintlayout:constraintlayout:2.1.4">
+            <repositories>
+                <repository>https://repo.dgtverse.cn/repository/maven-public/</repository>
+            </repositories>
+        </androidPackage>
+    </androidPackages>
+</dependencies>

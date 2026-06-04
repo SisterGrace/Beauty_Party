@@ -1,0 +1,7 @@
+hat.png
+size:2048,512
+filter:Linear,Linear
+pma:true
+小丑帽
+bounds:2,2,1024,448
+offsets:0,292,1024,1024

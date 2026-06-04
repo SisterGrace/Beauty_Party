@@ -1,0 +1,155 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &4343727234628468602
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: UIRaw_Atlas_Photos
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 0
+      compressionQuality: 0
+      maxTextureSize: 0
+      textureCompression: 0
+      filterMode: 1
+      generateMipMaps: 0
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings:
+    - serializedVersion: 3
+      m_BuildTarget: iPhone
+      m_MaxTextureSize: 2048
+      m_ResizeAlgorithm: 0
+      m_TextureFormat: 49
+      m_TextureCompression: 1
+      m_CompressionQuality: 100
+      m_CrunchedCompression: 0
+      m_AllowsAlphaSplitting: 0
+      m_Overridden: 1
+      m_IgnorePlatformSupport: 0
+      m_AndroidETC2FallbackOverride: 0
+      m_ForceMaximumCompressionQuality_BC6H_BC7: 0
+    - serializedVersion: 3
+      m_BuildTarget: Android
+      m_MaxTextureSize: 2048
+      m_ResizeAlgorithm: 0
+      m_TextureFormat: 50
+      m_TextureCompression: 1
+      m_CompressionQuality: 100
+      m_CrunchedCompression: 0
+      m_AllowsAlphaSplitting: 0
+      m_Overridden: 1
+      m_IgnorePlatformSupport: 0
+      m_AndroidETC2FallbackOverride: 0
+      m_ForceMaximumCompressionQuality_BC6H_BC7: 0
+    - serializedVersion: 3
+      m_BuildTarget: WebGL
+      m_MaxTextureSize: 2048
+      m_ResizeAlgorithm: 0
+      m_TextureFormat: 50
+      m_TextureCompression: 1
+      m_CompressionQuality: 50
+      m_CrunchedCompression: 0
+      m_AllowsAlphaSplitting: 0
+      m_Overridden: 1
+      m_IgnorePlatformSupport: 0
+      m_AndroidETC2FallbackOverride: 0
+      m_ForceMaximumCompressionQuality_BC6H_BC7: 0
+    packingSettings:
+      serializedVersion: 2
+      padding: 2
+      blockOffset: 1
+      allowAlphaSplitting: 0
+      enableRotation: 1
+      enableTightPacking: 0
+      enableAlphaDilation: 0
+    secondaryTextureSettings: {}
+    variantMultiplier: 1
+    packables:
+    - {fileID: 21300000, guid: f4ca85b526e28e54ba34c78f537ce8fd, type: 3}
+    - {fileID: 21300000, guid: 51fdeb9130f43fb43892008c965d6fa1, type: 3}
+    - {fileID: 21300000, guid: ba75f4b688d61bf46a3807a364ee72ae, type: 3}
+    - {fileID: 21300000, guid: 12a8a0e065eaccf4aa5888f3ae595370, type: 3}
+    - {fileID: 21300000, guid: 76967820b20e3184fb567aa1e8d77833, type: 3}
+    - {fileID: 21300000, guid: 694f9642be4f86240a502a9df8b94b33, type: 3}
+    - {fileID: 21300000, guid: e2500c16d69836641abbae8821e36d39, type: 3}
+    - {fileID: 21300000, guid: 731de415694ef1c4a80ae40483e5b339, type: 3}
+    - {fileID: 21300000, guid: 76a6d838f3cc90f4c85398ff46ba3ad7, type: 3}
+    - {fileID: 21300000, guid: 0de9bf45fa5a36e49b1cd2f90549c2b0, type: 3}
+    - {fileID: 21300000, guid: b64be578124875f43a4567dd19c8f02d, type: 3}
+    - {fileID: 21300000, guid: 37537f669a41c1a4bbc8f0e5634831d6, type: 3}
+    - {fileID: 21300000, guid: 4e9679ca8ca8e4747a59ed16f099c0a4, type: 3}
+    - {fileID: 21300000, guid: bd3f4dc7caff1924abfaa33c95dd260a, type: 3}
+    - {fileID: 21300000, guid: 1acb2a154514c4e4693915ce3e35d532, type: 3}
+    - {fileID: 21300000, guid: 6be0f210d5a779948810dc888adf2b63, type: 3}
+    - {fileID: 21300000, guid: fb06d99754f6aed489f0048a859a21a6, type: 3}
+    - {fileID: 21300000, guid: b65449bfb8c26ed4f946bf12f6896de5, type: 3}
+    bindAsDefault: 1
+    isAtlasV2: 0
+    cachedData: {fileID: 0}
+    packedSpriteRenderDataKeys:
+    - 6be0f210d5a779948810dc888adf2b63: 21300000
+    - 76967820b20e3184fb567aa1e8d77833: 21300000
+    - 12a8a0e065eaccf4aa5888f3ae595370: 21300000
+    - 51fdeb9130f43fb43892008c965d6fa1: 21300000
+    - 694f9642be4f86240a502a9df8b94b33: 21300000
+    - 731de415694ef1c4a80ae40483e5b339: 21300000
+    - 1acb2a154514c4e4693915ce3e35d532: 21300000
+    - 0de9bf45fa5a36e49b1cd2f90549c2b0: 21300000
+    - f4ca85b526e28e54ba34c78f537ce8fd: 21300000
+    - e2500c16d69836641abbae8821e36d39: 21300000
+    - 37537f669a41c1a4bbc8f0e5634831d6: 21300000
+    - ba75f4b688d61bf46a3807a364ee72ae: 21300000
+    - fb06d99754f6aed489f0048a859a21a6: 21300000
+    - bd3f4dc7caff1924abfaa33c95dd260a: 21300000
+    - 76a6d838f3cc90f4c85398ff46ba3ad7: 21300000
+    - b64be578124875f43a4567dd19c8f02d: 21300000
+    - 4e9679ca8ca8e4747a59ed16f099c0a4: 21300000
+    - b65449bfb8c26ed4f946bf12f6896de5: 21300000
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300000, guid: 6be0f210d5a779948810dc888adf2b63, type: 3}
+  - {fileID: 21300000, guid: 76967820b20e3184fb567aa1e8d77833, type: 3}
+  - {fileID: 21300000, guid: 12a8a0e065eaccf4aa5888f3ae595370, type: 3}
+  - {fileID: 21300000, guid: 51fdeb9130f43fb43892008c965d6fa1, type: 3}
+  - {fileID: 21300000, guid: 694f9642be4f86240a502a9df8b94b33, type: 3}
+  - {fileID: 21300000, guid: 731de415694ef1c4a80ae40483e5b339, type: 3}
+  - {fileID: 21300000, guid: 1acb2a154514c4e4693915ce3e35d532, type: 3}
+  - {fileID: 21300000, guid: 0de9bf45fa5a36e49b1cd2f90549c2b0, type: 3}
+  - {fileID: 21300000, guid: f4ca85b526e28e54ba34c78f537ce8fd, type: 3}
+  - {fileID: 21300000, guid: e2500c16d69836641abbae8821e36d39, type: 3}
+  - {fileID: 21300000, guid: 37537f669a41c1a4bbc8f0e5634831d6, type: 3}
+  - {fileID: 21300000, guid: ba75f4b688d61bf46a3807a364ee72ae, type: 3}
+  - {fileID: 21300000, guid: fb06d99754f6aed489f0048a859a21a6, type: 3}
+  - {fileID: 21300000, guid: bd3f4dc7caff1924abfaa33c95dd260a, type: 3}
+  - {fileID: 21300000, guid: 76a6d838f3cc90f4c85398ff46ba3ad7, type: 3}
+  - {fileID: 21300000, guid: b64be578124875f43a4567dd19c8f02d, type: 3}
+  - {fileID: 21300000, guid: 4e9679ca8ca8e4747a59ed16f099c0a4, type: 3}
+  - {fileID: 21300000, guid: b65449bfb8c26ed4f946bf12f6896de5, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - ui_Default_bg
+  - bg_xc_xiazai
+  - bg_xc_xiao
+  - bg_xc_da
+  - bg_xc_zhong
+  - icon_xc_bf
+  - img_xc_sy
+  - icon_xc_dz2
+  - bg_xc_bt
+  - btn_xc_xiazai2
+  - icon_xc_xz
+  - bg_xc_tab
+  - uitps_Photo_tab1_NoSelect
+  - img_xc_02
+  - icon_xc_dz
+  - icon_xc_xc
+  - img_xc_01
+  - uitps_Photo_tab1_Select
+  m_RenderDataMap: {}
+  m_Tag: UIRaw_Atlas_Photos
+  m_IsVariant: 0

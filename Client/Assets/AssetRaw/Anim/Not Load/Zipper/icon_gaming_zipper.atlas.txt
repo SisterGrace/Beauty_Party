@@ -1,0 +1,13 @@
+icon_gaming_zipper.png
+size:512,128
+filter:Linear,Linear
+pma:true
+图层 574
+bounds:283,2,88,120
+rotate:90
+图层 574 拷贝
+bounds:2,6,41,279
+rotate:90
+图层 574 拷贝 2
+bounds:2,49,41,279
+rotate:90
