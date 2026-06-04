@@ -230,10 +230,10 @@ namespace TK_Engine.Editor
             BuildInternal(target, outputRoot: Application.dataPath + "/../Bundles",
                 packageVersion: GetBuildPackageVersion());
             AssetDatabase.Refresh();
-            Debug.Log("11111111111111");
+           
             BuildImp(BuildTargetGroup.Android, BuildTarget.Android,
                 Path.Combine(GetApkOutputDir(), GetApkFileName()));
-            Debug.Log("22222222222222222");
+        
         }
 
         [MenuItem("TK_Engine/Quick Build/一键打包IOS", false, 90)]
