@@ -13,29 +13,29 @@ MonoBehaviour:
   m_Name: CoreGameConfigData
   m_EditorClassIdentifier: 
   serverConfig:
-    BaseUrl: https://pee66.syntacticdrift.com
-    AsnUrl: https://syntacticdrift.com/create/writer
+    BaseUrl: 
+    AsnUrl: 
   analyticsConfig:
-    SSAppID_Android: 870108b9b77a46508d6f47f3850fcbb0
+    SSAppID_Android: 
     SSAppID_iOS: 
-    SSUrl: https://lexto.syntacticdrift.com
+    SSUrl: 
     AdjustToken_Android: 
     AdjustToken_iOS: 
     AdmobAppID_Android: 
     AdmobAppID_iOS: 
   toponLocalConfig:
-    appId: h69ff1b3dda79f
-    appKey: 67633c42a1f54d92bcde864a130787ba
-    interstitialPlacementId: n69ff1bcf89f04
-    rewardedPlacementId: n69ff1bee70ca8
-    bannerPlacementId: n69ff1c185235c
-    splashPlacementId: n69ff1c51e6544
+    appId: 
+    appKey: 
+    interstitialPlacementId: 
+    rewardedPlacementId: 
+    bannerPlacementId: 
+    splashPlacementId: 
   mtgLocalConfig:
-    appId: 474266
-    appKey: 5aecaacbde96820998642782c1cbf2aa
-    interstitialPlacementId: 3644170
-    interstitialUnitId: 6007677
-    rewardedPlacementId: 3644172
-    rewardedUnitId: 6007679
+    appId: 
+    appKey: 
+    interstitialPlacementId: 
+    interstitialUnitId: 
+    rewardedPlacementId: 
+    rewardedUnitId: 
   up2LocalConfig:
-    appId: 3035
+    appId: 
