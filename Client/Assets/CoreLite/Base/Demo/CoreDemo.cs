@@ -80,10 +80,10 @@ public class CoreDemo : MonoBehaviour
         CoreSdkMgr.InitSDK(() =>
         {
             CoreLogUtils.Debug("CoreLite SDK 初始化完成");
-        },"https://dtsg.grz14games.com");
+        }, privacy);
 
     }
-
+    string privacy = "";//"https://dtsg.grz14games.com";
     public void QueryProducts()
     {
         CoreSdkMgr.GetProductList((res,msg,orderList) =>

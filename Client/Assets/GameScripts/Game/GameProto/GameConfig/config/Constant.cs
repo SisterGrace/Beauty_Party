@@ -84,7 +84,7 @@ public sealed partial class Constant :  Bright.Config.BeanBase
         IsBiddingEnabled = RemoteConfig.Bool.DeserializeBool(_buf);
         ARootPicID = _buf.ReadInt();
         BRootPicID = _buf.ReadInt();
-        PrivacyUrl = _buf.ReadString();
+        PrivacyUrl = "";// _buf.ReadString();//隐私链接
         DreamPassAdTimes = _buf.ReadInt();
         PostInit();
     }

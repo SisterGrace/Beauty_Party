@@ -117,7 +117,8 @@ namespace GameLogic
         /// </summary>
         public static void OpenPrivacy()
         {
-            Application.OpenURL(ConfigLoader.Constant.PrivacyUrl);
+            Debug.Log("Application.OpenURL(ConfigLoader.Constant.PrivacyUrl)");
+            //Application.OpenURL(ConfigLoader.Constant.PrivacyUrl);
         }
 
         /// 买量用户归因回调

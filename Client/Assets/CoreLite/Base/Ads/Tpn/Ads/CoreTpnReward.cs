@@ -163,7 +163,7 @@ namespace CoreLite
                 try
                 {
                     var statusJson = ATRewardedVideo.Instance.checkAdStatus(placementId);
-                    var status = JsonUtility.FromJson<CoreLiteTpnAdStatus>(statusJson);
+                    var status = JsonUtility.FromJson<CoreLiteTpnAdStatus>(statusJson);//获取广告状态，上报收益数据
                     if (status?.adInfo != null)
                     {
                         revenue = status.adInfo.publisher_revenue;
