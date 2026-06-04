@@ -2,9 +2,9 @@
 using UnityEngine;
 
 [InitializeOnLoad]
-public class BlueSkyKeystore
+public class SkyKeystore
 {
-    static BlueSkyKeystore()
+    static SkyKeystore()
    {
         PlayerSettings.Android.keystorePass = "123456";
         PlayerSettings.Android.keyaliasName = "s";
