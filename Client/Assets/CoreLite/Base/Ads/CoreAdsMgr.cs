@@ -48,7 +48,8 @@ namespace CoreLite
         private void InitializeAdNetworks()
         {
 #if UNITY_ANDROID
-            _adNetworks.Add(CoreMtgMgr.Instance);
+            Debug.Log("CoreAdsMgr InitializeAdNetworks: Android platform"); 
+            //_adNetworks.Add(CoreMtgMgr.Instance);
 #endif            
             _adNetworks.Add(CoreTpnMgr.Instance);
         }
@@ -600,10 +601,12 @@ namespace CoreLite
             switch (adType)
             {
                 case CoreLiteAdsType.Rewarded:
-                    CoreMtgMgr.Instance.LoadAllBidRewardAds();
+                    Debug.Log("CoreMtgMgr.Instance.LoadAllBidRewardAds();");
+                    //CoreMtgMgr.Instance.LoadAllBidRewardAds();
                     break;
                 case CoreLiteAdsType.Interstitial:
-                    CoreMtgMgr.Instance.LoadAllBidInterstitialAds();
+                    Debug.Log("CoreMtgMgr.Instance.LoadAllBidInterstitialAds();");
+                    //CoreMtgMgr.Instance.LoadAllBidInterstitialAds();
                     break;
                 default:
                     break;
