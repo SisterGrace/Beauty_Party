@@ -46,8 +46,10 @@ namespace GameLogic
 		{
 			mClose.AddListener(ClickClose);
 			mSetLanguage.AddListener(ClickSetLanguage);
-			mPrivacy.AddListener(ClickPrivacy);
-			mContactUs.AddListener(ClickContactUs);
+			mPrivacy.enabled = false;
+            mPrivacy.AddListener(ClickPrivacy);
+			mContactUs.enabled = false;
+            mContactUs.AddListener(ClickContactUs);
 			mMask.AddListener(ClickClose);
 			mUseRedemption.AddListener(ClickUseRedemption);
 			mCopyUID.AddListener(ClickCopyUID);
