@@ -57,10 +57,10 @@ namespace Sky
                 return;
             }
 
-           /* SkyMaxInter.Instance.SetPlacementIds(interUnits ?? new List<string>());
+           *//* SkyMaxInter.Instance.SetPlacementIds(interUnits ?? new List<string>());
             SkyMaxReward.Instance.SetPlacementIds(rewardUnits ?? new List<string>());
             SkyMaxSplash.Instance.SetPlacementIds(splashUnits ?? new List<string>());
-            SkyMaxBanner.Instance.SetPlacementIds(bannerUnits ?? new List<string>());*/
+            SkyMaxBanner.Instance.SetPlacementIds(bannerUnits ?? new List<string>());*//*
 
 #if UNITY_ANDROID || UNITY_IOS
             AnyThinkAds.Api.ATSDKAPI.setLogDebug(SkyLogUtils.Enabled);

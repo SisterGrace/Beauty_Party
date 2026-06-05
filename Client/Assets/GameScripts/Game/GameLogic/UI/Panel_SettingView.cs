@@ -79,7 +79,7 @@ namespace GameLogic
 							  $"OS:%20{PlayGameExtensions.Encode(SystemInfo.operatingSystem)}%0A" +
 							  $"SDK:%20{PlayGameExtensions.Encode(SDKManager.GetSDKVersion())}%0A";
 			Application.OpenURL(string.Format("mailto:{0}?subject={1}&body={2}", ConfigLoader.Constant.Email, PlayGameExtensions.Encode(subInfo), bodyInfo)); */
-		    Application.OpenURL(ConfigLoader.Constant.DiscordUrl);
+		    Application.OpenURL(ConfigLoader.Constant.DiscordUrl);//反馈功能
 		}
 		private void ClickUseRedemption(GameObject obj)
 		{
