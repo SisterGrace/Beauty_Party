@@ -3,7 +3,12 @@ apply plugin: 'com.android.application'
 dependencies {
     implementation project(':unityLibrary')
     }
-
+configurations.all {
+    resolutionStrategy {
+        force 'androidx.work:work-runtime:2.8.1'
+        force 'androidx.work:work-runtime-ktx:2.8.1'
+    }
+}
 android {
     namespace "**NAMESPACE**"
     ndkPath "**NDKPATH**"
