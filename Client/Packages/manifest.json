@@ -2,6 +2,7 @@
   "dependencies": {
     "com.boxqkrtm.ide.cursor": "https://github.com/boxqkrtm/com.unity.ide.cursor.git",
     "com.code-philosophy.hybridclr": "https://gitee.com/focus-creative-games/hybridclr_unity.git",
+    "com.google.external-dependency-manager": "file:../GA/com.google.external-dependency-manager-1.2.187.tgz",
     "com.liyingsong.foldertag": "https://github.com/liyingsong99/FolderTag.git",
     "com.unity.2d.sprite": "1.0.0",
     "com.unity.collab-proxy": "2.10.0",
@@ -43,6 +44,24 @@
     "com.unity.modules.video": "1.0.0",
     "com.unity.modules.vr": "1.0.0",
     "com.unity.modules.wind": "1.0.0",
-    "com.unity.modules.xr": "1.0.0"
+    "com.unity.modules.xr": "1.0.0",
+    "com.gameanalytics.sdk": "7.10.6"
+  },
+
+  "scopedRegistries": [
+  {
+    "name": "Game Package Registry by Google",
+    "url": "https://unityregistry-pa.googleapis.com/",
+    "scopes": [
+      "com.google"
+    ]
+  },
+  {
+    "name": "package.openupm.com",
+    "url": "https://package.openupm.com",
+    "scopes": [
+      "com.gameanalytics"
+    ]
   }
+]
 }

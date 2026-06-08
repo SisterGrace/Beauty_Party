@@ -22,6 +22,21 @@
       "source": "embedded",
       "dependencies": {}
     },
+    "com.gameanalytics.sdk": {
+      "version": "7.10.6",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.google.external-dependency-manager": "1.2.168"
+      },
+      "url": "https://package.openupm.com"
+    },
+    "com.google.external-dependency-manager": {
+      "version": "file:../GA/com.google.external-dependency-manager-1.2.187.tgz",
+      "depth": 0,
+      "source": "local-tarball",
+      "dependencies": {}
+    },
     "com.liyingsong.foldertag": {
       "version": "https://github.com/liyingsong99/FolderTag.git",
       "depth": 0,
@@ -152,9 +167,9 @@
       "depth": 1,
       "source": "registry",
       "dependencies": {
-        "com.unity.modules.unitywebrequest": "1.0.0",
+        "com.unity.modules.androidjni": "1.0.0",
         "com.unity.nuget.newtonsoft-json": "3.2.1",
-        "com.unity.modules.androidjni": "1.0.0"
+        "com.unity.modules.unitywebrequest": "1.0.0"
       },
       "url": "https://packages.unity.cn"
     },
