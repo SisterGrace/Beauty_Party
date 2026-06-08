@@ -283,6 +283,80 @@ namespace TK_Engine.Editor
                 Debug.Log($"Build Failed" + summary.result);
             }
         }
+        #region 一键打包adb
+        [MenuItem("TK_Engine/Quick Build/一键打包Android AAB", false, 90)]
+        public static void AutomationBuildAndroidAAB()
+        {
+            BuildTarget target = EditorUserBuildSettings.activeBuildTarget;
+            BuildDLLCommand.BuildAndCopyDlls(target);
+            AssetDatabase.Refresh();
+            BuildInternal(target, outputRoot: Application.dataPath + "/../Bundles",
+                packageVersion: GetBuildPackageVersion());
+            AssetDatabase.Refresh();
+            Debug.Log("开始生成 AAB...");
+            BuildAAB(BuildTargetGroup.Android, BuildTarget.Android,
+                Path.Combine(GetAabOutputDir(), GetAabFileName()));
+            Debug.Log("AAB 生成完毕");
+        }
+
+        internal static string GetAabFileName()
+        {
+            string bundleId = PlayerSettings.applicationIdentifier;
+            string timestamp = DateTime.Now.ToString("MMddHHmm");
+            return $"{bundleId}_{timestamp}.aab";
+        }
+
+        internal static string GetAabOutputDir()
+        {
+            string dir = Path.GetFullPath(Path.Combine(Application.dataPath, "../../ToolBuild/output"));
+            if (!Directory.Exists(dir))
+                Directory.CreateDirectory(dir);
+            return dir;
+        }
+
+        private static void BuildAAB(BuildTargetGroup buildTargetGroup, BuildTarget buildTarget, string locationPathName)
+        {
+            // 必须切换到 Android 平台
+            if (!EditorUserBuildSettings.SwitchActiveBuildTarget(buildTargetGroup, buildTarget))
+            {
+                Debug.LogError("切换到 Android 平台失败！");
+                return;
+            }
+            AssetDatabase.Refresh();
+
+            // 设置构建 App Bundle
+            EditorUserBuildSettings.buildAppBundle = true;
+            Debug.Log("buildAppBundle = " + EditorUserBuildSettings.buildAppBundle);
+
+            // 检查场景
+            var scenes = EditorBuildSettings.scenes.Where(s => s.enabled).Select(s => s.path).ToArray();
+            Debug.Log("待构建场景数量: " + scenes.Length);
+            if (scenes.Length == 0)
+            {
+                Debug.LogError("没有启用的场景，无法打包！");
+                return;
+            }
+
+            BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions
+            {
+                scenes = scenes,
+                locationPathName = locationPathName,
+                targetGroup = buildTargetGroup,
+                target = buildTarget,
+                options = BuildOptions.None
+            };
+
+            var report = BuildPipeline.BuildPlayer(buildPlayerOptions);
+            if (report.summary.result == BuildResult.Succeeded)
+            {
+                Debug.Log($"AAB 构建成功！文件大小: {report.summary.totalSize / 1024 / 1024} MB，路径: {locationPathName}");
+            }
+            else
+            {
+                Debug.LogError($"AAB 构建失败！错误类型: {report.summary.result}");
+            }
+        }
+        #endregion
 
         #region Editor Menu Build
 
