@@ -1,4 +1,4 @@
-using UnityEngine;
+/*using UnityEngine;
 using UnityEditor;
 using System.IO;
 using Bright.Serialization;
@@ -26,4 +26,4 @@ public class TbConstantReader : EditorWindow
         Debug.Log($"RegisterUrl = {tb.RegisterUrl}");
         // 打印更多字段...
     }
-}
+}*/

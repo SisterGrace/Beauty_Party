@@ -1,63 +1,65 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static Reporter;
-
-
-
-public enum BlueSkyLogType
+namespace Sky
 {
-    GA = 1,
-    Umeng = 1 << 1,
-    Adjust = 1 << 2,
-    Reyun = 1 << 3,
-    Firebase = 1 << 4,
-    BlueSkySdk = 1 << 5,
 
-}
-public class SkyAnalyticsMgr 
-{
-    static public void init()
+    public enum BlueSkyLogType
     {
-        Sky.SkyGAMgr.Instance.Init();
+        GA = 1,
+        Umeng = 1 << 1,
+        Adjust = 1 << 2,
+        Reyun = 1 << 3,
+        Firebase = 1 << 4,
+        BlueSkySdk = 1 << 5,
+
     }
-    static BlueSkyLogType _logType = BlueSkyLogType.GA;
-    static public void DesignEvent(string sort, string type, string position, bool onlyFirst = false, string extra = "")
+    public class SkyAnalyticsMgr
     {
-        if (onlyFirst)
+        static public void init()
         {
-            if (CryptoPrefs.HasKey(GetString(sort, type, position, extra)))
+            Sky.SkyGAMgr.Instance.Init();
+        }
+        static BlueSkyLogType _logType = BlueSkyLogType.GA;
+        static public void DesignEvent(string sort, string type, string position, bool onlyFirst = false, string extra = "")
+        {
+            if (onlyFirst)
             {
-                LogTool.DebugLog(GetString(sort, type, position, extra) + "  not first ", LogTool.Color.lightblue);
-                return;
+                if (CryptoPrefs.HasKey(GetString(sort, type, position, extra)))
+                {
+                    LogTool.DebugLog(GetString(sort, type, position, extra) + "  not first ", LogTool.Color.lightblue);
+                    return;
+                }
+                else
+                {
+                    CryptoPrefs.SetInt(GetString(sort, type, position, extra), 1);
+                }
+            }
+            LogTool.DebugLog(" _logType = " + _logType + "  " + GetString(sort, type, position, extra), LogTool.Color.lightblue);
+            if ((_logType & BlueSkyLogType.GA) > 0)
+            {
+                string str = GetString(sort, type, position, extra);
+                if (!string.IsNullOrEmpty(str))
+                    Sky.SkyGAMgr.Instance.GAEvent(str);
+            }
+        }
+        static string GetString(string sort, string type, string position, string extra = "")
+        {
+            string str;
+            if (string.IsNullOrEmpty(extra))
+            {
+                str = string.Format("{0}:{1}:{2}", sort, type, position);
             }
             else
             {
-                CryptoPrefs.SetInt(GetString(sort, type, position, extra), 1);
+                str = string.Format("{0}:{1}:{2}:{3}", sort, type, position, extra);
             }
+            return str;
         }
-        LogTool.DebugLog(" _logType = " + _logType + "  " + GetString(sort, type, position, extra), LogTool.Color.lightblue);
-        if ((_logType & BlueSkyLogType.GA) > 0)
-        {
-            string str = GetString(sort, type, position, extra);
-            if (!string.IsNullOrEmpty(str))
-                Sky.SkyGAMgr.Instance.GAEvent(str);
-        }
-    }
-    static string GetString(string sort, string type, string position, string extra = "")
-    {
-        string str;
-        if (string.IsNullOrEmpty(extra))
-        {
-            str = string.Format("{0}:{1}:{2}", sort, type, position);
-        }
-        else
-        {
-            str = string.Format("{0}:{1}:{2}:{3}", sort, type, position, extra);
-        }
-        return str;
     }
 }
+
+
 
 
 
