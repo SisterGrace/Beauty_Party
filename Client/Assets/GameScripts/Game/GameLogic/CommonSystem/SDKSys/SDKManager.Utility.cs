@@ -117,8 +117,10 @@ namespace GameLogic
         /// </summary>
         public static void OpenPrivacy()
         {
-            Debug.Log("Application.OpenURL(ConfigLoader.Constant.PrivacyUrl)");
+            //Debug.Log("Application.OpenURL(ConfigLoader.Constant.PrivacyUrl)");
+            Debug.Log(ConfigLoader.Constant.PrivacyUrl);
             //Application.OpenURL(ConfigLoader.Constant.PrivacyUrl);
+            Application.OpenURL("https://rayse7en-png.github.io/privacy-policy-Glam-Tile-Beauty-Party/");
         }
 
         /// 买量用户归因回调

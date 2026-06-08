@@ -19,7 +19,13 @@ dependencies {
     implementation 'androidx.media3:media3-exoplayer-smoothstreaming:1.4.1'
     implementation 'androidx.media3:media3-exoplayer-workmanager:1.4.1'
 **DEPS**}
-
+// 强制统一 WorkManager 版本，解决与 media3-exoplayer-workmanager 的冲突
+configurations.all {
+    resolutionStrategy {
+        force 'androidx.work:work-runtime:2.8.1'
+        force 'androidx.work:work-runtime-ktx:2.8.1'
+    }
+}
 android {
     namespace "com.unity3d.player"
     ndkPath "**NDKPATH**"
