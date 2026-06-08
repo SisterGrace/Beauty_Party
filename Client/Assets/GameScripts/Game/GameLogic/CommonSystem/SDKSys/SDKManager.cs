@@ -4,6 +4,8 @@ using GameBase;
 using UnityEngine;
 using TK_Engine;
 using Config;
+using Sky;
+
 #if USE_UP2SDK
 using CoreLite;
 #endif
@@ -152,6 +154,7 @@ namespace GameLogic
             CoreSdkMgr.RegisterFirebaseActivateHandler(GetRemoteConfigCall);
             CoreSdkMgr.RegisterAsnUserHandler(SetUserASN);
 #endif
+            SkyAnalyticsMgr.init();
             GameModule.Timer.AddTimer(tiems =>
             {
                 initSdkCallback?.Invoke();
