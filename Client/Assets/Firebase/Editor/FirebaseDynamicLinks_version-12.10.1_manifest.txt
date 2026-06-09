@@ -61,11 +61,7 @@ Assets/Firebase/Plugins/x86_64/FirebaseCppApp-12_10_1.so
 Assets/Firebase/Plugins/x86_64/FirebaseCppDynamicLinks.bundle
 Assets/Firebase/Plugins/x86_64/FirebaseCppDynamicLinks.dll
 Assets/Firebase/Plugins/x86_64/FirebaseCppDynamicLinks.so
-Assets/Firebase/m2repository/com/google/firebase/firebase-app-unity/12.10.1/firebase-app-unity-12.10.1.pom
-Assets/Firebase/m2repository/com/google/firebase/firebase-app-unity/12.10.1/firebase-app-unity-12.10.1.srcaar
 Assets/Firebase/m2repository/com/google/firebase/firebase-app-unity/maven-metadata.xml
-Assets/Firebase/m2repository/com/google/firebase/firebase-dynamic-links-unity/12.10.1/firebase-dynamic-links-unity-12.10.1.pom
-Assets/Firebase/m2repository/com/google/firebase/firebase-dynamic-links-unity/12.10.1/firebase-dynamic-links-unity-12.10.1.srcaar
 Assets/Firebase/m2repository/com/google/firebase/firebase-dynamic-links-unity/maven-metadata.xml
 Assets/Plugins/iOS/Firebase/libFirebaseCppApp.a
 Assets/Plugins/iOS/Firebase/libFirebaseCppDynamicLinks.a
