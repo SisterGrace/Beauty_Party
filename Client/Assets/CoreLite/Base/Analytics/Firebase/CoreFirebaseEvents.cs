@@ -1,6 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-//using Firebase.Analytics;
+using Firebase.Analytics;
 using UnityEngine;
 
 namespace CoreLite
