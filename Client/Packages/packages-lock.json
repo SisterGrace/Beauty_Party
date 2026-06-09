@@ -37,13 +37,6 @@
       "source": "local-tarball",
       "dependencies": {}
     },
-    "com.liyingsong.foldertag": {
-      "version": "https://github.com/liyingsong99/FolderTag.git",
-      "depth": 0,
-      "source": "git",
-      "dependencies": {},
-      "hash": "1dcc7589a7788d15ce4cd890f6bea1f2ac0c6461"
-    },
     "com.tuyoogame.yooasset": {
       "version": "file:YooAsset",
       "depth": 0,
