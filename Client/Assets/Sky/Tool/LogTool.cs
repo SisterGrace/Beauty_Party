@@ -26,27 +26,35 @@ namespace Sky
             Debug.unityLogger.logEnabled = logFlg;
         }
 
-        public static void DebugLog(string log, Color color = Color.none, [CallerFilePath] string path = null, [CallerMemberName] string name = null)
+        public static void DebugLog(string log, Color color = Color.none, bool showPath = false, [CallerFilePath] string path = null, [CallerMemberName] string name = null)
         {
             if (logFlg == false)
             {
                 return;
             }
             string colorStr = m_colorS[(int)color];
-            string[] str = null;
-            if (path != null)
+            if(showPath==true)
             {
-                str = path.Split('/');
-            }
-            if (str != null)
-            {
-                Debug.Log(string.Format(colorStr, "[" + str[str.Length - 1] + "_" + name + "]:" + log));
+                string[] str = null;
+                if (path != null)
+                {
+                    str = path.Split('/');
+                }
+                if (str != null)
+                {
+                    Debug.Log(string.Format(colorStr, "[" + str[str.Length - 1] + "_" + name + "]:" + log));
+                }
+                else
+                {
+                    Debug.Log(string.Format(colorStr, "[" + path + "_" + name + "]:" + log));
+                }
+                str = null;
             }
             else
             {
-                Debug.Log(string.Format(colorStr, "[" + path + "_" + name + "]:" + log));
+                Debug.Log(string.Format(colorStr, log));
             }
-            str = null;
+            
         }
         public static void Error(string log, [CallerFilePath] string path = null, [CallerMemberName] string name = null)
         {
