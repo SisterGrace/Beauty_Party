@@ -23,13 +23,12 @@
       "dependencies": {}
     },
     "com.gameanalytics.sdk": {
-      "version": "7.10.6",
+      "version": "file:GameAnalytics",
       "depth": 0,
-      "source": "registry",
+      "source": "embedded",
       "dependencies": {
         "com.google.external-dependency-manager": "1.2.168"
-      },
-      "url": "https://package.openupm.com"
+      }
     },
     "com.google.external-dependency-manager": {
       "version": "file:../GA/com.google.external-dependency-manager-1.2.187.tgz",
