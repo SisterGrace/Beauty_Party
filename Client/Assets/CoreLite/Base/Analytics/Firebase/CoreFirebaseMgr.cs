@@ -7,7 +7,7 @@ using AdjustSdk;
 #if FIRBASE
 using Firebase;
 using Firebase.Extensions;
-//using Firebase.Messaging;
+using Firebase.Messaging;
 using Firebase.RemoteConfig;
 #endif
 using Newtonsoft.Json.Linq;
@@ -22,7 +22,7 @@ namespace CoreLite
         public void Init()
         {
             #if FIRBASE
-            //FirebaseMessaging.TokenReceived += OnTokenReceived;
+            FirebaseMessaging.TokenReceived += OnTokenReceived;
             FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task =>
             {
                 if (task.Result == DependencyStatus.Available)
@@ -36,7 +36,7 @@ namespace CoreLite
                             {
                                 _isInitialized = true;
                                 CoreAdsConfigParser.Parse(GetConfigStr("AdUnits"));
-                                //FirebaseMessaging.TokenReceived += OnTokenReceived;
+                                FirebaseMessaging.TokenReceived += OnTokenReceived;
                                 CoreAdjustEvents.UpdateEventToken();
                                 ApplyAdjustInitByRemoteConfig();
                                 CoreSdkMgr.OnFirebaseActivated?.Invoke();
@@ -85,10 +85,10 @@ namespace CoreLite
             return _isInitialized;
         }
 #if FIRBASE
-       /* private void OnTokenReceived(object sender, Firebase.Messaging.TokenReceivedEventArgs token)
+        private void OnTokenReceived(object sender, Firebase.Messaging.TokenReceivedEventArgs token)
         {
-            Adjust.SetPushToken(token?.Token);
-        }*/
+            Adjust.SetPushToken(token?.Token); 
+        }
 #endif
 
         private void GroupingSet()
