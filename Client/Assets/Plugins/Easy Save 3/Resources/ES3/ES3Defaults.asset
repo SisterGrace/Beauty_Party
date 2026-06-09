@@ -47,7 +47,6 @@ MonoBehaviour:
     - YooAsset
     - GameProto
     - IAPResolver
-    - com.liyingsong.foldertag.Editor
     - GameBase
     - AVProVideo.Runtime
     - spine-csharp
