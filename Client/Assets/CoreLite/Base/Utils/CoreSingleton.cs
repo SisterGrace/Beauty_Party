@@ -14,13 +14,25 @@ namespace CoreLite
             get
             {
                 if (null != _instance) return _instance;
-                _instance = FindObjectOfType(typeof(T)) as T;
-                if (null != _instance) return _instance;
-
+                _instance = FindObjectOfType<T>();
+                if (_instance != null)
+                {
+                    // 如果从场景中找到，也保证它不被销毁
+                    if (Application.isPlaying)
+                        DontDestroyOnLoad(_instance.gameObject);
+                    return _instance;
+                }
                 var container = new GameObject
                 {
                     name = typeof(T).ToString(),
-                    hideFlags = HideFlags.HideInHierarchy
+#if UNITY_EDITOR
+
+#else
+hideFlags = HideFlags.HideInHierarchy
+#endif
+
+
+
                 };
                 _instance = container.AddComponent(typeof(T)) as T;
                 if (Application.isPlaying)
