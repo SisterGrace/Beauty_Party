@@ -12,7 +12,7 @@ namespace Sky
     {
         public void Init()
         {
-            LogTool.DebugLog("GA init", LogTool.Color.green);
+            LogTool.DebugLog("GA init", LogTool.Color.yellow);
             if (UnityEngine.Object.FindObjectOfType(typeof(GameAnalytics)) == null)
             {
                 GameObject ga = new GameObject();
@@ -30,7 +30,7 @@ namespace Sky
             var gamekey = SkyConfigMgr.Instance.GetGA_gameKey();
             var secretkey = SkyConfigMgr.Instance.GetGA_secretKey();
             GA_Wrapper.Initialize(gamekey, secretkey);
-            LogTool.DebugLog("GA: init :GA_gameKey=" + gamekey + "GA_secretKey=" + secretkey + " Application.version=" + Application.version, LogTool.Color.green);
+            LogTool.DebugLog("GA_gameKey=" + gamekey + "GA_secretKey=" + secretkey + " Application.version=" + Application.version, LogTool.Color.yellow);
             _isInitialized = true;
         }
         static bool _isInitialized = false;
