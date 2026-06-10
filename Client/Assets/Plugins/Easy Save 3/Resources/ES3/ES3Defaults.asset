@@ -91,7 +91,6 @@ MonoBehaviour:
     - Coffee.UnmaskForUGUI
     - UniTask.Editor
     - Up2SDK.Editor
-    - FirebaseMessagingActivityGenerator
     - _AVProVideo.Extensions.VideoPlayer.Editor
     - UniTask.DOTween
     showAdvancedSettings: 0
