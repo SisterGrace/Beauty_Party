@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+#if FIRBASE
 using Firebase.Analytics;
+#endif
 using UnityEngine;
 
 namespace CoreLite
@@ -12,7 +14,7 @@ namespace CoreLite
         public static void TrackEvent(string eventName)
         {
             if (!CoreFirebaseMgr.Instance.TrackingEnable()) return;
-            #if FIRBASE
+#if FIRBASE
             FirebaseAnalytics.LogEvent(eventName);
 #endif
         }
@@ -20,7 +22,7 @@ namespace CoreLite
         public static void TrackEvent(string eventName, string key, object value)
         {
             if (!CoreFirebaseMgr.Instance.TrackingEnable()) return;
-            #if FIRBASE
+#if FIRBASE
             FirebaseAnalytics.LogEvent(eventName, key, value.ToString());
 #endif
         }
@@ -28,7 +30,7 @@ namespace CoreLite
         public static void TrackEvent(string eventName, Dictionary<string, object> dict)
         {
             if (!CoreFirebaseMgr.Instance.TrackingEnable()) return;
-            #if FIRBASE
+#if FIRBASE
             List<Parameter> parmlist = new List<Parameter>();
             foreach (var item in dict)
             {
@@ -45,7 +47,7 @@ namespace CoreLite
         {
             var source = CoreAdImpressionSource.GetSource("revenue_fir","ad_impression");
             if (!CoreFirebaseMgr.Instance.TrackingEnable()) return;
-            #if FIRBASE
+#if FIRBASE
             var impressionParameters = new List<Parameter>
             {
                 new Parameter("ad_platform", platform),
