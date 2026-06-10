@@ -48,49 +48,41 @@ namespace CoreLite
         // 服务器URL相关
         public string GetIapReport()
         {
-            return null;
             return gameConfig?.GetIAPReportUrl() ?? "";
         }
 
         public string GetLoginUrl()
         {
-            return null;
             return gameConfig?.GetLoginUrl() ?? "";
         }
         
         public string GetProductListUrl()
         {
-            return null;
             return gameConfig?.GetProductListUrl() ?? "";
         }
 
         public string GetGameConfigUrl()
         {
-            return null;
             return gameConfig?.GetGameConfigUrl() ?? "";
         }
         
         public string GetCreateOrderUrl()
         {
-            return null;
             return gameConfig?.GetCreateOrderUrl() ?? "";
         }
 
         public string GetReportOrderRewardUrl()
         {
-            return null;
             return gameConfig?.GetReportOrderRewardUrl() ?? "";
         }
         
         public string GetQueryOrderUrl()
         {
-            return null;
             return gameConfig?.GetQueryOrderUrl() ?? "";
         }
 
         public string GetQueryOrderListUrl()
         {
-            return null;
             return gameConfig?.GetQueryOrderListUrl() ?? "";
         }
     }
