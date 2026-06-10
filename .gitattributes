@@ -1,0 +1,2 @@
+Client/Assets/Firebase/**/*.so filter=lfs diff=lfs merge=lfs -text
+Client/Assets/Firebase/**/*.bundle filter=lfs diff=lfs merge=lfs -text
