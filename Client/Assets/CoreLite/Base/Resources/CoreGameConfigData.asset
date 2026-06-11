@@ -21,7 +21,7 @@ MonoBehaviour:
     SSUrl: 
     AdjustToken_Android: 
     AdjustToken_iOS: 
-    AdmobAppID_Android: 
+    AdmobAppID_Android: ca-app-pub-3940256099942544~3347511713
     AdmobAppID_iOS: 
   toponLocalConfig:
     appId: 

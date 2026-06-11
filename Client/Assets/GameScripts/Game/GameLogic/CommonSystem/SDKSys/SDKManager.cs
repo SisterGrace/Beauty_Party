@@ -155,6 +155,13 @@ namespace GameLogic
             CoreSdkMgr.RegisterAsnUserHandler(SetUserASN);
 #endif
             SkyAnalyticsMgr.init();
+            // 【新增】接入热力引擎（SolarEngine / 热云）Android SDK，海外数据区
+            // 文档：https://docs.solar-engine.com  AppKey 在 SkyConfigData.asset 的 reyun_ID 字段
+            // 注意：当前为最小验证版本，preInit 与 initialize 同步调用
+            // 后续若要严格遵循"用户同意隐私政策后再 initialize"，请把 Initialize 调用挪到隐私同意回调里
+            var seAppKey = SolarEngineBridge.GetAppKey();
+            SolarEngineBridge.PreInit(seAppKey);
+            SolarEngineBridge.Initialize(seAppKey, enableLog: true);
             GameModule.Timer.AddTimer(tiems =>
             {
                 initSdkCallback?.Invoke();

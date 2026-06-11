@@ -17,7 +17,7 @@ MonoBehaviour:
     fireBaseAppID_iOS: 
     GA_Game_key: 535a5cb4e17090c0dd693662ba562daa
     GA_Secret_key: 4e2e1c6ba65fcfdb9b2d240f8ddafc7e43dfecda
-    reyun_ID: 
+    reyun_ID: e97dbbdaee70a917
   maxLocalConfig:
     appId: 
     appKey: 
