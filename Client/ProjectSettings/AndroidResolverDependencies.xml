@@ -37,6 +37,7 @@
     <package>com.google.android.instantapps:instantapps:1.1.0</package>
     <package>com.google.android.material:material:1.2.1</package>
     <package>com.google.code.gson:gson:2.8.0</package>
+    <package>com.google.firebase:firebase-analytics:22.4.0</package>
     <package>com.google.firebase:firebase-analytics:23.0.0</package>
     <package>com.google.firebase:firebase-analytics-unity:13.6.0</package>
     <package>com.google.firebase:firebase-app-unity:13.6.0</package>
@@ -45,6 +46,7 @@
     <package>com.google.firebase:firebase-config-unity:13.6.0</package>
     <package>com.google.firebase:firebase-crashlytics-ndk:20.0.3</package>
     <package>com.google.firebase:firebase-crashlytics-unity:13.6.0</package>
+    <package>com.google.firebase:firebase-dynamic-links:22.1.0</package>
     <package>com.google.firebase:firebase-iid:21.1.0</package>
     <package>com.google.firebase:firebase-messaging:25.0.1</package>
     <package>com.google.firebase:firebase-messaging-unity:13.6.0</package>
@@ -54,6 +56,7 @@
     <package>com.mbridge.msdk.oversea:mbridge_android_sdk:17.0.61</package>
     <package>com.miui.referrer:homereferrer:1.0.0.6</package>
     <package>com.pangle.global:pag-sdk:7.8.5.9</package>
+    <package>com.reyun.solar.engine.oversea:solar-engine-core:1.3.1.4</package>
     <package>com.smartdigimkttech.sdk:smartdigimkttech-sdk:6.5.54</package>
     <package>com.squareup.okhttp3:okhttp:4.9.1</package>
     <package>com.thinkup.sdk:tramini-plugin-tpn:6.5.71</package>
