@@ -37,8 +37,10 @@ namespace CoreLite
                                 _isInitialized = true;
                                 CoreAdsConfigParser.Parse(GetConfigStr("AdUnits"));
                                 FirebaseMessaging.TokenReceived += OnTokenReceived;
+#if ADJUST
                                 CoreAdjustEvents.UpdateEventToken();
                                 ApplyAdjustInitByRemoteConfig();
+#endif
                                 CoreSdkMgr.OnFirebaseActivated?.Invoke();
                                 CoreAnalyticsMgr.TrackEvent("Parameter_Connect", FirebaseRemoteConfig.DefaultInstance.AllValues.ToDictionary(kvp => kvp.Key, kvp => (object)kvp.Value.StringValue.Replace("-", "_")));
                                 CoreLogUtils.Enabled = GetConfigStr("log_enable","0").Equals("1");
@@ -52,7 +54,7 @@ namespace CoreLite
                 }
             });
 #endif
-        }
+                            }
 
         public string GetConfigStr(string key, string defaultValue = "")
         {
@@ -100,7 +102,7 @@ namespace CoreLite
         }
 
         private const string ADJ_INIT_CONFIG_KEY = "adj_init";
-
+#if ADJUST
         /// <summary>
         /// 按在线参数 adj_init（JSON 字符串，含 adj_init、adj_event_token）决定 Adjust 初始化时机。
         /// 若上次启动已执行过 Init，则本次直接初始化；否则 adj_init=0 或 adj_event_token 为空时启动初始化，adj_init=1 且 token 配置时等事件上报再初始化。
@@ -142,7 +144,7 @@ namespace CoreLite
             }
             CoreAdjustMgr.Instance.Init();
         }
-
+#endif
     }
 }
 

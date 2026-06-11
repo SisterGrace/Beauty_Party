@@ -39,14 +39,18 @@ namespace CoreLite
         public static void TrackEvent(string eventName)
         {
             CoreFirebaseEvents.TrackEvent(eventName);
+#if ADJUST
             CoreAdjustEvents.TrackEvent(eventName);
+#endif
             CoreThinkingDataEvents.TrackEvent(eventName);
         }
 
         public static void TrackEvent(string eventName, string key, object value)
         {
             CoreFirebaseEvents.TrackEvent(eventName, key, value);
+#if ADJUST
             CoreAdjustEvents.TrackEvent(eventName);
+#endif
             CoreThinkingDataEvents.TrackEvent(eventName, key, value);
             
         }
@@ -68,11 +72,13 @@ namespace CoreLite
             }
 
             CoreFirebaseEvents.TrackEvent(eventName, dict);
+#if ADJUST
             CoreAdjustEvents.TrackEvent(eventName);
+#endif
             CoreThinkingDataEvents.TrackEvent(eventName, dict);
         }
 
-        #endregion
+#endregion
 
         #region  广告事件上报
         /// <param name="pos">广告展示点位，客户端根据实际位置上报</param>
@@ -82,7 +88,9 @@ namespace CoreLite
         {
             CoreLogUtils.Debug("TrackAdImpressionEvent"+" revenue:"+revenue+" network:"+network+" unit:"+unit+" placement:"+placement+" format:"+format+" platform:"+platform+" pos:"+pos+" format_number:"+formatNumber+" position_number:"+positionNumber);
             CoreFirebaseEvents.TrackAdImpressionEvent(revenue, network, unit, format, platform, pos, formatNumber, positionNumber);
+#if ADJUST
             CoreAdjustEvents.TrackAdImpressionEvent(revenue, network, unit, placement);
+#endif
             CoreThinkingDataEvents.TrackAdImpressionEvent(revenue, network, unit, format, platform, pos, formatNumber, positionNumber);
 #if USE_XMSDK
             CoreXmSdkMgr.Instance.TrackAdImpression(revenue, format, platform, unit, network, placement);
@@ -96,7 +104,7 @@ namespace CoreLite
 #endif
         }
 
-        #endregion
+#endregion
 
         #region  公共事件属性/用户属性
         public static void UserSet(Dictionary<string, object> dic,bool setOnce = false)

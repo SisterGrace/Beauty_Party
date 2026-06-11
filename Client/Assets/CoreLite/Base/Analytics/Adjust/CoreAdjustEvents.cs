@@ -1,7 +1,10 @@
+#if ADJUST
 using System;
 using System.Collections;
 using System.Collections.Generic;
+
 using AdjustSdk;
+
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -126,4 +129,4 @@ namespace CoreLite
         }
     }
 }
-
+#endif
