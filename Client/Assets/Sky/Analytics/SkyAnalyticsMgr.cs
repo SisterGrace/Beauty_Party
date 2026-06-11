@@ -40,7 +40,7 @@ namespace Sky
             {
                 string str = GetString(sort, type, position, extra);
                 if (!string.IsNullOrEmpty(str))
-                    Sky.SkyGAMgr.Instance.GAEvent(str);
+                    Sky.SkyGAEvents.TrackEvent(str);
             }
         }
         static string GetString(string sort, string type, string position, string extra = "")

@@ -1,4 +1,4 @@
-using CoreLite;
+
 using GameAnalyticsSDK;
 using GameAnalyticsSDK.Events;
 using GameAnalyticsSDK.Wrapper;
@@ -37,10 +37,6 @@ namespace Sky
         public bool TrackingEnable()
         {
             return _isInitialized;
-        }
-        public void GAEvent(string str)
-        {
-            GameAnalytics.NewDesignEvent(str);
         }
         void OnDestroy()
         {

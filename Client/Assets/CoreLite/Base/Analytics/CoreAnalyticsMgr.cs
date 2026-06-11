@@ -1,7 +1,8 @@
+using AdjustSdk;
+using CodiceApp.EventTracking.Plastic;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using AdjustSdk;
 using ThinkingData.Analytics;
 using UnityEngine;
 
@@ -41,6 +42,7 @@ namespace CoreLite
         public static void TrackEvent(string eventName)
         {
             CoreFirebaseEvents.TrackEvent(eventName);
+            Sky.SkyGAEvents.TrackEvent(eventName);
 #if ADJUST
             CoreAdjustEvents.TrackEvent(eventName);
 #endif
@@ -52,13 +54,14 @@ namespace CoreLite
         public static void TrackEvent(string eventName, string key, object value)
         {
             CoreFirebaseEvents.TrackEvent(eventName, key, value);
+            Sky.SkyGAEvents.TrackEvent(eventName, key, value);
 #if ADJUST
             CoreAdjustEvents.TrackEvent(eventName);
 #endif
 #if SSThinkingData
             CoreThinkingDataEvents.TrackEvent(eventName, key, value);
 #endif
-            
+
         }
 
         public static void TrackEvent(string eventName, Dictionary<string, object> dict)
@@ -76,7 +79,7 @@ namespace CoreLite
                     dict[key] = ""; 
                 }
             }
-
+            Sky.SkyGAEvents.TrackEvent(eventName, dict);
             CoreFirebaseEvents.TrackEvent(eventName, dict);
 #if ADJUST
             CoreAdjustEvents.TrackEvent(eventName);
@@ -96,6 +99,7 @@ namespace CoreLite
         {
             CoreLogUtils.Debug("TrackAdImpressionEvent"+" revenue:"+revenue+" network:"+network+" unit:"+unit+" placement:"+placement+" format:"+format+" platform:"+platform+" pos:"+pos+" format_number:"+formatNumber+" position_number:"+positionNumber);
             CoreFirebaseEvents.TrackAdImpressionEvent(revenue, network, unit, format, platform, pos, formatNumber, positionNumber);
+            Sky.SkyGAEvents.TrackAdImpressionEvent(revenue, network, unit, format, platform, pos, formatNumber, positionNumber);
 #if ADJUST
             CoreAdjustEvents.TrackAdImpressionEvent(revenue, network, unit, placement);
 #endif
