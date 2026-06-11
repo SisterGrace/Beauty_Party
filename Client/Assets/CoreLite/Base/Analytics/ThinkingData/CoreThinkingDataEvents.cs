@@ -1,3 +1,4 @@
+
 using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -8,6 +9,7 @@ namespace CoreLite
 {
     public static class CoreThinkingDataEvents
     {
+#if SSThinkingData
         public static void TrackEvent(string eventName)
         {
             if(CoreThinkingDataMgr.IsAppIdOrServerUrlEmpty()) return;
@@ -74,7 +76,7 @@ namespace CoreLite
                 properties["position_number"] = positionNumber;
             TrackEvent("ad_impression", properties);
         }
-
+#endif
         public static string FormatEventName(string eventName)
         {
             if (string.IsNullOrEmpty(eventName))

@@ -32,7 +32,7 @@ namespace CoreLite
 
         private static readonly List<PendingSplashEvent> _pendingSplashEvents = new List<PendingSplashEvent>();
         private bool _coldSplashEventsPending;
-        private const float FLUSH_EXTRA_DELAY = 0.5f;
+        private const float FLUSH_EXTRA_DELAY = 1f;
         private const float FLUSH_MAX_WAIT = 10f;
 
         /// <summary>
@@ -59,12 +59,15 @@ namespace CoreLite
 
         private IEnumerator FlushColdStartSplashEvents()
         {
+
             float waited = 0f;
+            #if SSThinkingData
             while (!CoreThinkingDataMgr.Instance.IsReady && waited < FLUSH_MAX_WAIT)
             {
                 yield return new WaitForSeconds(0.5f);
                 waited += 0.5f;
             }
+#endif
             yield return new WaitForSeconds(FLUSH_EXTRA_DELAY);
 
             _coldSplashEventsPending = false;
@@ -79,7 +82,7 @@ namespace CoreLite
             _pendingSplashEvents.Clear();
         }
 
-        #endregion
+#endregion
 
         public void SetSplash()
         {

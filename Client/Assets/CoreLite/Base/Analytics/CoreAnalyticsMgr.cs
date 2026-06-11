@@ -12,7 +12,9 @@ namespace CoreLite
         public static void Init()
         {
             CoreFirebaseMgr.Instance.Init();
+            #if SSThinkingData
             CoreThinkingDataMgr.Instance.Init();
+#endif
 #if USE_XMSDK
             CoreXmSdkMgr.Instance.OnAnalyticsReady();
 #endif
@@ -42,7 +44,9 @@ namespace CoreLite
 #if ADJUST
             CoreAdjustEvents.TrackEvent(eventName);
 #endif
+#if SSThinkingData
             CoreThinkingDataEvents.TrackEvent(eventName);
+#endif
         }
 
         public static void TrackEvent(string eventName, string key, object value)
@@ -51,7 +55,9 @@ namespace CoreLite
 #if ADJUST
             CoreAdjustEvents.TrackEvent(eventName);
 #endif
+#if SSThinkingData
             CoreThinkingDataEvents.TrackEvent(eventName, key, value);
+#endif
             
         }
 
@@ -75,7 +81,9 @@ namespace CoreLite
 #if ADJUST
             CoreAdjustEvents.TrackEvent(eventName);
 #endif
+#if SSThinkingData
             CoreThinkingDataEvents.TrackEvent(eventName, dict);
+#endif
         }
 
 #endregion
@@ -91,7 +99,9 @@ namespace CoreLite
 #if ADJUST
             CoreAdjustEvents.TrackAdImpressionEvent(revenue, network, unit, placement);
 #endif
+#if SSThinkingData
             CoreThinkingDataEvents.TrackAdImpressionEvent(revenue, network, unit, format, platform, pos, formatNumber, positionNumber);
+#endif
 #if USE_XMSDK
             CoreXmSdkMgr.Instance.TrackAdImpression(revenue, format, platform, unit, network, placement);
 #endif
@@ -109,26 +119,34 @@ namespace CoreLite
         #region  公共事件属性/用户属性
         public static void UserSet(Dictionary<string, object> dic,bool setOnce = false)
         {
+            #if SSThinkingData
             CoreThinkingDataMgr.Instance.UserSet(dic, setOnce);
+#endif
         }
 
         public static void SetSuperProperties(Dictionary<string, object> superProperties)
         {
+            #if SSThinkingData
             CoreThinkingDataMgr.Instance.SetSuperProperties(superProperties);
+#endif
         }
-        #endregion
+#endregion
 
         #region  登录/登出
         public static void SetLoginAccount(string account)
         {
+#if SSThinkingData
             CoreThinkingDataMgr.Instance.SetLoginAccount(account);
+#endif
         }
 
         public static void Logout()
         {
+#if SSThinkingData
             CoreThinkingDataMgr.Instance.Logout();
+#endif
         }
-        #endregion
+#endregion
 
     }
 }

@@ -39,7 +39,9 @@ namespace CoreLite
                 _lastLoginTime = Time.time;
                 string deviceId = await CorePrefs.GetOrCreateDeviceId();
                 CoreAdjustPrefs.DeviceId = deviceId;
+                #if SSThinkingData
                 CoreThinkingDataMgr.Instance.SetSuperProperties(new Dictionary<string, object> { { "device_num", deviceId } });
+#endif
                 var loginRequest = CreateLoginRequest(deviceId);
                 CoreAnalyticsMgr.TrackEvent("User_Start_Login");
                 CoreLogUtils.Debug("deviceid:"+CoreAdjustPrefs.DeviceId);
