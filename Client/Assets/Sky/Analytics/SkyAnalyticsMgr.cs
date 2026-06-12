@@ -19,8 +19,10 @@ namespace Sky
         static public void init()
         {
             Sky.SkyGAMgr.Instance.Init();
+            // 【新增】SolarEngine（热云）最小接入：与 GA 并列初始化
+            Sky.SkySolarEngineMgr.Instance.Init();
         }
-        static BlueSkyLogType _logType = BlueSkyLogType.GA;
+        static BlueSkyLogType _logType = BlueSkyLogType.GA | BlueSkyLogType.Reyun;
         static public void DesignEvent(string sort, string type, string position, bool onlyFirst = false, string extra = "")
         {
             if (onlyFirst)
@@ -41,6 +43,13 @@ namespace Sky
                 string str = GetString(sort, type, position, extra);
                 if (!string.IsNullOrEmpty(str))
                     Sky.SkyGAMgr.Instance.GAEvent(str);
+            }
+            // 【新增】SolarEngine 事件分发占位，当前 Mgr 内为空实现
+            if ((_logType & BlueSkyLogType.Reyun) > 0)
+            {
+                string str = GetString(sort, type, position, extra);
+                if (!string.IsNullOrEmpty(str))
+                    SkySolarEngineEvents.TrackEvent(str);
             }
         }
         static string GetString(string sort, string type, string position, string extra = "")

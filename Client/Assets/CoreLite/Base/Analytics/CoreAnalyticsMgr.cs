@@ -48,7 +48,7 @@ namespace CoreLite
             CoreFirebaseEvents.TrackEvent(eventName, key, value);
             CoreAdjustEvents.TrackEvent(eventName);
             CoreThinkingDataEvents.TrackEvent(eventName, key, value);
-            
+
         }
 
         public static void TrackEvent(string eventName, Dictionary<string, object> dict)
@@ -57,13 +57,13 @@ namespace CoreLite
             {
                 dict = new Dictionary<string, object>();
             }
-            
+
             var keys = dict.Keys.ToList();
             foreach (var key in keys)
             {
                 if (dict[key] == null)
                 {
-                    dict[key] = ""; 
+                    dict[key] = "";
                 }
             }
 
