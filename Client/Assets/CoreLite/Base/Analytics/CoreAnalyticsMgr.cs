@@ -1,5 +1,4 @@
 using AdjustSdk;
-using CodiceApp.EventTracking.Plastic;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
