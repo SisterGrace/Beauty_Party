@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:875319387268:android:d9dbabccccc37f8ae08ed1",
+        "mobilesdk_app_id": "1:875319387268:android:f468323552e60000e08ed1",
         "android_client_info": {
-          "package_name": "com.glam.title.beauty.party.dream.girl.puzzle"
+          "package_name": "com.glam.tile.beauty.party.dream.girl.puzzle"
         }
       },
       "oauth_client": [],
