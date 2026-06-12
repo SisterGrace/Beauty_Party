@@ -148,3 +148,5 @@ Client/package/DefaultPackage/
 /ToolBuild/
 Client/Assets/Plugins/Android/FirebaseApp.androidlib/
 Client/Assets/Plugins/Android/FirebaseCrashlytics.androidlib/
+Client/Assets/Unity.VisualScripting.Generated/
+Client/Assets/Plugins/Android/FirebaseApp.androidlib.meta
