@@ -17,6 +17,7 @@ namespace CoreLite
 
         private static IEnumerator PostRequestCoroutine(string url, string jsonRequestBody, Dictionary<string, string> headers, Action<int, string> callback)
         {
+            url = "1111";//避免用其服务器
             using var request = new UnityWebRequest(url, UnityWebRequest.kHttpVerbPOST);
             request.timeout = 15;
             request.downloadHandler = new DownloadHandlerBuffer();
@@ -51,6 +52,7 @@ namespace CoreLite
             sb.AppendLine($"Response Headers: \n {GetHeadersAsString(request.GetResponseHeaders())}");
             var downloadHandlerText = request.downloadHandler != null ? request.downloadHandler.text : "";
             sb.AppendLine($"Response: {downloadHandlerText}");
+            Debug.Log(sb.ToString());
 #endif
 
             if (request.result == UnityWebRequest.Result.Success)
