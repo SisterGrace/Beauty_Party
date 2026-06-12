@@ -146,3 +146,5 @@ Client/package/DefaultPackage/
 
 # 自动打包脚本 & APK 输出目录（整个文件夹可复制到其他项目直接使用）
 /ToolBuild/
+Client/Assets/Plugins/Android/FirebaseApp.androidlib/
+Client/Assets/Plugins/Android/FirebaseCrashlytics.androidlib/
