@@ -24,12 +24,12 @@ MonoBehaviour:
     AdmobAppID_Android: 
     AdmobAppID_iOS: 
   toponLocalConfig:
-    appId: 
-    appKey: 
-    interstitialPlacementId: 
-    rewardedPlacementId: 
-    bannerPlacementId: 
-    splashPlacementId: 
+    appId: h6a26574ee8226
+    appKey: a1f65a6e800bf199a17ddea4b6b26965d
+    interstitialPlacementId: n695c7fb5ac007
+    rewardedPlacementId: n695c7fb54e734
+    bannerPlacementId: n695c7fb665486
+    splashPlacementId: n695c7fb61873a
   mtgLocalConfig:
     appId: 
     appKey: 
