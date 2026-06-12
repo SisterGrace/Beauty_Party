@@ -86,7 +86,7 @@ namespace CoreLite
             }
         }
 
-        public static Thread RunAsync(Action a)
+       /* public static Thread RunAsync(Action a)
         {
             Initialize();
             while (numThreads >= maxThreads)
@@ -96,7 +96,7 @@ namespace CoreLite
             Interlocked.Increment(ref numThreads);
             ThreadPool.QueueUserWorkItem(RunAction, a);
             return null;
-        }
+        }*/
 
         private static void RunAction(object action)
         {
