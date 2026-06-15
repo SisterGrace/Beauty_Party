@@ -84,7 +84,7 @@ namespace CoreLite
             CoreIapNativeMgr.Instance.PreInitialize();
             CoreIapH5Mgr.Instance.Init();
             CoreIapNativeMgr.Instance.Initialize();
-#if UNITY_ANDROID
+#if UNITY_ANDROID||UNITY_EDITOR
             CoreAnalyticsMgr.Init();
             CoreAdsMgr.Instance.Init(_splashCloseCallback);
 #else
