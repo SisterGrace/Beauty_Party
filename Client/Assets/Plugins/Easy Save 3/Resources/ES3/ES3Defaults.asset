@@ -85,7 +85,6 @@ MonoBehaviour:
     - SkyEditor
     - AdjustSdk.Editor
     - HybridCLR.Runtime
-    - Analytics
     - AVProVideo.Extensions.VisualEffectGraph
     - Up2SDK
     - UniTask.Addressables
