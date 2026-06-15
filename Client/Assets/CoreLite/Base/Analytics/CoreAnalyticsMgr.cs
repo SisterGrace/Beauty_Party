@@ -42,18 +42,21 @@ namespace CoreLite
         {
             CoreFirebaseEvents.TrackEvent(eventName);
             Sky.SkyGAEvents.TrackEvent(eventName);
+            Sky.SkySolarEngineEvents.TrackEvent(eventName);
 #if ADJUST
             CoreAdjustEvents.TrackEvent(eventName);
 #endif
 #if SSThinkingData
             CoreThinkingDataEvents.TrackEvent(eventName);
 #endif
+            Sky.SkySolarEngineEvents.TrackEvent(eventName);
         }
 
         public static void TrackEvent(string eventName, string key, object value)
         {
             CoreFirebaseEvents.TrackEvent(eventName, key, value);
             Sky.SkyGAEvents.TrackEvent(eventName, key, value);
+            Sky.SkySolarEngineEvents.TrackEvent(eventName, key, value);
 #if ADJUST
             CoreAdjustEvents.TrackEvent(eventName);
 #endif
@@ -78,6 +81,7 @@ namespace CoreLite
                 }
             }
             Sky.SkyGAEvents.TrackEvent(eventName, dict);
+            Sky.SkySolarEngineEvents.TrackEvent(eventName, dict);
             CoreFirebaseEvents.TrackEvent(eventName, dict);
 #if ADJUST
             CoreAdjustEvents.TrackEvent(eventName);
