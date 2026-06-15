@@ -59,7 +59,10 @@ namespace CoreLite
 #endif
 #if SSThinkingData
             CoreThinkingDataEvents.TrackEvent(eventName, key, value);
+<<<<<<< HEAD
 #endif
+=======
+>>>>>>> af271a787f5f9a64adb42d6b6f859dfcc1bb4001
 
         }
 
@@ -69,13 +72,13 @@ namespace CoreLite
             {
                 dict = new Dictionary<string, object>();
             }
-            
+
             var keys = dict.Keys.ToList();
             foreach (var key in keys)
             {
                 if (dict[key] == null)
                 {
-                    dict[key] = ""; 
+                    dict[key] = "";
                 }
             }
             Sky.SkyGAEvents.TrackEvent(eventName, dict);
