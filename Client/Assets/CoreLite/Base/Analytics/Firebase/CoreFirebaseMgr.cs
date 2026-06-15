@@ -58,9 +58,14 @@ namespace CoreLite
 
         public string GetConfigStr(string key, string defaultValue = "")
         {
-            if(!_isInitialized) return defaultValue;
+            if (!_isInitialized)
+            {
+                Sky.LogTool.DebugLog("未初始化"+ key +" :"+ defaultValue,Sky.LogTool.Color.red);
+                return defaultValue;
+            }
             var value = GetRemoteValue(key);
-            if(string.IsNullOrEmpty(value)) return defaultValue;
+            Sky.LogTool.DebugLog("GetRemotekey:"+key+" GetRemoteValue:" + value,Sky.LogTool.Color.lightblue);
+            if (string.IsNullOrEmpty(value)) return defaultValue;
             return value;
         }
             
