@@ -79,6 +79,7 @@ MonoBehaviour:
     - Coffee.UIParticle.Editor
     - Purchasing.Common
     - UniTask.TextMeshPro
+    - SkyFirebaseEditor
     - _AVProVideo.Extensions.VideoPlayer
     - StompyRobot.SRF.Editor
     - ParticleImage.Editor
