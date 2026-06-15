@@ -19,8 +19,6 @@ dependencyResolutionManagement {
 // Android Resolver Repos Start
         def unityProjectPath = $/file:///**DIR_UNITYPROJECT**/$.replace("\\", "/")
         maven {
-<<<<<<< HEAD
-=======
             url "https://maven-android.solar-engine.com/repository/se_sdk_for_android/" // Assets/Plugins/SolarEngine/Editor/SolarEngineDependencies.xml:18
         }
         maven {
@@ -30,7 +28,6 @@ dependencyResolutionManagement {
             url "https://developer.hihonor.com/repo/" // Assets/Plugins/SolarEngine/Editor/SolarEngineDependencies.xml:18
         }
         maven {
->>>>>>> af271a787f5f9a64adb42d6b6f859dfcc1bb4001
             url "https://jfrog.anythinktech.com/artifactory/overseas_sdk" // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/Editor/Dependencies.xml:5
         }
         maven {

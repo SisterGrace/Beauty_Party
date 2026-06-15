@@ -27,10 +27,6 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.1.0' // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/gtm/Editor/Dependencies.xml:8
     implementation 'com.adjust.sdk:adjust-android:5.4.6' // Assets/Adjust/Native/Editor/Dependencies.xml:5
     implementation 'com.android.installreferrer:installreferrer:2.2' // Assets/Script/SDKManager/Up2SDK/Editor/Dependencies.xml:7
-<<<<<<< HEAD
-=======
-    implementation 'com.anythink.sdk:adapter-tpn-admob:24.9.0.1.0' // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/admob/Editor/Dependencies.xml:3
->>>>>>> af271a787f5f9a64adb42d6b6f859dfcc1bb4001
     implementation 'com.anythink.sdk:adapter-tpn-applovin:13.5.1.1.0' // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/applovin/Editor/Dependencies.xml:3
     implementation 'com.anythink.sdk:adapter-tpn-bidmachine:3.5.1.1.1' // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/bidmachine/Editor/Dependencies.xml:6
     implementation 'com.anythink.sdk:adapter-tpn-bigo:5.7.0.1.0' // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/bigo/Editor/Dependencies.xml:3
@@ -48,10 +44,6 @@ dependencies {
     implementation 'com.applovin:applovin-sdk:13.5.1' // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/applovin/Editor/Dependencies.xml:4
     implementation 'com.bigossp:bigo-ads:5.7.0' // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/bigo/Editor/Dependencies.xml:4
     implementation 'com.fyber:marketplace-sdk:8.4.2' // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/fyber/Editor/Dependencies.xml:4
-<<<<<<< HEAD
-=======
-    implementation 'com.google.android.gms:play-services-ads:24.9.0' // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/admob/Editor/Dependencies.xml:4
->>>>>>> af271a787f5f9a64adb42d6b6f859dfcc1bb4001
     // implementation 'com.google.android.gms:play-services-ads-identifier:18.0.1' // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/vungle/Editor/Dependencies.xml:6
     implementation 'com.google.android.gms:play-services-ads-identifier:18.2.0' // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/pangle/Editor/Dependencies.xml:8
     // implementation 'com.google.android.gms:play-services-appset:16.0.2' // Packages/com.gameanalytics.sdk/Editor/Android/Dependencies.xml:4
@@ -81,10 +73,7 @@ dependencies {
     implementation 'com.mbridge.msdk.oversea:mbridge_android_sdk:17.0.61' // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/gtm/Editor/Dependencies.xml:7
     implementation 'com.miui.referrer:homereferrer:1.0.0.6' // Assets/Script/SDKManager/Up2SDK/Editor/Dependencies.xml:8
     implementation 'com.pangle.global:pag-sdk:7.8.5.9' // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/pangle/Editor/Dependencies.xml:7
-<<<<<<< HEAD
-=======
     implementation 'com.reyun.solar.engine.oversea:solar-engine-core:1.3.1.4' // Assets/Plugins/SolarEngine/Editor/SolarEngineDependencies.xml:20
->>>>>>> af271a787f5f9a64adb42d6b6f859dfcc1bb4001
     implementation 'com.smartdigimkttech.sdk:smartdigimkttech-sdk:6.5.54' // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/secmtp_base/sdm/Editor/Dependencies.xml:4
     implementation 'com.squareup.okhttp3:okhttp:4.9.1' // Assets/Script/SDKManager/Up2SDK/Editor/Dependencies.xml:5
     implementation 'com.thinkup.sdk:tramini-plugin-tpn:6.5.71' // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/Editor/Dependencies.xml:9
@@ -120,17 +109,6 @@ configurations.all {
         force 'androidx.work:work-runtime-ktx:2.8.1'
     }
 }
-// Android Resolver Exclusions Start
-android {
-  packagingOptions {
-      exclude ('/lib/armeabi/*' + '*')
-      exclude ('/lib/mips/*' + '*')
-      exclude ('/lib/mips64/*' + '*')
-      exclude ('/lib/x86/*' + '*')
-      exclude ('/lib/x86_64/*' + '*')
-  }
-}
-// Android Resolver Exclusions End
 android {
     namespace "com.unity3d.player"
     ndkPath "**NDKPATH**"
