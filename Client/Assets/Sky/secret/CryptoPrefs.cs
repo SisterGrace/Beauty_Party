@@ -4,117 +4,163 @@ using System.Security.Cryptography;
 using System.Text;
 using UnityEngine;
 
-
 public class CryptoPrefs
 {
-    private static string sKEY = "ZTdkvTNmaBE2NTM3nWM0NDFhNRdzNzU1";
-    private static string sIV = "4rZtmENfa/PpeJ86qU3gyA==";
+    // 128-bit key (16 bytes) - 取自原密钥前16字符
+    private static readonly string sKEY = "ZTdkvTNmaBE2NTM3";
+    // 128-bit IV (16 bytes) - Base64编码
+    private static readonly string sIV = "4rZtmENfa/PpeJ86qU3gyA==";
+
+    private const int TrueValue = 1;
+    private const int FalseValue = 0;
+
+    // ---------- Bool ----------
+    public static void SetBool(string key, bool value)
+    {
+        SetInt(key, value ? TrueValue : FalseValue);
+    }
+
+    public static bool GetBool(string key, bool defaultValue = false)
+    {
+        int value = GetInt(key, defaultValue ? TrueValue : FalseValue);
+        return value == TrueValue;
+    }
+
+    // ---------- Int ----------
     public static void SetInt(string key, int val)
     {
-        PlayerPrefs.SetString(CryptoPrefs.GetHash(key), CryptoPrefs.Encrypt(val.ToString()));
+        PlayerPrefs.SetString(GetHash(key), Encrypt(val.ToString()));
     }
+
     public static int GetInt(string key, int defaultValue = 0)
     {
-        string @string = CryptoPrefs.GetString(key, defaultValue.ToString());
-        int result = defaultValue;
-        int.TryParse(@string, out result);
-        return result;
+        string str = GetString(key, defaultValue.ToString());
+        return int.TryParse(str, out int result) ? result : defaultValue;
     }
+
+    // ---------- Float ----------
     public static void SetFloat(string key, float val)
     {
-        PlayerPrefs.SetString(CryptoPrefs.GetHash(key), CryptoPrefs.Encrypt(val.ToString()));
+        PlayerPrefs.SetString(GetHash(key), Encrypt(val.ToString()));
     }
+
     public static float GetFloat(string key, float defaultValue = 0f)
     {
-        string @string = CryptoPrefs.GetString(key, defaultValue.ToString());
-        float result = defaultValue;
-        float.TryParse(@string, out result);
-        return result;
+        string str = GetString(key, defaultValue.ToString());
+        return float.TryParse(str, out float result) ? result : defaultValue;
     }
+
+    // ---------- String ----------
     public static void SetString(string key, string val)
     {
-        PlayerPrefs.SetString(CryptoPrefs.GetHash(key), CryptoPrefs.Encrypt(val));
+        if (val == null) val = "";
+        PlayerPrefs.SetString(GetHash(key), Encrypt(val));
     }
+
     public static string GetString(string key, string defaultValue = "")
     {
-        string text = defaultValue;
-        string @string = PlayerPrefs.GetString(CryptoPrefs.GetHash(key), defaultValue.ToString());
-        if (!text.Equals(@string))
-        {
-            text = CryptoPrefs.Decrypt(@string);
-        }
-        return text;
+        string hashKey = GetHash(key);
+        if (!PlayerPrefs.HasKey(hashKey))
+            return defaultValue;
+
+        string encrypted = PlayerPrefs.GetString(hashKey);
+        return Decrypt(encrypted);
     }
+
+    // ---------- Management ----------
     public static bool HasKey(string key)
     {
-        string hash = CryptoPrefs.GetHash(key);
-        return PlayerPrefs.HasKey(hash);
+        return PlayerPrefs.HasKey(GetHash(key));
     }
+
     public static void DeleteKey(string key)
     {
-        string hash = CryptoPrefs.GetHash(key);
-        PlayerPrefs.DeleteKey(hash);
+        PlayerPrefs.DeleteKey(GetHash(key));
     }
+
     public static void DeleteAll()
     {
         PlayerPrefs.DeleteAll();
     }
+
     public static void Save()
     {
         PlayerPrefs.Save();
     }
-    private static string Decrypt(string encString)
-    {
-        RijndaelManaged rijndaelManaged = new RijndaelManaged
-        {
-            Padding = PaddingMode.Zeros,
-            Mode = CipherMode.CBC,
-            KeySize = 128,
-            BlockSize = 128
-        };
-        byte[] bytes = Encoding.UTF8.GetBytes(CryptoPrefs.sKEY);
-        byte[] rgbIV = Convert.FromBase64String(CryptoPrefs.sIV);
-        ICryptoTransform transform = rijndaelManaged.CreateDecryptor(bytes, rgbIV);
-        byte[] array = Convert.FromBase64String(encString);
-        byte[] array2 = new byte[array.Length];
-        MemoryStream stream = new MemoryStream(array);
-        CryptoStream cryptoStream = new CryptoStream(stream, transform, CryptoStreamMode.Read);
-        cryptoStream.Read(array2, 0, array2.Length);
-        //Debug.Log("Encoding.UTF8.GetString(array2).TrimEnd(new char[1] " + Encoding.UTF8.GetString(array2).TrimEnd(new char[1]));
-        return Encoding.UTF8.GetString(array2).TrimEnd(new char[1]);
-    }
+
+    // ---------- Cryptography ----------
     private static string Encrypt(string rawString)
     {
-        RijndaelManaged rijndaelManaged = new RijndaelManaged
+        if (string.IsNullOrEmpty(rawString))
+            return "";
+
+        byte[] keyBytes = Encoding.UTF8.GetBytes(sKEY);
+        byte[] ivBytes = Convert.FromBase64String(sIV);
+
+        using (var aes = new RijndaelManaged())
         {
-            Padding = PaddingMode.Zeros,
-            Mode = CipherMode.CBC,
-            KeySize = 128,
-            BlockSize = 128
-        };
-        byte[] bytes = Encoding.UTF8.GetBytes(CryptoPrefs.sKEY);
-        byte[] rgbIV = Convert.FromBase64String(CryptoPrefs.sIV);
-        ICryptoTransform transform = rijndaelManaged.CreateEncryptor(bytes, rgbIV);
-        MemoryStream memoryStream = new MemoryStream();
-        CryptoStream cryptoStream = new CryptoStream(memoryStream, transform, CryptoStreamMode.Write);
-        byte[] bytes2 = Encoding.UTF8.GetBytes(rawString);
-        cryptoStream.Write(bytes2, 0, bytes2.Length);
-        cryptoStream.FlushFinalBlock();
-        byte[] inArray = memoryStream.ToArray();
-        return Convert.ToBase64String(inArray);
-    }
-    private static string GetHash(string key)
-    {
-        MD5 mD = new MD5CryptoServiceProvider();
-        byte[] array = mD.ComputeHash(Encoding.UTF8.GetBytes(key));
-        StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < array.Length; i++)
-        {
-            stringBuilder.Append(array[i].ToString("x2"));
+            aes.KeySize = 128;          // 128位密钥
+            aes.BlockSize = 128;
+            aes.Mode = CipherMode.CBC;
+            aes.Padding = PaddingMode.Zeros;
+            aes.Key = keyBytes;
+            aes.IV = ivBytes;
+
+            using (var encryptor = aes.CreateEncryptor())
+            using (var ms = new MemoryStream())
+            using (var cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Write))
+            {
+                byte[] plain = Encoding.UTF8.GetBytes(rawString);
+                cs.Write(plain, 0, plain.Length);
+                cs.FlushFinalBlock();
+                return Convert.ToBase64String(ms.ToArray());
+            }
         }
-        return stringBuilder.ToString();
     }
 
+    private static string Decrypt(string encString)
+    {
+        if (string.IsNullOrEmpty(encString))
+            return "";
+
+        byte[] keyBytes = Encoding.UTF8.GetBytes(sKEY);
+        byte[] ivBytes = Convert.FromBase64String(sIV);
+        byte[] cipher = Convert.FromBase64String(encString);
+
+        using (var aes = new RijndaelManaged())
+        {
+            aes.KeySize = 128;
+            aes.BlockSize = 128;
+            aes.Mode = CipherMode.CBC;
+            aes.Padding = PaddingMode.Zeros;
+            aes.Key = keyBytes;
+            aes.IV = ivBytes;
+
+            using (var decryptor = aes.CreateDecryptor())
+            using (var ms = new MemoryStream(cipher))
+            using (var cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Read))
+            using (var resultMs = new MemoryStream())
+            {
+                cs.CopyTo(resultMs);   // 完整读取（自动循环）
+                byte[] decrypted = resultMs.ToArray();
+                string raw = Encoding.UTF8.GetString(decrypted);
+                return raw.TrimEnd('\0'); // 去除零填充
+            }
+        }
+    }
+
+    private static string GetHash(string key)
+    {
+        using (var md5 = MD5.Create())
+        {
+            byte[] hash = md5.ComputeHash(Encoding.UTF8.GetBytes(key));
+            var sb = new StringBuilder();
+            for (int i = 0; i < hash.Length; i++)
+                sb.Append(hash[i].ToString("x2"));
+            return sb.ToString();
+        }
+    }
+}
 
     //  //默认密钥向量
     //  private static byte[] Keys = { 0x12, 0x34, 0x56, 0x78, 0x90, 0xAB, 0xCD, 0xEF };
@@ -168,4 +214,3 @@ public class CryptoPrefs
     //          return decryptString;
     //      }
     //  }
-}

@@ -59,11 +59,7 @@ namespace CoreLite
 #endif
 #if SSThinkingData
             CoreThinkingDataEvents.TrackEvent(eventName, key, value);
-<<<<<<< HEAD
 #endif
-=======
->>>>>>> af271a787f5f9a64adb42d6b6f859dfcc1bb4001
-
         }
 
         public static void TrackEvent(string eventName, Dictionary<string, object> dict)
