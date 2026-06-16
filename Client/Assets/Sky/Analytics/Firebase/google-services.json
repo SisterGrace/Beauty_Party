@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "647328957695",
-    "project_id": "test-2ef42",
-    "storage_bucket": "test-2ef42.firebasestorage.app"
+    "project_number": "875319387268",
+    "project_id": "glam-tile-beautyparty",
+    "storage_bucket": "glam-tile-beautyparty.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:647328957695:android:fdb9ebf5a64898b2fa38ca",
+        "mobilesdk_app_id": "1:875319387268:android:f468323552e60000e08ed1",
         "android_client_info": {
-          "package_name": "com.cn.test"
+          "package_name": "com.glam.tile.beauty.party.dream.girl.puzzle"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyALsxm6NkAy-l7SOJQljKES84rNIpW34s8"
+          "current_key": "AIzaSyAMTb2bOKyanXHfrkmz-xHhUnp1QManTw8"
         }
       ],
       "services": {
