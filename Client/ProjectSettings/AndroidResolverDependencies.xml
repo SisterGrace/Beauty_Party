@@ -1,5 +1,6 @@
 <dependencies>
   <packages>
+    <package>androidx.annotation:annotation:1.0.0</package>
     <package>androidx.annotation:annotation:1.2.0</package>
     <package>androidx.appcompat:appcompat:1.6.1</package>
     <package>androidx.browser:browser:1.4.0</package>
@@ -34,6 +35,7 @@
     <package>com.chartboost:chartboost-mediation-adapter-chartboost:5.9.11.0.0</package>
     <package>com.chartboost:chartboost-mediation-sdk:5.3.0</package>
     <package>com.chartboost:chartboost-sdk:9.11.0</package>
+    <package>com.facebook.android:audience-network-sdk:6.20.0</package>
     <package>com.fyber:marketplace-sdk:8.4.2</package>
     <package>com.google.android.gms:play-services-ads-identifier:18.0.1</package>
     <package>com.google.android.gms:play-services-ads-identifier:18.2.0</package>
