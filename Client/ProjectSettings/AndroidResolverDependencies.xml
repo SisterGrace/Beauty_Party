@@ -45,7 +45,6 @@
     <package>com.google.android.instantapps:instantapps:1.1.0</package>
     <package>com.google.android.material:material:1.2.1</package>
     <package>com.google.code.gson:gson:2.8.0</package>
-    <package>com.google.firebase:firebase-analytics:22.4.0</package>
     <package>com.google.firebase:firebase-analytics:23.0.0</package>
     <package>com.google.firebase:firebase-analytics-unity:13.6.0</package>
     <package>com.google.firebase:firebase-app-unity:13.6.0</package>
@@ -54,7 +53,6 @@
     <package>com.google.firebase:firebase-config-unity:13.6.0</package>
     <package>com.google.firebase:firebase-crashlytics-ndk:20.0.3</package>
     <package>com.google.firebase:firebase-crashlytics-unity:13.6.0</package>
-    <package>com.google.firebase:firebase-dynamic-links:22.1.0</package>
     <package>com.google.firebase:firebase-iid:21.1.0</package>
     <package>com.google.firebase:firebase-messaging:25.0.1</package>
     <package>com.google.firebase:firebase-messaging-unity:13.6.0</package>
