@@ -96,7 +96,7 @@ namespace Sky
         // 归因成功：参数为热云返回的 JSON 字符串
         public void OnAttributionSuccess(string json)
         {
-            LogTool.DebugLog("[SolarEngine] OnAttributionSuccess: " + json, LogTool.Color.yellow);
+             LogTool.DebugLog("[SolarEngine] OnAttributionSuccess: " + json);
             try
             {
                 // 字段名对照真机日志确认（SDK 1.3.1.4 海外，2026-06-12 真机验证）
