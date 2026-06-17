@@ -34,6 +34,15 @@ dependencyResolutionManagement {
             url "https://artifactory.bidmachine.io/bidmachine" // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/bidmachine/Editor/Dependencies.xml:5
         }
         maven {
+            url "https://cboost.jfrog.io/artifactory/chartboost-ads" // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/chartboost/Editor/Dependencies.xml:7
+        }
+        maven {
+            url "https://cboost.jfrog.io/artifactory/chartboost-mediation" // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/chartboost/Editor/Dependencies.xml:7
+        }
+        maven {
+            url "https://cboost.jfrog.io/artifactory/chartboost-core" // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/chartboost/Editor/Dependencies.xml:7
+        }
+        maven {
             url "https://dl-maven-android.mintegral.com/repository/mbridge_android_sdk_oversea" // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/gtm/Editor/Dependencies.xml:5
         }
         maven {
@@ -44,6 +53,9 @@ dependencyResolutionManagement {
         }
         maven {
             url "https://verve.jfrog.io/artifactory/verve-gradle-release" // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/pubnative/Editor/Dependencies.xml:5
+        }
+        maven {
+            url "https://s3.amazonaws.com/smaato-sdk-releases/" // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/smaato/Editor/Dependencies.xml:5
         }
         maven {
             url (unityProjectPath + "/Assets/GeneratedLocalRepo/Firebase/m2repository") // Assets/Firebase/Editor/AnalyticsDependencies.xml:18, Assets/Firebase/Editor/AppDependencies.xml:22, Assets/Firebase/Editor/CrashlyticsDependencies.xml:20, Assets/Firebase/Editor/DynamicLinksDependencies.xml:18, Assets/Firebase/Editor/MessagingDependencies.xml:24, Assets/Firebase/Editor/RemoteConfigDependencies.xml:20
