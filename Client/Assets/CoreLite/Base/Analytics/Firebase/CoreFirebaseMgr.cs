@@ -21,40 +21,87 @@ namespace CoreLite
 
         public void Init()
         {
-            #if FIRBASE
+#if FIRBASE
+            // 注册 Messaging Token 回调（注意：这里注册了一次，Activate成功后又会注册一次，建议只保留一处，但这里先不动）
             FirebaseMessaging.TokenReceived += OnTokenReceived;
+
             FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task =>
             {
-                if (task.Result == DependencyStatus.Available)
+                // 1. 依赖检查失败
+                if (task.IsFaulted)
                 {
-                    FirebaseRemoteConfig.DefaultInstance.FetchAsync(TimeSpan.Zero).ContinueWithOnMainThread(fetchTask =>
+                    Debug.LogError($"[Firebase] 依赖检查异常: {task.Exception}");
+                    return;
+                }
+
+                if (task.Result != DependencyStatus.Available)
+                {
+                    Debug.LogError($"[Firebase] 依赖不可用: {task.Result}");
+                    return;
+                }
+
+                // 依赖检查通过，开始拉取远程配置
+                FirebaseRemoteConfig.DefaultInstance.FetchAsync(TimeSpan.Zero)
+                    .ContinueWithOnMainThread(fetchTask =>
                     {
-                        if (fetchTask.IsCompleted && 
-                            FirebaseRemoteConfig.DefaultInstance.Info.LastFetchStatus == LastFetchStatus.Success)
+                        // 2. Fetch 任务异常（网络错误、超时等）
+                        if (fetchTask.IsFaulted)
                         {
-                            FirebaseRemoteConfig.DefaultInstance.ActivateAsync().ContinueWithOnMainThread(task =>
+                            Debug.LogError($"[Firebase] 远程配置 Fetch 异常: {fetchTask.Exception}");
+                            return;
+                        }
+
+                        var info = FirebaseRemoteConfig.DefaultInstance.Info;
+                        // 3. Fetch 完成但状态不是 Success
+                        if (info.LastFetchStatus != LastFetchStatus.Success)
+                        {
+                            Debug.LogError($"[Firebase] 远程配置 Fetch 未成功, 状态: {info.LastFetchStatus}, 失败原因: {info.LastFetchFailureReason}");
+                            // 即使失败，也不继续 Activate，因为没新数据
+                            return;
+                        }
+
+                        // Fetch 成功，开始激活
+                        FirebaseRemoteConfig.DefaultInstance.ActivateAsync()
+                            .ContinueWithOnMainThread(activateTask =>
                             {
+                                // 4. Activate 异常
+                                if (activateTask.IsFaulted)
+                                {
+                                    Debug.LogError($"[Firebase] 远程配置 Activate 异常: {activateTask.Exception}");
+                                    return;
+                                }
+
+                                // Activate 成功（即使结果为 false 也表示没有新配置被激活，但通常不算错误）
+                                bool activated = activateTask.Result;
+                                if (!activated)
+                                {
+                                    Debug.LogWarning("[Firebase] 远程配置 Activate 返回 false（没有新配置被激活）");
+                                }
+
+                                // ---- 原有的初始化逻辑（保持不变） ----
                                 _isInitialized = true;
                                 CoreAdsConfigParser.Parse(GetConfigStr("AdUnits"));
-                                FirebaseMessaging.TokenReceived += OnTokenReceived;
+                                FirebaseMessaging.TokenReceived += OnTokenReceived; // 建议只注册一次，这里可删除
 #if ADJUST
-                                CoreAdjustEvents.UpdateEventToken();
-                                ApplyAdjustInitByRemoteConfig();
+                        CoreAdjustEvents.UpdateEventToken();
+                        ApplyAdjustInitByRemoteConfig();
 #endif
                                 CoreSdkMgr.OnFirebaseActivated?.Invoke();
-                                CoreAnalyticsMgr.TrackEvent("Parameter_Connect", FirebaseRemoteConfig.DefaultInstance.AllValues.ToDictionary(kvp => kvp.Key, kvp => (object)kvp.Value.StringValue.Replace("-", "_")));
-                                CoreLogUtils.Enabled = GetConfigStr("log_enable","0").Equals("1");
+                                CoreAnalyticsMgr.TrackEvent("Parameter_Connect",
+                                    FirebaseRemoteConfig.DefaultInstance.AllValues.ToDictionary(
+                                        kvp => kvp.Key,
+                                        kvp => (object)kvp.Value.StringValue.Replace("-", "_")));
+                                //Sky.LogTool.Init(GetConfigStr("log_enable", "0").Equals("1"));
+                                CoreLogUtils.Enabled = GetConfigStr("log_enable", "0").Equals("1");
                                 GroupingSet();
-                                // TPN/MTG 已在 SDK 初始化时基于本地参数 init，这里仅用远程参数刷新过期判定。
-                                CoreBidPlatformMgr.Instance.InitializePlatformStates(CoreAdsConfigParser.GetAdExpireInSec());
+                                CoreBidPlatformMgr.Instance.InitializePlatformStates(
+                                    CoreAdsConfigParser.GetAdExpireInSec());
+                               
                             });
-                            
-                        }
-                });
-                }
+                    });
             });
 #endif
-                            }
+        }
 
         public string GetConfigStr(string key, string defaultValue = "")
         {
