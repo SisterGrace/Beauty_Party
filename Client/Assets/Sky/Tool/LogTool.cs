@@ -20,10 +20,19 @@ namespace Sky
         static string[] m_colorS = { "{0}", "<color=#ff0000>{0}</color>", "<color=#ffff00ff>{0}</color>", "<color=#008000ff>{0}</color>", "<color=#0000ffff>{0}</color>", "<color=#add8e6ff>{0}</color>",
       "<color=#800080ff>{0}</color>","<color=#c0c0c0ff>{0}</color>","{0}" };
 
-        public static void Init(bool _logFlg)
+        public static void Init(bool enableFullLog)
         {
-            logFlg = _logFlg;
-            Debug.unityLogger.logEnabled = logFlg;
+            logFlg = enableFullLog;
+            if (enableFullLog)
+            {
+                Debug.unityLogger.logEnabled = true;
+                Debug.unityLogger.filterLogType = LogType.Log;   // 显示所有
+            }
+            else
+            {
+                Debug.unityLogger.logEnabled = true;             // 保持启用，只过滤级别
+                Debug.unityLogger.filterLogType = LogType.Error; // 仅显示 Error
+            }
         }
 
         public static void DebugLog(string log, Color color = Color.none, bool showPath = false, [CallerFilePath] string path = null, [CallerMemberName] string name = null)
