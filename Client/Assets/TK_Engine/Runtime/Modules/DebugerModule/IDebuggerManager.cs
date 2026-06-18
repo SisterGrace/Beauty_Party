@@ -3,7 +3,7 @@
     /// <summary>
     /// 调试器管理器接口。
     /// </summary>
-    [KeepName]
+ 
     public interface IDebuggerManager
     {
         /// <summary>
