@@ -531,7 +531,7 @@ MonoBehaviour:
   m_Skin: {fileID: 11400000, guid: b38f904eb09e4bd48a46a63750942109, type: 2}
   m_ActiveWindow: 3
   m_ShowFullWindow: 0
-  m_ShowSRDebugger: 1
+  m_ShowSRDebugger: 0
   m_IsOpenLog: 1
   m_ConsoleWindow:
     m_LockScroll: 1
