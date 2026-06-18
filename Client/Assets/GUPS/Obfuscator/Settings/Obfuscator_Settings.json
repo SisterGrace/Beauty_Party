@@ -93,7 +93,7 @@
         {
           "Type" : "Bool",
           "Key" : "Obfuscate_Assembly_AssemblyCSharp",
-          "Value" : "False",
+          "Value" : "True",
           "Values" : null
         },
         {
