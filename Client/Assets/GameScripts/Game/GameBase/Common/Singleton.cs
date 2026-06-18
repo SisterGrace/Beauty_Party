@@ -32,7 +32,7 @@ namespace Y_Base
 #if UNITY_EDITOR
             string st = new StackTrace().ToString();
             // using const string to compare simply
-            if (!st.Contains("GameBase.Singleton`1[T].get_Instance"))
+            if (!st.Contains("Y_Base.Singleton`1[T].get_Instance"))
             {
                 UnityEngine.Debug.LogError($"请必须通过Instance方法来实例化{typeof(T).FullName}类");
             }
