@@ -113,56 +113,56 @@ MonoBehaviour:
     FileName: assets_assetraw_scenes_game_8f8b32a8e4826e57185d7b5f59533e8c.bundle
     FileCRC32: 605fde50
   - PackageName: DefaultPackage
-    FileName: assets_assetraw_uiraw_atlas_common_71a96bea14eea953a76428ebd73d3228.bundle
-    FileCRC32: 252c0e8c
+    FileName: assets_assetraw_uiraw_atlas_common_0a5d4f8af19de5a052a8ede231d5d505.bundle
+    FileCRC32: e9ccdb87
   - PackageName: DefaultPackage
-    FileName: assets_assetraw_uiraw_atlas_daycheck_0901b4a7f6540610742852279c95997a.bundle
-    FileCRC32: 66114f7a
+    FileName: assets_assetraw_uiraw_atlas_daycheck_d5cedf4102572814a28250abb378981c.bundle
+    FileCRC32: f13d0870
   - PackageName: DefaultPackage
-    FileName: assets_assetraw_uiraw_atlas_deampass_badff84023bbb2da8ae54bc8e9b47d99.bundle
-    FileCRC32: 9b948cff
+    FileName: assets_assetraw_uiraw_atlas_deampass_d3f7883f8195a88820a39945280fdd1b.bundle
+    FileCRC32: 7c2c9d94
   - PackageName: DefaultPackage
-    FileName: assets_assetraw_uiraw_atlas_endlesstreasure_c90ecbf19c66c894a76b25746d292699.bundle
-    FileCRC32: ab12baf1
+    FileName: assets_assetraw_uiraw_atlas_endlesstreasure_3d8d4d4d363db483712a75eb149492b1.bundle
+    FileCRC32: 6dc4a0c6
   - PackageName: DefaultPackage
-    FileName: assets_assetraw_uiraw_atlas_gache_745cda53ce429c29795d6b3739e4c3c9.bundle
-    FileCRC32: 007b46a7
+    FileName: assets_assetraw_uiraw_atlas_gache_c85499c1616a47602eecc168ba70c3da.bundle
+    FileCRC32: 5bf48115
   - PackageName: DefaultPackage
-    FileName: assets_assetraw_uiraw_atlas_guide_b442455bfb7368e9ebd06dbf455c35ef.bundle
-    FileCRC32: d6b499cb
+    FileName: assets_assetraw_uiraw_atlas_guide_7ef2280ac551b5c951dede01c341cd86.bundle
+    FileCRC32: 53978571
   - PackageName: DefaultPackage
-    FileName: assets_assetraw_uiraw_atlas_home_23ea030719c91cb16fe1acb237724756.bundle
-    FileCRC32: 4326d4b9
+    FileName: assets_assetraw_uiraw_atlas_home_0d4d75133ee1d2d5ce520f5a94b6ad30.bundle
+    FileCRC32: 24544d9c
   - PackageName: DefaultPackage
-    FileName: assets_assetraw_uiraw_atlas_level_882a0b18ad349a1ad0cecc4833863ace.bundle
-    FileCRC32: e741bf73
+    FileName: assets_assetraw_uiraw_atlas_level_e62135d4fab14c7d6e226759ae72e4df.bundle
+    FileCRC32: 2f3836d5
   - PackageName: DefaultPackage
-    FileName: assets_assetraw_uiraw_atlas_loading_e5170c6b1058ca2443f41a23a4606368.bundle
-    FileCRC32: 26ff5809
+    FileName: assets_assetraw_uiraw_atlas_loading_4f9bf32649a7508e4d0b91988df206de.bundle
+    FileCRC32: e20e6ddc
   - PackageName: DefaultPackage
-    FileName: assets_assetraw_uiraw_atlas_newplayerpack_50ddf7c414872b3df3a153ff5b382e1a.bundle
-    FileCRC32: 3ba8068f
+    FileName: assets_assetraw_uiraw_atlas_newplayerpack_df3510a3076fe2b8d55a4f273db303d9.bundle
+    FileCRC32: ff581832
   - PackageName: DefaultPackage
-    FileName: assets_assetraw_uiraw_atlas_noad_45a27459e658da8be3228880b7c555e1.bundle
-    FileCRC32: 3df931c3
+    FileName: assets_assetraw_uiraw_atlas_noad_2e9d3890043952f62d5f77bef2dafa74.bundle
+    FileCRC32: dea654d0
   - PackageName: DefaultPackage
-    FileName: assets_assetraw_uiraw_atlas_photos_8d984aafbdff73cb1341861ccf2c69b7.bundle
-    FileCRC32: 50e89b3b
+    FileName: assets_assetraw_uiraw_atlas_photos_643695eccd278fff3c0594cba3929b91.bundle
+    FileCRC32: d165be6a
   - PackageName: DefaultPackage
-    FileName: assets_assetraw_uiraw_atlas_playgame_96c0ad7169f3de798076eec374618972.bundle
-    FileCRC32: c430708d
+    FileName: assets_assetraw_uiraw_atlas_playgame_0d845a1ddd8de0eae53f38d73660a923.bundle
+    FileCRC32: f8963910
   - PackageName: DefaultPackage
-    FileName: assets_assetraw_uiraw_atlas_shop_9a4de89d4b99df9cf838856bc4168fb9.bundle
-    FileCRC32: b24fd000
+    FileName: assets_assetraw_uiraw_atlas_shop_f9ab8d490fc512f4f03356b41b3dfb2e.bundle
+    FileCRC32: 7c6ee8a1
   - PackageName: DefaultPackage
-    FileName: assets_assetraw_uiraw_atlas_vip_07a42ccc18c8b699c028bbc6300f3905.bundle
-    FileCRC32: 81975103
+    FileName: assets_assetraw_uiraw_atlas_vip_a03cbb7a2c7efe83934436cdeff77038.bundle
+    FileCRC32: b2b22299
   - PackageName: DefaultPackage
     FileName: assets_assetraw_uiraw_raw_flytexture_bdb5fac3bb01aa49c4693c9d198d3952.bundle
     FileCRC32: 2e2238a1
   - PackageName: DefaultPackage
-    FileName: assets_assetraw_uiraw_raw_uitexture_84f4c6e33b3872705e1c7ea154e04bb1.bundle
-    FileCRC32: 0968c8d6
+    FileName: assets_assetraw_uiraw_raw_uitexture_112a8da33547fcb20d18acb0f80ac889.bundle
+    FileCRC32: e04f7498
   - PackageName: DefaultPackage
     FileName: assets_assetraw_ui_panel_activatepass_a93401ad47f8555f3b685c1ae5e8d212.bundle
     FileCRC32: eea4457b
@@ -539,8 +539,8 @@ MonoBehaviour:
     FileName: share_assets_plugins_textmesh pro_fonts_e4c1d3239839642e71a2b009109a32f9.bundle
     FileCRC32: 2c050d52
   - PackageName: DefaultPackage
-    FileName: share_assets_plugins_textmesh pro_resources_fonts & materials_3da9f463180b5d5f0a456a139a84389e.bundle
-    FileCRC32: eb179cc1
+    FileName: share_assets_plugins_textmesh pro_resources_fonts & materials_39bf4d0391434142763cf286c91a829c.bundle
+    FileCRC32: 67c93b9f
   - PackageName: DefaultPackage
     FileName: share_assets_plugins_textmesh pro_resources_sprite assets_b13d611461ba066be6eefeb7ff485752.bundle
     FileCRC32: c3e4b193
