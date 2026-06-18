@@ -1,6 +1,0 @@
-framework module AnyThinkBidMachineAdapter {
-  umbrella header "AnyThinkBidMachineAdapter.h"
-  export *
-
-  module * { export * }
-}
