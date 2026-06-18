@@ -31,7 +31,7 @@ MonoBehaviour:
     assemblyNames:
     - GameLogic
     - EasySave3.Runtime
-    - Assembly-CSharp
+    - GameMain
     - TK_Engine.Runtime
     - ThinkingAnalytics
     - CoreLite
@@ -76,6 +76,8 @@ MonoBehaviour:
     - Vibration.Runtime
     - Coffee.SoftMaskForUGUI
     - AVProVideo.Editor
+    - GUPS.Obfuscator
+    - Assembly-CSharp
     - Coffee.UIParticle.Editor
     - Purchasing.Common
     - UniTask.TextMeshPro
@@ -89,6 +91,7 @@ MonoBehaviour:
     - AVProVideo.Extensions.VisualEffectGraph
     - Up2SDK
     - UniTask.Addressables
+    - GUPS.Editor
     - Coffee.UnmaskForUGUI
     - UniTask.Editor
     - Up2SDK.Editor
