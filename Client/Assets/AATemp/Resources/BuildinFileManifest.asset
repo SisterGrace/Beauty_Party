@@ -173,8 +173,8 @@ MonoBehaviour:
     FileName: assets_assetraw_ui_panel_cancelpay_669065eab9ebbe083767145cc9d92cce.bundle
     FileCRC32: bb4106ec
   - PackageName: DefaultPackage
-    FileName: assets_assetraw_ui_panel_collectdiamond_bbb58380590ff16aac5b9713899ac945.bundle
-    FileCRC32: 886f5470
+    FileName: assets_assetraw_ui_panel_collectdiamond_fcacfbe4907af14541d843380a42a8f6.bundle
+    FileCRC32: 14de05c5
   - PackageName: DefaultPackage
     FileName: assets_assetraw_ui_panel_collectphotos_06655cc34b2000b88c9e13f1f86109a0.bundle
     FileCRC32: 7764efd0
@@ -227,8 +227,8 @@ MonoBehaviour:
     FileName: assets_assetraw_ui_panel_getreward_1_0976302ed5964eca5f49fd41390f6b7c.bundle
     FileCRC32: 989f6566
   - PackageName: DefaultPackage
-    FileName: assets_assetraw_ui_panel_guide_26f7216ea641919316de1d991b2c72d5.bundle
-    FileCRC32: 2217062d
+    FileName: assets_assetraw_ui_panel_guide_879162f5e689f8424af48584294b6df4.bundle
+    FileCRC32: 71567004
   - PackageName: DefaultPackage
     FileName: assets_assetraw_ui_panel_home_58c43935260e894f6624e1661aa1fcf0.bundle
     FileCRC32: c7bd5744
@@ -266,8 +266,8 @@ MonoBehaviour:
     FileName: assets_assetraw_ui_panel_starterpack_d1201eb4ac352dc7825e7984afc2aea7.bundle
     FileCRC32: 8eeeda6a
   - PackageName: DefaultPackage
-    FileName: assets_assetraw_ui_panel_succeed_b03c0e044113e498356d8382d86fac0b.bundle
-    FileCRC32: bf7ebb77
+    FileName: assets_assetraw_ui_panel_succeed_75bf6e069aea24802e7a95314ac65d8a.bundle
+    FileCRC32: 9ca89f16
   - PackageName: DefaultPackage
     FileName: assets_assetraw_ui_panel_unlockoneprop_17d4a02504383401a47cec31bfaaa8ea.bundle
     FileCRC32: ff1ab406
@@ -311,11 +311,11 @@ MonoBehaviour:
     FileName: assets_assetraw_ui_widget_widget_gachaanimation_74f8377be8969a4b5748895935660a63.bundle
     FileCRC32: 2730c058
   - PackageName: DefaultPackage
-    FileName: assets_assetraw_ui_widget_widget_handguide_1bd0d607ccb26d8172fe41d8eb1dba0e.bundle
-    FileCRC32: c6407a2c
+    FileName: assets_assetraw_ui_widget_widget_handguide_770e2547fe8d760b27ddcbf3d150663c.bundle
+    FileCRC32: 6772dfa6
   - PackageName: DefaultPackage
-    FileName: assets_assetraw_ui_widget_widget_jiantouguide_5f3bde2355f9574f1eea0c93d4df9c26.bundle
-    FileCRC32: 7fa858bc
+    FileName: assets_assetraw_ui_widget_widget_jiantouguide_66a136aa0b7c6521d3109538ff1391a3.bundle
+    FileCRC32: bcc43ec9
   - PackageName: DefaultPackage
     FileName: assets_assetraw_ui_widget_widget_onediaproduct_dd24630165ab0a62f8573d35b3e38f2f.bundle
     FileCRC32: f8638002
@@ -374,8 +374,8 @@ MonoBehaviour:
     FileName: assets_assetraw_ui_widget_widget_switchphoto_c4f58b4d8e599f575a1812aabeaf8971.bundle
     FileCRC32: a4347264
   - PackageName: DefaultPackage
-    FileName: assets_assetraw_ui_widget_widget_timeleveltips_9086960ed68f1b60b475ab153365465e.bundle
-    FileCRC32: f207e3ca
+    FileName: assets_assetraw_ui_widget_widget_timeleveltips_716f4ee146c3afee865ca85c8819e977.bundle
+    FileCRC32: f65c8cc8
   - PackageName: DefaultPackage
     FileName: assets_assetraw_ui_widget_widget_tipsnode_bc92840376ae83719a1e76e72c785d4d.bundle
     FileCRC32: 8348436e
@@ -539,8 +539,8 @@ MonoBehaviour:
     FileName: share_assets_plugins_textmesh pro_fonts_e4c1d3239839642e71a2b009109a32f9.bundle
     FileCRC32: 2c050d52
   - PackageName: DefaultPackage
-    FileName: share_assets_plugins_textmesh pro_resources_fonts & materials_39bf4d0391434142763cf286c91a829c.bundle
-    FileCRC32: 67c93b9f
+    FileName: share_assets_plugins_textmesh pro_resources_fonts & materials_1e7e5d506e7414a8a02e44c685e8bf1d.bundle
+    FileCRC32: f44a5b7a
   - PackageName: DefaultPackage
     FileName: share_assets_plugins_textmesh pro_resources_sprite assets_b13d611461ba066be6eefeb7ff485752.bundle
     FileCRC32: c3e4b193
