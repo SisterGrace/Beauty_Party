@@ -181,9 +181,7 @@
           "Value" : null,
           "Values" : [
             "CoreLite",
-            "Sky",
-            "TK_Engine",
-            "GameMain"
+            "Sky"
           ]
         },
         {
