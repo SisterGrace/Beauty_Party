@@ -4,7 +4,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using Config.common;
-using GameBase;
+using Y_Base;
 using UnityEngine.UI;
 namespace GameLogic
 {

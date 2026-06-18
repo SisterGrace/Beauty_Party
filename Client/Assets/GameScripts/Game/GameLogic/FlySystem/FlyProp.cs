@@ -6,7 +6,7 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
-using GameBase;
+using Y_Base;
 using TK_Engine;
 using TMPro;
 

@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using GameBase;
+using Y_Base;
 using Sirenix.OdinInspector;
 using DG.Tweening;
 using UnityEngine;

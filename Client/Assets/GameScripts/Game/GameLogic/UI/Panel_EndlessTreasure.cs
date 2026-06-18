@@ -6,7 +6,7 @@ using System.Linq;
 using Config.common;
 using Config.config;
 using DG.Tweening;
-using GameBase;
+using Y_Base;
 using UnityEngine.UI;
 
 namespace GameLogic

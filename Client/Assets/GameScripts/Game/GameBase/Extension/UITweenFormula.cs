@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
 
-namespace GameBase
+namespace Y_Base
 {
     public class UITweenFormula
     {

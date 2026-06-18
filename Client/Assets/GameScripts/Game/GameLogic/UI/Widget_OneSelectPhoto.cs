@@ -1,7 +1,7 @@
 using TK_Engine;
 using UnityEngine;
 using UnityEngine.UI;
-using GameBase;
+using Y_Base;
 using DG.Tweening;
 
 namespace GameLogic

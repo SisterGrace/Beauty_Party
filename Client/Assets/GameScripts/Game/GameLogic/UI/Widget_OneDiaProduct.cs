@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Config.common;
 using Config.config;
-using GameBase;
+using Y_Base;
 namespace GameLogic
 {
 	[Window(UILayer.UI)]

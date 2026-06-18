@@ -10,7 +10,7 @@ using UnityEngine.Networking;
 using UnityEngine.Android;
 #endif
 
-namespace GameBase
+namespace Y_Base
 {
     public static class VideoUtil
     {

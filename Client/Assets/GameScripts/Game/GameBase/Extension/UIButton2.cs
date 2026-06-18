@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using DG.Tweening;
-using GameBase;
+using Y_Base;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.EventSystems;

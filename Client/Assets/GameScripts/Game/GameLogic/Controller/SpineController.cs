@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using GameBase;
+using Y_Base;
 using Spine.Unity;
 using static Spine.AnimationState;
 using System;

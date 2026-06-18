@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System;
 using DG.Tweening;
 using SRDebugger;
-using GameBase;
+using Y_Base;
 using System.Text;
 
 namespace GameLogic

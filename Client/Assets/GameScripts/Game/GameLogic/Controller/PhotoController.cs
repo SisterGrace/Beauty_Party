@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Config.config;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
-using GameBase;
+using Y_Base;
 using Config.common;
 using TK_Engine;
 

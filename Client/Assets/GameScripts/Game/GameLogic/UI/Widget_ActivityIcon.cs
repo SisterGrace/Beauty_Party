@@ -3,7 +3,7 @@ using TK_Engine;
 using UnityEngine;
 using Config.common;
 using Config.config;
-using GameBase;
+using Y_Base;
 using UnityEngine.UI;
 
 namespace GameLogic

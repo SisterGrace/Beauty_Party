@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Config.common;
 using UnityEngine;
-using GameBase;
+using Y_Base;
 using System;
 using Config.config;
 using DG.Tweening;

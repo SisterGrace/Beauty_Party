@@ -2,11 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Config.common;
-using GameBase;
+using Y_Base;
 using TK_Engine;
 using UnityEngine;
 using AudioType = TK_Engine.AudioType;
-using UnityExtensions = GameBase.UnityExtensions;
+using UnityExtensions = Y_Base.UnityExtensions;
 
 namespace GameLogic
 {

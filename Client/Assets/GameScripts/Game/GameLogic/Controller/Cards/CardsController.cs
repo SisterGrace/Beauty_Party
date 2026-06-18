@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using GameBase;
+using Y_Base;
 using Sirenix.Utilities;
 using System;
 using Config.common;

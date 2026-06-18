@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace GameBase
+namespace Y_Base
 {
     public class FileEncrypter 
     {

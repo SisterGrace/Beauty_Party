@@ -4,7 +4,7 @@ using Bright.Serialization;
 using System.IO;
 using Config;
 using Config.config;
-using GameBase;
+using Y_Base;
 using SimpleJSON;
 using TK_Engine;
 using UnityEngine;

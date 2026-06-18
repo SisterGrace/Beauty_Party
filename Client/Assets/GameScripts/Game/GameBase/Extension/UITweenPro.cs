@@ -8,7 +8,7 @@ using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace GameBase
+namespace Y_Base
 {
     public class UITweenPro : MonoBehaviour
     {

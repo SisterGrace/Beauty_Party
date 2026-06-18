@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Config.common;
 using Config.config;
-using GameBase;
+using Y_Base;
 using EventType = GameLogic.EventType;
 namespace GameLogic
 {

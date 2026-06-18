@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using TK_Engine;
 
-namespace GameBase
+namespace Y_Base
 {
     public enum HttpMethod
     {

@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using GameBase;
+using Y_Base;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;

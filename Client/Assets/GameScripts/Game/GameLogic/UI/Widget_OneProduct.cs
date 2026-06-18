@@ -3,7 +3,7 @@ using UnityEngine;
 using Config.common;
 using System.Collections;
 using System.Collections.Generic;
-using GameBase;
+using Y_Base;
 using UnityEngine.UI;
 using TMPro;
 using System;

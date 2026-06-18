@@ -1,6 +1,6 @@
 using TK_Engine;
 using UnityEngine;
-using GameBase;
+using Y_Base;
 
 namespace GameLogic
 {

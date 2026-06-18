@@ -8,7 +8,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using AudioType = TK_Engine.AudioType;
-using GameBase;
+using Y_Base;
 using RenderHeads.Media.AVProVideo;
 
 namespace GameLogic

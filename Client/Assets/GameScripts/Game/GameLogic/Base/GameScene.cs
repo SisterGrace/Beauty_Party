@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Config.common;
 using DG.Tweening;
 using UnityEngine;
-using GameBase;
+using Y_Base;
 using TK_Engine;
 
 namespace GameLogic

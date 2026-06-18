@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using TK_Engine;
 
-namespace GameBase
+namespace Y_Base
 {
     /// <summary>
     /// 通过LogicSys来驱动且具备Unity完整生命周期的单例（不继承MonoBehaviour，生命周期由TK_Engine实现）推荐给系统实现。

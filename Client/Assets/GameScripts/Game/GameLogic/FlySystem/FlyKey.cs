@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
-using GameBase;
+using Y_Base;
 
 namespace GameLogic
 {

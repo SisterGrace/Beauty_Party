@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Cysharp.Threading.Tasks;
-using GameBase;
+using Y_Base;
 using UnityEngine;
 using YooAsset;
 using UnityEngine.SceneManagement;

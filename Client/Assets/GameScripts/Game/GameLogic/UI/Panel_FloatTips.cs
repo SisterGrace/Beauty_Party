@@ -1,7 +1,7 @@
 using System;
 using TK_Engine;
 using UnityEngine;
-using GameBase;
+using Y_Base;
 using System.Collections;
 using System.Collections.Generic;
 using Config.common;

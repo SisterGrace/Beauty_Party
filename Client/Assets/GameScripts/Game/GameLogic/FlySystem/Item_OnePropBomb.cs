@@ -6,7 +6,7 @@ using DG.Tweening;
 using TMPro;
 using System;
 using Config.common;
-using GameBase;
+using Y_Base;
 
 namespace GameLogic
 {

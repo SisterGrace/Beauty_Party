@@ -1,7 +1,7 @@
 ﻿using TK_Engine;
 using UnityEngine;
 
-namespace GameBase
+namespace Y_Base
 {
     /// <summary>
     /// 框架中的全局对象与Unity场景依赖相关的DontDestroyOnLoad需要统一管理，方便重启游戏时清除工作

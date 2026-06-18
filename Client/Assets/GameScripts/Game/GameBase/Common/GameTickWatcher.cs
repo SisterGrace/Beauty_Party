@@ -1,6 +1,6 @@
 ﻿using TK_Engine;
 
-namespace GameBase
+namespace Y_Base
 {
     /// <summary>
     /// 用于检测耗时。

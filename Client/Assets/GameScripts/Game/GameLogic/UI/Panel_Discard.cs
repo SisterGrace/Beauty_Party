@@ -3,7 +3,7 @@ using UnityEngine;
 
 using System.Collections;
 using System.Collections.Generic;
-using GameBase;
+using Y_Base;
 using UnityEditor;
 using Config.common;
 namespace GameLogic

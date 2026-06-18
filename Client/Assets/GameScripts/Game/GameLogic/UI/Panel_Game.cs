@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Config.common;
 using DG.Tweening;
-using GameBase;
+using Y_Base;
 using TMPro;
 using AudioType = TK_Engine.AudioType;
 using UnityEngine.UI;

@@ -8,7 +8,7 @@ using TK_Engine;
 using Config;
 using Config.common;
 using Config.config;
-using GameBase;
+using Y_Base;
 using UnityEngine.UI;
 using AudioType = TK_Engine.AudioType;
 using Random = UnityEngine.Random;

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace GameBase
+namespace Y_Base
 {
     public static class SecureScreen
     {

@@ -4,7 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Config.config;
-using GameBase;
+using Y_Base;
 
 namespace GameLogic
 {

@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using DG.Tweening;
-using GameBase;
+using Y_Base;
 
 
 namespace GameLogic

@@ -4,7 +4,7 @@ using UnityEngine;
 using TK_Engine;
 using System;
 
-namespace GameBase
+namespace Y_Base
 {
     public class WebRequestCert : UnityEngine.Networking.CertificateHandler
 {

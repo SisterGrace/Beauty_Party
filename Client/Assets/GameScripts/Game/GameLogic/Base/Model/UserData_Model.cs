@@ -5,7 +5,7 @@ using System;
 using Config.common;
 using Config.config;
 using TK_Engine;
-using GameBase;
+using Y_Base;
 
 namespace GameLogic
 {

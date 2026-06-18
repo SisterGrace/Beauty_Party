@@ -6,7 +6,7 @@ using Config.common;
 using System;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
-using GameBase;
+using Y_Base;
 using RenderHeads.Media.AVProVideo;
 using UnityEngine.UI;
 

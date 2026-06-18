@@ -13,7 +13,7 @@ using UnityEngine.Networking;
 using UnityEngine.Android;
 #endif
 
-namespace GameBase
+namespace Y_Base
 {
     /// <summary>
     /// 图片工具类 - 提供图片加载、缓存和保存到相册功能

@@ -7,7 +7,7 @@ using Config.common;
 using Config.config;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
-using GameBase;
+using Y_Base;
 using TMPro;
 using UnityEngine.UI;
 using Spine.Unity;

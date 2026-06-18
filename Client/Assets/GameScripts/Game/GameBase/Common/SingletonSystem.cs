@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace GameBase
+namespace Y_Base
 {
     public interface ISingleton
     {

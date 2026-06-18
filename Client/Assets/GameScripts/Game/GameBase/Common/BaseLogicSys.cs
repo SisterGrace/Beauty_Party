@@ -1,4 +1,4 @@
-﻿namespace GameBase
+﻿namespace Y_Base
 {
     /// <summary>
     /// 基础LogicSys,生命周期由TK_Engine实现，推荐给系统实现，

@@ -4,7 +4,7 @@ using Sirenix.OdinInspector;
 using UnityEngine;
 using TMPro;
 using System;
-using GameBase;
+using Y_Base;
 using TK_Engine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;

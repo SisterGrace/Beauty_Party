@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Config.common;
 using DG.Tweening;
-using GameBase;
+using Y_Base;
 using Sirenix.OdinInspector;
 using TK_Engine;
 using UnityEngine;

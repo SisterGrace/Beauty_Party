@@ -1,7 +1,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using GameBase;
+using Y_Base;
 using TK_Engine;
 using RenderHeads.Media.AVProVideo;
 using Config.common;

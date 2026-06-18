@@ -90,7 +90,7 @@ namespace TK_Engine.Editor.UI
                 sb.AppendLine("using UnityEngine;");
                 sb.AppendLine("using UnityEngine.UI;");
                 //sb.AppendLine("using SuperScrollView;");
-                sb.AppendLine("using GameBase;");
+                sb.AppendLine("using Y_Base;");
                 sb.AppendLine("using TK_Engine;");
                 sb.AppendLine("using RenderHeads.Media.AVProVideo;");
                 sb.AppendLine("namespace GameLogic");

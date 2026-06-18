@@ -2,7 +2,7 @@
 using GameLogic;
 using TK_Engine;
 using UnityEngine;
-using GameBase;
+using Y_Base;
 
 public partial class GameApp
 {

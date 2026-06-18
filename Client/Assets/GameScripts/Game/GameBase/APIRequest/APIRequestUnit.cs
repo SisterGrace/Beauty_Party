@@ -6,7 +6,7 @@ using UnityEngine.Networking;
 using TK_Engine;
 using Newtonsoft.Json;
 
-namespace GameBase
+namespace Y_Base
 {
     public class APIRequestUnit : MonoBehaviour
     {

@@ -9,7 +9,7 @@ using UnityEngine.UI;
 using Object = UnityEngine.Object;
 using TK_Engine;
 using System.Threading;
-namespace GameBase
+namespace Y_Base
 {
     public static class UnityExtensions
     {

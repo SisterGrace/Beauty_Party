@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace GameBase
+namespace Y_Base
 {
     /// <summary>
     /// 全局对象必须继承于此。
