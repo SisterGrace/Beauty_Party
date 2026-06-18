@@ -428,8 +428,7 @@
           "Key" : "Attributes_Behave_Like_DoNotRename_Array",
           "Value" : null,
           "Values" : [
-            "TK_Engine.UIWindow",
-            "UIWindow"
+            "KeepName"
           ]
         }
       ]
