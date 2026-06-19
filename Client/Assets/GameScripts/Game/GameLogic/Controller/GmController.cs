@@ -15,6 +15,7 @@ namespace GameLogic
     {
         public void Init()
         {
+            SetADFree();
             if (!SettingsUtils.FrameworkGlobalSettings.DebugModeEnabled) return;
             GameEvent.AddEventListener<int>(EventType.SetLevel, SetLevel);
             GameEvent.AddEventListener(EventType.SetGold, SetGold);
