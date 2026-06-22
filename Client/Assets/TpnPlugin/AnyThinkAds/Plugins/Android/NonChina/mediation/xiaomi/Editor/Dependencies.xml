@@ -1,0 +1,6 @@
+<dependencies>
+    <androidPackages>
+        <androidPackage spec="com.anythink.sdk:adapter-tpn-xiaomi:4.0.7.4.1.0"/>
+        <androidPackage spec="com.mi.ads:columbus-sdk:4.0.7.4"/>
+    </androidPackages>
+</dependencies>

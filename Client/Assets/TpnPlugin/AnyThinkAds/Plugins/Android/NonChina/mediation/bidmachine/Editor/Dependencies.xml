@@ -1,0 +1,9 @@
+<dependencies>
+    <androidPackages>
+        <repositories>
+            <repository>https://artifactory.bidmachine.io/bidmachine</repository>
+        </repositories>
+        <androidPackage spec="com.anythink.sdk:adapter-tpn-bidmachine:3.5.1.1.1"/>
+        <androidPackage spec="io.bidmachine:ads:3.5.1"/>
+    </androidPackages>
+</dependencies>
