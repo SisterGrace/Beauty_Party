@@ -283,6 +283,12 @@ namespace TK_Engine.Editor
                 Debug.Log($"Build Failed" + summary.result);
             }
         }
+        [MenuItem("TK_Engine/Quick Build/仅打Android AssetBundle")]
+        public static void BuildAndroidAssetBundleOnly()
+        {
+            BuildInternal(BuildTarget.Android, Application.dataPath + "/../Builds/AndroidBundles", packageVersion: GetBuildPackageVersion());
+            AssetDatabase.Refresh();
+        }
         #region 一键打包adb
         [MenuItem("TK_Engine/Quick Build/一键打包Android AAB", false, 90)]
         public static void AutomationBuildAndroidAAB()
