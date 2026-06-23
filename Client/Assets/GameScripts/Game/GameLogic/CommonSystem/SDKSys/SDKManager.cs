@@ -159,7 +159,7 @@ namespace GameLogic
             {
                 initSdkCallback?.Invoke();
             }, 0.5f);
-#if USE_UP2SDK && !UNITY_EDITOR
+#if USE_UP2SDK 
             CoreSdkMgr.InitSDK(() =>
                 {
                     OnSplashClosed();
