@@ -36,7 +36,7 @@ namespace CoreLite
 
         public static Task<string> GetGaid()
         {
-            return Task.FromResult(GetGoogleAdvertisingId());
+            return Task.Run(() => GetGoogleAdvertisingId());
         }
 
         public static string GetGoogleAdvertisingId()
