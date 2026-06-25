@@ -45,9 +45,7 @@ namespace GameAnalyticsSDK.Editor
             UpdateMoPub();
             UpdateFyber();
             UpdateIronSource();
-            #if TopOn
             UpdateTopOn();
-            #endif
             UpdateMax();
             UpdateAequus();
             UpdateHyperBid();
