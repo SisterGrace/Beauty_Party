@@ -46,14 +46,6 @@ namespace GameLogic
             }
             shinyEffectForUGUI.SetShinyEffect();
             shinyEffectForUGUI.enabled = false;
-            StartCoroutine(DeactivateAfterDelay());
-        }
-        IEnumerator DeactivateAfterDelay()
-        {
-            // yield return new WaitForSeconds(2f); 这行就是暂停点
-            // 程序运行到这里会暂停，等待2秒（游戏时间）后，再继续执行后面的代码
-            yield return new WaitForSeconds(0.01f);
-
             // 初始化 _lastAdIconState
             if (adIcon != null)
             {
@@ -66,12 +58,10 @@ namespace GameLogic
 
             // 初始状态
             UpdateShineState();
-            update = true;
         }
-        bool update = false;
+        //bool update = false;
         private void Update()
         {
-            if (!update) { return; }
             // 检测AD图标状态变化
             if (adIcon != null)
             {
