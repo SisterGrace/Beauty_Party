@@ -64,18 +64,20 @@ namespace CoreLite
 #if UNITY_ANDROID || UNITY_IOS
             AnyThinkAds.Api.ATSDKAPI.setLogDebug(CoreLogUtils.Enabled);
 #if UNITY_ANDROID
+            // 海外版 SDK 使用 secmtp 混淆，原始路径 com.anythink.core.api.* 不可用
             try
             {
-                using (var atsdkClass = new AndroidJavaClass("com.anythink.core.api.ATSDK"))
+                using (var atsdkClass = new AndroidJavaClass("com.secmtp.sdk.core.api.ATSDK"))
                 {
                     atsdkClass.CallStatic("setNetworkLogDebug", true);
+                    CoreLogUtils.Debug("[CoreLiteTpn] setNetworkLogDebug ON (secmtp)");
                 }
             }
             catch (System.Exception e)
             {
                 CoreLogUtils.Debug("[CoreLiteTpn] setNetworkLogDebug failed: " + e.Message);
             }
-            SetAdmobTestDevice("2d04bdd5-eb09-4df0-9293-250ab4990c5b"); // 设备真实GAID
+            SetAdmobTestDevice("CECC96A68B641E880BC8530704249FE9"); // AdMob 设备 hash（从日志获取，非 GAID）
             EnableAdmobDebug();
             // TopOn 调试模式：使用硬编码 GAID 开启 Admob 测试广告（避免主线程阻塞获取GAID失败）
             SetTopOnDebugMode("2d04bdd5-eb09-4df0-9293-250ab4990c5b");
@@ -137,17 +139,22 @@ namespace CoreLite
         {
             try
             {
-                using (var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
-                using (var activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"))
-                using (var adRequestClass = new AndroidJavaClass("com.google.android.gms.ads.AdRequest"))
+                using (var mobileAdsClass = new AndroidJavaClass("com.google.android.gms.ads.MobileAds"))
                 {
-                    var isTest = adRequestClass.CallStatic<bool>("isTestDevice", activity);
-                    CoreLogUtils.Debug("[CoreLiteTpn] AdRequest.isTestDevice()=" + isTest);
+                    var config = mobileAdsClass.CallStatic<AndroidJavaObject>("getRequestConfiguration");
+                    var testDeviceIds = config.Call<AndroidJavaObject>("getTestDeviceIds");
+                    int count = testDeviceIds.Call<int>("size");
+                    CoreLogUtils.Debug("[CoreLiteTpn] AdMob test device count: " + count);
+                    for (int i = 0; i < count; i++)
+                    {
+                        var id = testDeviceIds.Call<string>("get", i);
+                        CoreLogUtils.Debug("[CoreLiteTpn] AdMob test device[" + i + "]: " + id);
+                    }
                 }
             }
             catch (System.Exception e)
             {
-                CoreLogUtils.Debug("[CoreLiteTpn] isTestDevice() call failed: " + e.Message);
+                CoreLogUtils.Debug("[CoreLiteTpn] VerifyAdmobTestDevice failed: " + e.Message);
             }
         }
 
@@ -194,7 +201,7 @@ namespace CoreLite
                 {
                     using (var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
                     using (var activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"))
-                    using (var debuggerClass = new AndroidJavaClass("com.anythink.core.api.ATDebuggerUITest"))
+                    using (var debuggerClass = new AndroidJavaClass("com.secmtp.sdk.debug.api.ATDebuggerUITest"))
                     {
                         debuggerClass.CallStatic("showDebuggerUI", activity);
                     }
@@ -224,14 +231,14 @@ namespace CoreLite
             {
                 using (var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
                 using (var activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"))
-                using (var atsdkClass = new AndroidJavaClass("com.anythink.core.api.ATSDK"))
+                using (var atsdkClass = new AndroidJavaClass("com.secmtp.sdk.core.api.ATSDK"))
                 {
                     // 读取 Admob 网络常量，兜底用 2
                     int admobNetwork;
                     try { admobNetwork = atsdkClass.GetStatic<int>("Admob_NETWORK"); }
                     catch { admobNetwork = 2; }
 
-                    using (var builder = new AndroidJavaObject("com.anythink.core.api.ATDebuggerConfig$Builder", admobNetwork))
+                    using (var builder = new AndroidJavaObject("com.secmtp.sdk.core.api.ATDebuggerConfig$Builder", admobNetwork))
                     {
                         var config = builder.Call<AndroidJavaObject>("build");
                         atsdkClass.CallStatic("setDebuggerConfig", activity, gaid, config);
