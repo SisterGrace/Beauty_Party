@@ -896,6 +896,9 @@ GameObject:
   - component: {fileID: 5562539243386194541}
   - component: {fileID: 7410963161911510403}
   - component: {fileID: 5192070957957360969}
+  - component: {fileID: 5778839500859880834}
+  - component: {fileID: 4108078034888408108}
+  - component: {fileID: 8199166262777807402}
   m_Layer: 5
   m_Name: Btn_AdDownload
   m_TagString: Untagged
@@ -945,7 +948,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 2100000, guid: 2d37c4afca8784ce9ab899810e29aa9c, type: 2}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
@@ -981,6 +984,56 @@ MonoBehaviour:
   effectTarget: {fileID: 0}
   thisImager: {fileID: 0}
   CurentCanvasGroup: {fileID: 0}
+--- !u!114 &5778839500859880834
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8170493160333142083}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1b2c3d4e5f6789012345678901234ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  adIcon: {fileID: 5444331801227616304}
+  shineEffect: {fileID: 4108078034888408108}
+  shinyEffectForUGUI: {fileID: 8199166262777807402}
+--- !u!114 &4108078034888408108
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8170493160333142083}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7fbea51ba9b60db449f868eb8bf8fee4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Speed: 1
+  Interval: 1
+  FromValue: 0
+  ToValue: 1
+--- !u!114 &8199166262777807402
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8170493160333142083}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62e4947d070cf41eb87bc6a9968c32a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Location: 0.83631015
+  m_Width: 0.25
+  m_Softness: 1
+  m_Brightness: 1
+  m_Rotation: 0
+  m_Highlight: 1
+  m_EffectMaterial: {fileID: 2100000, guid: 2d37c4afca8784ce9ab899810e29aa9c, type: 2}
 --- !u!1 &8923023829619064273
 GameObject:
   m_ObjectHideFlags: 0
