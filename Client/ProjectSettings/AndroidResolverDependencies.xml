@@ -30,7 +30,6 @@
     <package>com.anythink.sdk:adapter-tpn-vungle:7.6.1.1.0</package>
     <package>com.anythink.sdk:adapter-tpn-xiaomi:4.0.7.4.1.0</package>
     <package>com.anythink.sdk:core-tpn:6.5.52</package>
-    <package>com.anythink.sdk:debugger-ui-tpn:1.1.3</package>
     <package>com.applovin:applovin-sdk:13.5.1</package>
     <package>com.bigossp:bigo-ads:5.7.0</package>
     <package>com.chartboost:chartboost-core-sdk:1.1.0</package>
