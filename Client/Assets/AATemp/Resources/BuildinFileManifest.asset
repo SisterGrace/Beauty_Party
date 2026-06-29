@@ -149,8 +149,8 @@ MonoBehaviour:
     FileName: assets_assetraw_uiraw_atlas_photos_398855fc9f9877d7185508d55260d7cb.bundle
     FileCRC32: 7b27461b
   - PackageName: DefaultPackage
-    FileName: assets_assetraw_uiraw_atlas_playgame_defc077e1d496109a4150b9e1c03f1cf.bundle
-    FileCRC32: 27c35235
+    FileName: assets_assetraw_uiraw_atlas_playgame_9e8b383d94509445a36dd13c8e2a3010.bundle
+    FileCRC32: dcbf2f5f
   - PackageName: DefaultPackage
     FileName: assets_assetraw_uiraw_atlas_shop_2ed8c86119b5992c0e6339f9101911fb.bundle
     FileCRC32: 3f3bbdf6
@@ -260,8 +260,8 @@ MonoBehaviour:
     FileName: assets_assetraw_ui_panel_setting_16acb476c74311ed6753822f715772ef.bundle
     FileCRC32: 526fc4ac
   - PackageName: DefaultPackage
-    FileName: assets_assetraw_ui_panel_shop_ab34ba07d2a3cfd62e8a1a0a540cb76b.bundle
-    FileCRC32: 3280ab69
+    FileName: assets_assetraw_ui_panel_shop_3d0f61436b516175cb6b0bceece79542.bundle
+    FileCRC32: 9ead1114
   - PackageName: DefaultPackage
     FileName: assets_assetraw_ui_panel_starterpack_db601e9493d90313a6542b740e63baa7.bundle
     FileCRC32: dab7e04c
@@ -449,8 +449,8 @@ MonoBehaviour:
     FileName: share_assets_assetraw_anim_not load_grassyclick_2e808a70dfec11d0783538b2ea58e887.bundle
     FileCRC32: 2d75df12
   - PackageName: DefaultPackage
-    FileName: share_assets_assetraw_anim_not load_hat_8c325310a72bc2760ab1f2042a216146.bundle
-    FileCRC32: 8d9a93c5
+    FileName: share_assets_assetraw_anim_not load_hat_6d208093bae075a005c6d08d533b367b.bundle
+    FileCRC32: fb0a1770
   - PackageName: DefaultPackage
     FileName: share_assets_assetraw_anim_not load_icecubeclick_d55579c735187789d4282e0ae6a06e43.bundle
     FileCRC32: 35db4d06
@@ -458,8 +458,8 @@ MonoBehaviour:
     FileName: share_assets_assetraw_anim_not load_lihe_cf5847fab23cd2e83633811db58cc2a8.bundle
     FileCRC32: f0a02eb1
   - PackageName: DefaultPackage
-    FileName: share_assets_assetraw_anim_not load_mfb_c4c19d3cddebc3c7b300debb4465a9a7.bundle
-    FileCRC32: f6eca2cd
+    FileName: share_assets_assetraw_anim_not load_mfb_8db20a9395ee04c0f7e505345dc7b3d8.bundle
+    FileCRC32: fd041586
   - PackageName: DefaultPackage
     FileName: share_assets_assetraw_anim_not load_net_ffd2ed1c51004a95afcef0e351351d6c.bundle
     FileCRC32: 9dc220ba
@@ -539,8 +539,8 @@ MonoBehaviour:
     FileName: share_assets_plugins_textmesh pro_fonts_daca5fd4b228c17a1b1b23f79056d0f7.bundle
     FileCRC32: 65513a8f
   - PackageName: DefaultPackage
-    FileName: share_assets_plugins_textmesh pro_resources_fonts & materials_3fcb7510fac7b8c8b2fbd54eb73f36d5.bundle
-    FileCRC32: 7cf8dcb9
+    FileName: share_assets_plugins_textmesh pro_resources_fonts & materials_43690076e4ae17a22f49a5f4a76c0028.bundle
+    FileCRC32: 81653294
   - PackageName: DefaultPackage
     FileName: share_assets_plugins_textmesh pro_resources_sprite assets_55f167513337e99109e01997387a7a1f.bundle
     FileCRC32: 6e36513f
