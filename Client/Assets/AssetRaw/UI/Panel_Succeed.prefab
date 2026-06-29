@@ -1734,6 +1734,7 @@ GameObject:
   - component: {fileID: 8528050421576356174}
   - component: {fileID: 6105170039209280636}
   - component: {fileID: 7190589464568627603}
+  - component: {fileID: 3148506156677599940}
   m_Layer: 5
   m_Name: Btn_AdGet
   m_TagString: Untagged
@@ -1817,6 +1818,20 @@ MonoBehaviour:
   effectTarget: {fileID: 0}
   thisImager: {fileID: 0}
   CurentCanvasGroup: {fileID: 0}
+--- !u!114 &3148506156677599940
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5220910668387611032}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1b2c3d4e5f6789012345678901234ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  adIcon: {fileID: 5220910668387611032}
+  shineEffect: {fileID: 0}
 --- !u!1 &5240093916548067891
 GameObject:
   m_ObjectHideFlags: 0
@@ -2871,6 +2886,7 @@ GameObject:
   - component: {fileID: 9000785784484141858}
   - component: {fileID: 9000785784484141857}
   - component: {fileID: 9000785784484141859}
+  - component: {fileID: 9041352432484611900}
   m_Layer: 5
   m_Name: Btn_AdDownload
   m_TagString: Untagged
@@ -2955,6 +2971,20 @@ MonoBehaviour:
   effectTarget: {fileID: 0}
   thisImager: {fileID: 0}
   CurentCanvasGroup: {fileID: 0}
+--- !u!114 &9041352432484611900
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9000785784484141863}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1b2c3d4e5f6789012345678901234ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  adIcon: {fileID: 5240093916548067891}
+  shineEffect: {fileID: 0}
 --- !u!1 &9027707882429202969
 GameObject:
   m_ObjectHideFlags: 0

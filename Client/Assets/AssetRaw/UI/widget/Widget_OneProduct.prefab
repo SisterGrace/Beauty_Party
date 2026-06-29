@@ -336,6 +336,7 @@ GameObject:
   - component: {fileID: 2239590829667280974}
   - component: {fileID: 6522040970926787381}
   - component: {fileID: 3887412402482096586}
+  - component: {fileID: 30067452757024068}
   m_Layer: 5
   m_Name: Btn_PackPrice
   m_TagString: Untagged
@@ -419,6 +420,20 @@ MonoBehaviour:
   effectTarget: {fileID: 0}
   thisImager: {fileID: 0}
   CurentCanvasGroup: {fileID: 0}
+--- !u!114 &30067452757024068
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1771993797578395779}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1b2c3d4e5f6789012345678901234ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  adIcon: {fileID: 694737773993030164}
+  shineEffect: {fileID: 0}
 --- !u!1 &2030103744561206357
 GameObject:
   m_ObjectHideFlags: 0

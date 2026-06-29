@@ -41,14 +41,23 @@ namespace Coffee.UIExtensions
 		[SerializeField][Range(0, 1)] float m_Highlight = 1;
 		[SerializeField] Material m_EffectMaterial;
 
-
-		//################################
-		// Public Members.
-		//################################
-		/// <summary>
-		/// Graphic affected by the UIEffect.
-		/// </summary>
-		new public Graphic graphic { get { return base.graphic; } }
+        //设置与主界面"进入关卡"按钮相同的参数
+        public void SetShinyEffect()
+		{
+            m_Location = 0.9934562f;
+            m_Width = 0.175f;
+            m_Softness = 0.893f;
+            m_Brightness = 0.607f;
+            m_Rotation = 33f;  // 斜扫33度
+            m_Highlight = 0.406f;
+        }
+        //################################
+        // Public Members.
+        //################################
+        /// <summary>
+        /// Graphic affected by the UIEffect.
+        /// </summary>
+        new public Graphic graphic { get { return base.graphic; } }
 
 		/// <summary>
 		/// Location for shiny effect.

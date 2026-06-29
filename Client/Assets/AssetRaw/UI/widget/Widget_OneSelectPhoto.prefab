@@ -48,6 +48,7 @@ GameObject:
   - component: {fileID: 6750600880600823236}
   - component: {fileID: 3687522089981230843}
   - component: {fileID: 3001694035233167858}
+  - component: {fileID: 9049660496797499666}
   m_Layer: 5
   m_Name: Btn_Refresh
   m_TagString: Untagged
@@ -131,6 +132,20 @@ MonoBehaviour:
   effectTarget: {fileID: 0}
   thisImager: {fileID: 0}
   CurentCanvasGroup: {fileID: 0}
+--- !u!114 &9049660496797499666
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2506454177528874177}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1b2c3d4e5f6789012345678901234ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  adIcon: {fileID: 5283185876830007986}
+  shineEffect: {fileID: 0}
 --- !u!1 &3785453016347570489
 GameObject:
   m_ObjectHideFlags: 0
