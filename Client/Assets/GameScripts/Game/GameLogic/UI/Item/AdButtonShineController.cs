@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using Coffee.UIExtensions;
+using System.Collections;
 namespace GameLogic
 {
     /// <summary>
@@ -19,37 +20,63 @@ namespace GameLogic
 
         private bool _lastAdIconState;
 
+        public ShinyEffectForUGUI shinyEffectForUGUI;
+
         private void Awake()
-        {
+    {
             // 自动查找扫光组件
             if (shineEffect == null)
             {
                 shineEffect = GetComponent<Item_ShineEffect>();
             }
 
-            // 如果按钮上没有扫光组件，自动添加
+            // 如果GameObject上没有Item_ShineEffect组件，自动添加
             if (shineEffect == null)
             {
                 shineEffect = gameObject.AddComponent<Item_ShineEffect>();
-                shineEffect.SetShineEffect();
+                shineEffect.Speed = 0.7f;
+                shineEffect.Interval = 0.4f;
+                shineEffect.FromValue = 0f;
+                shineEffect.ToValue = 1f;
+                shineEffect.enabled = false; // 默认禁用
+                Debug.LogWarning($"[AdButtonShineController] {gameObject.name}: Auto-created Item_ShineEffect");
             }
-
+            shineEffect.enabled = false;
             // 确保ShinyEffectForUGUI组件存在
-            var shinyEffect = GetComponent<ShinyEffectForUGUI>();
-            if (shinyEffect == null)
+            shinyEffectForUGUI = GetComponent<ShinyEffectForUGUI>();
+            if (shinyEffectForUGUI == null)
             {
-                shinyEffect = gameObject.AddComponent<ShinyEffectForUGUI>();
-                // 设置与主界面"进入关卡"按钮相同的参数
-                shinyEffect.SetShinyEffect();
-                
+                shinyEffectForUGUI = gameObject.AddComponent<ShinyEffectForUGUI>();
+                shinyEffectForUGUI.SetShinyEffect();
+                Debug.LogWarning($"[AdButtonShineController] {gameObject.name}: Auto-created ShinyEffectForUGUI");
+            }
+            shinyEffectForUGUI.enabled = false;
+            StartCoroutine(DeactivateAfterDelay());
+        }
+        IEnumerator DeactivateAfterDelay()
+        {
+            // yield return new WaitForSeconds(2f); 这行就是暂停点
+            // 程序运行到这里会暂停，等待2秒（游戏时间）后，再继续执行后面的代码
+            yield return new WaitForSeconds(0.01f);
+
+            // 初始化 _lastAdIconState
+            if (adIcon != null)
+            {
+                _lastAdIconState = adIcon.activeInHierarchy;
+            }
+            else
+            {
+                Debug.LogError($"[AdButtonShineController] {gameObject.name}: adIcon is not assigned!");
             }
 
             // 初始状态
             UpdateShineState();
+            update = true;
         }
-
+        bool update = false;
         private void Update()
         {
+            if (!update) { return; }
             // 检测AD图标状态变化
             if (adIcon != null)
             {
@@ -67,7 +94,14 @@ namespace GameLogic
             if (shineEffect != null && adIcon != null)
             {
                 // 只有当AD图标显示时才启用扫光
-                shineEffect.enabled = adIcon.activeInHierarchy;
+                bool shouldEnable = adIcon.activeInHierarchy;
+                shineEffect.enabled = shouldEnable;
+                shinyEffectForUGUI.enabled= shouldEnable;
+                Debug.Log($"[AdButtonShineController] {gameObject.name}: adIcon={adIcon.name}, active={shouldEnable}, shineEffect.enabled={shineEffect.enabled}");
+            }
+            else
+            {
+                Debug.LogWarning($"[AdButtonShineController] {gameObject.name}: shineEffect={shineEffect != null}, adIcon={adIcon != null}");
             }
         }
 

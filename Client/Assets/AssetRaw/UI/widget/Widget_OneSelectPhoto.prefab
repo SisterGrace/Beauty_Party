@@ -49,6 +49,8 @@ GameObject:
   - component: {fileID: 3687522089981230843}
   - component: {fileID: 3001694035233167858}
   - component: {fileID: 9049660496797499666}
+  - component: {fileID: 9155706268849696859}
+  - component: {fileID: 9155706268849696860}
   m_Layer: 5
   m_Name: Btn_Refresh
   m_TagString: Untagged
@@ -96,7 +98,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 2100000, guid: 2d37c4afca8784ce9ab899810e29aa9c, type: 2}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
@@ -145,7 +147,42 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   adIcon: {fileID: 5283185876830007986}
-  shineEffect: {fileID: 0}
+  shineEffect: {fileID: 3687522089981230843}
+--- !u!114 &9155706268849696859
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2506454177528874177}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7fbea51ba9b60db449f868eb8bf8fee4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Speed: 0.7
+  Interval: 0.4
+  FromValue: 0
+  ToValue: 1
+--- !u!114 &9155706268849696860
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2506454177528874177}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62e4947d070cf41eb87bc6a9968c32a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Location: 0.9934562
+  m_Width: 0.175
+  m_Softness: 0.893
+  m_Brightness: 0.607
+  m_Rotation: 33
+  m_Highlight: 0.406
+  m_EffectMaterial: {fileID: 2100000, guid: 2d37c4afca8784ce9ab899810e29aa9c, type: 2}
 --- !u!1 &3785453016347570489
 GameObject:
   m_ObjectHideFlags: 0
