@@ -29,27 +29,22 @@ namespace GameLogic
             {
                 shineEffect = GetComponent<Item_ShineEffect>();
             }
-
             // 如果GameObject上没有Item_ShineEffect组件，自动添加
             if (shineEffect == null)
             {
                 shineEffect = gameObject.AddComponent<Item_ShineEffect>();
-                shineEffect.Speed = 0.7f;
-                shineEffect.Interval = 0.4f;
-                shineEffect.FromValue = 0f;
-                shineEffect.ToValue = 1f;
-                shineEffect.enabled = false; // 默认禁用
                 Debug.LogWarning($"[AdButtonShineController] {gameObject.name}: Auto-created Item_ShineEffect");
             }
+            shineEffect.SetShineEffect();
             shineEffect.enabled = false;
             // 确保ShinyEffectForUGUI组件存在
             shinyEffectForUGUI = GetComponent<ShinyEffectForUGUI>();
             if (shinyEffectForUGUI == null)
             {
                 shinyEffectForUGUI = gameObject.AddComponent<ShinyEffectForUGUI>();
-                shinyEffectForUGUI.SetShinyEffect();
                 Debug.LogWarning($"[AdButtonShineController] {gameObject.name}: Auto-created ShinyEffectForUGUI");
             }
+            shinyEffectForUGUI.SetShinyEffect();
             shinyEffectForUGUI.enabled = false;
             StartCoroutine(DeactivateAfterDelay());
         }
