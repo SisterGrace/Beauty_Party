@@ -1,5 +1,5 @@
 //#define TOPON_TEST
-//#define ADMOB_TEST
+#define ADMOB_TEST
 using System.Collections.Generic;
 using AnyThinkAds.Api;
 using UnityEngine;
@@ -108,6 +108,8 @@ namespace CoreLite
 
 #if ADMOB_TEST && UNITY_ANDROID
             VerifyAdmobTestDevice();
+           /* bool isTestDevice = IsCurrentDeviceTestDevice();
+            CoreLogUtils.Debug("[CoreLiteTpn] Is current device a test device? " + isTestDevice);*/
 #endif
 #if TOPON_TEST && UNITY_ANDROID
             // SDK 初始化成功后，调起 TopOn 测试工具 UI（链接包方式）
@@ -192,6 +194,46 @@ namespace CoreLite
             catch (System.Exception e)
             {
                 CoreLogUtils.Debug("[CoreLiteTpn] EnableAdmobDebug all failed: " + e.Message);
+            }
+        }
+        /// <summary>
+        /// 判断当前设备是否为 AdMob 测试设备
+        /// 参考 React Native AdMob 的实现，调用原生 SDK 的 isTestDevice 方法//问题，拿不到istestdevice这个方法
+        /// </summary>
+        private static bool IsCurrentDeviceTestDevice()
+        {
+            try
+            {
+                // 方法1：通过 AdRequest.isTestDevice(Context) 判断（推荐）
+                using (var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
+                using (var activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"))
+                using (var adRequestClass = new AndroidJavaClass("com.google.android.gms.ads.AdRequest"))
+                {
+                    // 注意：这里是静态方法调用 AdRequest.isTestDevice(Context)
+                    bool isTest = adRequestClass.CallStatic<bool>("isTestDevice", activity);
+                    return isTest;
+                }
+            }
+            catch (System.Exception e1)
+            {
+                CoreLogUtils.Debug("[CoreLiteTpn] AdRequest.isTestDevice failed: " + e1.Message);
+
+                // 方法2：如果上面失败，尝试从 RequestConfiguration 读取
+                try
+                {
+                    using (var mobileAdsClass = new AndroidJavaClass("com.google.android.gms.ads.MobileAds"))
+                    {
+                        var config = mobileAdsClass.CallStatic<AndroidJavaObject>("getRequestConfiguration");
+                        var testDeviceIds = config.Call<AndroidJavaObject>("getTestDeviceIds");
+                        int count = testDeviceIds.Call<int>("size");
+                        return count > 0;
+                    }
+                }
+                catch (System.Exception e2)
+                {
+                    CoreLogUtils.Debug("[CoreLiteTpn] RequestConfiguration fallback failed: " + e2.Message);
+                    return false;
+                }
             }
         }
 #endif
