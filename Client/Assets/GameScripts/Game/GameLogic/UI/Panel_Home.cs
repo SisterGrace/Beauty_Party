@@ -228,7 +228,8 @@ namespace GameLogic
 		private void SetActivity()
 		{
 			var list = UserController.Instance.GetAllActivityData();
-			var count = list.Count;
+            list.RemoveAll(data => data.Id == ActivityType.Discard);
+            var count = list.Count;
 			if (list.Count < _activityList.Count && _activityList.Count > 0)
 			{
 				var tempList = new List<Widget_ActivityIcon>();
