@@ -1,3 +1,5 @@
+#define TOPON_TEST
+#define ADMOB_TEST
 using System.Collections.Generic;
 using AnyThinkAds.Api;
 using UnityEngine;
@@ -63,7 +65,7 @@ namespace CoreLite
 
 #if UNITY_ANDROID || UNITY_IOS
             AnyThinkAds.Api.ATSDKAPI.setLogDebug(CoreLogUtils.Enabled);
-#if UNITY_ANDROID
+#if TOPON_TEST && UNITY_ANDROID
             // 海外版 SDK 使用 secmtp 混淆，原始路径 com.anythink.core.api.* 不可用
             try
             {
@@ -77,11 +79,16 @@ namespace CoreLite
             {
                 CoreLogUtils.Debug("[CoreLiteTpn] setNetworkLogDebug failed: " + e.Message);
             }
-            SetAdmobTestDevice("CECC96A68B641E880BC8530704249FE9"); // AdMob 设备 hash（从日志获取，非 GAID）
-            EnableAdmobDebug();
+
             // TopOn 调试模式：使用硬编码 GAID 开启 Admob 测试广告（避免主线程阻塞获取GAID失败）
             SetTopOnDebugMode("2d04bdd5-eb09-4df0-9293-250ab4990c5b");
 #endif
+#if ADMOB_TEST && UNITY_ANDROID
+            SetAdmobTestDevice("CECC96A68B641E880BC8530704249FE9"); // AdMob 设备 hash（从日志获取，非 GAID）
+            EnableAdmobDebug();
+#endif
+
+
             CoreLogUtils.Debug("[CoreLiteTpn] ATSDKAPI.initSDK begin appId:" + _appId);
             var listener = new CoreTpnInitListener(
                 _appId,
@@ -98,8 +105,11 @@ namespace CoreLite
             _isInitialized = true;
             CoreLogUtils.Debug("[CoreLiteTpn] SDK initialized, start loading ads (Splash first)");
 
-#if UNITY_ANDROID
+
+#if ADMOB_TEST && UNITY_ANDROID
             VerifyAdmobTestDevice();
+#endif
+#if TOPON_TEST && UNITY_ANDROID
             // SDK 初始化成功后，调起 TopOn 测试工具 UI（链接包方式）
             ShowDebuggerUI();
 #endif
@@ -111,7 +121,7 @@ namespace CoreLite
             LoadBanner();
         }
 
-#if UNITY_ANDROID
+#if ADMOB_TEST
         private static void SetAdmobTestDevice(string testDeviceId)
         {
             try
@@ -184,7 +194,9 @@ namespace CoreLite
                 CoreLogUtils.Debug("[CoreLiteTpn] EnableAdmobDebug all failed: " + e.Message);
             }
         }
+#endif
 
+#if TOPON_TEST
         private static void ShowDebuggerUI()
         {
             try
@@ -213,7 +225,6 @@ namespace CoreLite
                 }
             }
         }
-#endif
 
         /// <summary>
         /// TopOn 调试模式：锁定当前设备仅加载指定广告平台的测试广告。
@@ -251,7 +262,7 @@ namespace CoreLite
                 CoreLogUtils.Debug("[CoreLiteTpn] SetTopOnDebugMode failed: " + e.Message);
             }
         }
-
+#endif
         private void OnSdkInitFail(string message)
         {
             _isInitialized = false;
