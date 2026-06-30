@@ -1121,7 +1121,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2182766826086277432, guid: b46e88b2966b60e41b9eb15f8d7fc3df, type: 3}
       propertyPath: _bursts.Array.data[0].used
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2182766826086277432, guid: b46e88b2966b60e41b9eb15f8d7fc3df, type: 3}
       propertyPath: _startSize.xCurve.m_ConstantMax
@@ -1133,7 +1133,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5849521796605177747, guid: b46e88b2966b60e41b9eb15f8d7fc3df, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6248523997720940949, guid: b46e88b2966b60e41b9eb15f8d7fc3df, type: 3}
       propertyPath: m_Pivot.x
@@ -1237,9 +1237,13 @@ PrefabInstance:
       propertyPath: m_Name
       value: eff_ui_QRXD_002
       objectReference: {fileID: 0}
+    - target: {fileID: 1764580450221459012, guid: 301e5423f4ba46c4f9c21ab3d9ab508e, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5612458291763068339, guid: 301e5423f4ba46c4f9c21ab3d9ab508e, type: 3}
       propertyPath: _bursts.Array.data[0].used
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8267344827358038466, guid: 301e5423f4ba46c4f9c21ab3d9ab508e, type: 3}
       propertyPath: m_Pivot.x
