@@ -77,7 +77,7 @@ namespace CoreLite
                                 {
                                     Debug.LogWarning("[Firebase] 远程配置 Activate 返回 false（没有新配置被激活）");
                                 }
-
+                                Sky.LogTool.DebugLog("[Firebase] 远程配置 成功！ ", Sky.LogTool.Color.purple);
                                 // ---- 原有的初始化逻辑（保持不变） ----
                                 _isInitialized = true;
                                 CoreAdsConfigParser.Parse(GetConfigStr("AdUnits"));

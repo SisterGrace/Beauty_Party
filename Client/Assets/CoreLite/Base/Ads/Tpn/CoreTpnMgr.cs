@@ -1,3 +1,5 @@
+//#define TOPON_TEST
+#define ADMOB_TEST
 using System.Collections.Generic;
 using AnyThinkAds.Api;
 using UnityEngine;
@@ -63,23 +65,30 @@ namespace CoreLite
 
 #if UNITY_ANDROID || UNITY_IOS
             AnyThinkAds.Api.ATSDKAPI.setLogDebug(CoreLogUtils.Enabled);
-#if UNITY_ANDROID
+#if TOPON_TEST && UNITY_ANDROID
+            // 海外版 SDK 使用 secmtp 混淆，原始路径 com.anythink.core.api.* 不可用
             try
             {
-                using (var atsdkClass = new AndroidJavaClass("com.anythink.core.api.ATSDK"))
+                using (var atsdkClass = new AndroidJavaClass("com.secmtp.sdk.core.api.ATSDK"))
                 {
                     atsdkClass.CallStatic("setNetworkLogDebug", true);
+                    CoreLogUtils.Debug("[CoreLiteTpn] setNetworkLogDebug ON (secmtp)");
                 }
             }
             catch (System.Exception e)
             {
                 CoreLogUtils.Debug("[CoreLiteTpn] setNetworkLogDebug failed: " + e.Message);
             }
-            SetAdmobTestDevice("2d04bdd5-eb09-4df0-9293-250ab4990c5b"); // 设备真实GAID
-            EnableAdmobDebug();
+
             // TopOn 调试模式：使用硬编码 GAID 开启 Admob 测试广告（避免主线程阻塞获取GAID失败）
             SetTopOnDebugMode("2d04bdd5-eb09-4df0-9293-250ab4990c5b");
 #endif
+#if ADMOB_TEST && UNITY_ANDROID
+            SetAdmobTestDevice("CECC96A68B641E880BC8530704249FE9"); // AdMob 设备 hash（从日志获取，非 GAID）
+            EnableAdmobDebug();
+#endif
+
+
             CoreLogUtils.Debug("[CoreLiteTpn] ATSDKAPI.initSDK begin appId:" + _appId);
             var listener = new CoreTpnInitListener(
                 _appId,
@@ -96,8 +105,13 @@ namespace CoreLite
             _isInitialized = true;
             CoreLogUtils.Debug("[CoreLiteTpn] SDK initialized, start loading ads (Splash first)");
 
-#if UNITY_ANDROID
+
+#if ADMOB_TEST && UNITY_ANDROID
             VerifyAdmobTestDevice();
+           /* bool isTestDevice = IsCurrentDeviceTestDevice();
+            CoreLogUtils.Debug("[CoreLiteTpn] Is current device a test device? " + isTestDevice);*/
+#endif
+#if TOPON_TEST && UNITY_ANDROID
             // SDK 初始化成功后，调起 TopOn 测试工具 UI（链接包方式）
             ShowDebuggerUI();
 #endif
@@ -109,7 +123,7 @@ namespace CoreLite
             LoadBanner();
         }
 
-#if UNITY_ANDROID
+#if ADMOB_TEST
         private static void SetAdmobTestDevice(string testDeviceId)
         {
             try
@@ -137,17 +151,22 @@ namespace CoreLite
         {
             try
             {
-                using (var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
-                using (var activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"))
-                using (var adRequestClass = new AndroidJavaClass("com.google.android.gms.ads.AdRequest"))
+                using (var mobileAdsClass = new AndroidJavaClass("com.google.android.gms.ads.MobileAds"))
                 {
-                    var isTest = adRequestClass.CallStatic<bool>("isTestDevice", activity);
-                    CoreLogUtils.Debug("[CoreLiteTpn] AdRequest.isTestDevice()=" + isTest);
+                    var config = mobileAdsClass.CallStatic<AndroidJavaObject>("getRequestConfiguration");
+                    var testDeviceIds = config.Call<AndroidJavaObject>("getTestDeviceIds");
+                    int count = testDeviceIds.Call<int>("size");
+                    CoreLogUtils.Debug("[CoreLiteTpn] AdMob test device count: " + count);
+                    for (int i = 0; i < count; i++)
+                    {
+                        var id = testDeviceIds.Call<string>("get", i);
+                        CoreLogUtils.Debug("[CoreLiteTpn] AdMob test device[" + i + "]: " + id);
+                    }
                 }
             }
             catch (System.Exception e)
             {
-                CoreLogUtils.Debug("[CoreLiteTpn] isTestDevice() call failed: " + e.Message);
+                CoreLogUtils.Debug("[CoreLiteTpn] VerifyAdmobTestDevice failed: " + e.Message);
             }
         }
 
@@ -177,7 +196,49 @@ namespace CoreLite
                 CoreLogUtils.Debug("[CoreLiteTpn] EnableAdmobDebug all failed: " + e.Message);
             }
         }
+        /// <summary>
+        /// 判断当前设备是否为 AdMob 测试设备
+        /// 参考 React Native AdMob 的实现，调用原生 SDK 的 isTestDevice 方法//问题，拿不到istestdevice这个方法
+        /// </summary>
+        private static bool IsCurrentDeviceTestDevice()
+        {
+            try
+            {
+                // 方法1：通过 AdRequest.isTestDevice(Context) 判断（推荐）
+                using (var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
+                using (var activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"))
+                using (var adRequestClass = new AndroidJavaClass("com.google.android.gms.ads.AdRequest"))
+                {
+                    // 注意：这里是静态方法调用 AdRequest.isTestDevice(Context)
+                    bool isTest = adRequestClass.CallStatic<bool>("isTestDevice", activity);
+                    return isTest;
+                }
+            }
+            catch (System.Exception e1)
+            {
+                CoreLogUtils.Debug("[CoreLiteTpn] AdRequest.isTestDevice failed: " + e1.Message);
 
+                // 方法2：如果上面失败，尝试从 RequestConfiguration 读取
+                try
+                {
+                    using (var mobileAdsClass = new AndroidJavaClass("com.google.android.gms.ads.MobileAds"))
+                    {
+                        var config = mobileAdsClass.CallStatic<AndroidJavaObject>("getRequestConfiguration");
+                        var testDeviceIds = config.Call<AndroidJavaObject>("getTestDeviceIds");
+                        int count = testDeviceIds.Call<int>("size");
+                        return count > 0;
+                    }
+                }
+                catch (System.Exception e2)
+                {
+                    CoreLogUtils.Debug("[CoreLiteTpn] RequestConfiguration fallback failed: " + e2.Message);
+                    return false;
+                }
+            }
+        }
+#endif
+
+#if TOPON_TEST
         private static void ShowDebuggerUI()
         {
             try
@@ -194,7 +255,7 @@ namespace CoreLite
                 {
                     using (var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
                     using (var activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"))
-                    using (var debuggerClass = new AndroidJavaClass("com.anythink.core.api.ATDebuggerUITest"))
+                    using (var debuggerClass = new AndroidJavaClass("com.secmtp.sdk.debug.api.ATDebuggerUITest"))
                     {
                         debuggerClass.CallStatic("showDebuggerUI", activity);
                     }
@@ -206,7 +267,6 @@ namespace CoreLite
                 }
             }
         }
-#endif
 
         /// <summary>
         /// TopOn 调试模式：锁定当前设备仅加载指定广告平台的测试广告。
@@ -224,14 +284,14 @@ namespace CoreLite
             {
                 using (var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
                 using (var activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"))
-                using (var atsdkClass = new AndroidJavaClass("com.anythink.core.api.ATSDK"))
+                using (var atsdkClass = new AndroidJavaClass("com.secmtp.sdk.core.api.ATSDK"))
                 {
                     // 读取 Admob 网络常量，兜底用 2
                     int admobNetwork;
                     try { admobNetwork = atsdkClass.GetStatic<int>("Admob_NETWORK"); }
                     catch { admobNetwork = 2; }
 
-                    using (var builder = new AndroidJavaObject("com.anythink.core.api.ATDebuggerConfig$Builder", admobNetwork))
+                    using (var builder = new AndroidJavaObject("com.secmtp.sdk.core.api.ATDebuggerConfig$Builder", admobNetwork))
                     {
                         var config = builder.Call<AndroidJavaObject>("build");
                         atsdkClass.CallStatic("setDebuggerConfig", activity, gaid, config);
@@ -244,7 +304,7 @@ namespace CoreLite
                 CoreLogUtils.Debug("[CoreLiteTpn] SetTopOnDebugMode failed: " + e.Message);
             }
         }
-
+#endif
         private void OnSdkInitFail(string message)
         {
             _isInitialized = false;

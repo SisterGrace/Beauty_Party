@@ -28,9 +28,6 @@ dependencyResolutionManagement {
             url "https://developer.hihonor.com/repo/" // Assets/Plugins/SolarEngine/Editor/SolarEngineDependencies.xml:18
         }
         maven {
-            url "https://jfrog.anythinktech.com/artifactory/debugger" // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/Editor/DebuggerUIDependencies.xml:5
-        }
-        maven {
             url "https://jfrog.anythinktech.com/artifactory/overseas_sdk" // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/Editor/Dependencies.xml:5
         }
         maven {

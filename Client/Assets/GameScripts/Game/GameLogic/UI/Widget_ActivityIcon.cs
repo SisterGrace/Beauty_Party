@@ -35,8 +35,10 @@ namespace GameLogic
 				FlySystem.Instance.RegisterPos(FlyReType.DreamPassKey, transform);
 			}
 
-			mstar.SetActive(_cfg.OpenBtnEff);
-			mEnter.transform.GetComponent<Item_ShineEffect>().enabled = _cfg.OpenBtnFlash;
+		mstar.SetActive(_cfg.OpenBtnEff);
+		// 强制关闭社区按钮的扫光效果
+		bool enableFlash = _cfg.ActType == ActivityType.Discard ? false : _cfg.OpenBtnFlash;
+		mEnter.transform.GetComponent<Item_ShineEffect>().enabled = enableFlash;
 
 			if (_data.Id == ActivityType.Gacha)
 			{

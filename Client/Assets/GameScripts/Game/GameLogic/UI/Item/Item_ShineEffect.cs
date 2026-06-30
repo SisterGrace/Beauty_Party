@@ -29,7 +29,11 @@ namespace GameLogic
 
             ResetState();
         }
-
+        public void SetShineEffect()
+        {
+            Speed = 0.7f;
+            Interval = 0.4f;
+        }
         private void ResetState()
         {
             _timer = 0f;

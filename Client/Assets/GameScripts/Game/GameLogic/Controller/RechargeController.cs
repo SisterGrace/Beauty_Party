@@ -485,9 +485,23 @@ namespace GameLogic
                     priceTxt.SetLanguage(btnTxt);
                     break;
             }
-            if (adIcon != null) adIcon.SetActive(isShowAd);
-            return isShowAd;
+        if (adIcon != null) adIcon.SetActive(isShowAd);
+        
+        // 控制扫光效果：IAA模式下启用扫光
+        // priceTxt 路径: Btn_PackPrice/Hor/TMP_PackPriceTxt
+        // 所以按钮是 parent.parent
+        var btnTransform = priceTxt.transform.parent?.parent;
+        if (btnTransform != null)
+        {
+            var shineEffect = btnTransform.GetComponent<Item_ShineEffect>();
+            if (shineEffect != null)
+            {
+                shineEffect.enabled = isShowAd;
+            }
         }
+        
+        return isShowAd;
+    }
 
         /// <summary>
         /// 通用点击处理：IAA 模式下弹出广告（广告位使用 cfg.EventID）并更新进度，IAP 模式下直接购买。
