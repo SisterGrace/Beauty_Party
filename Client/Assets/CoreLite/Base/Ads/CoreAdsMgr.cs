@@ -112,7 +112,7 @@ namespace CoreLite
                 else
                 {
                     CoreBidPlatformMgr.Instance.RecordBidSuccess(winner.PlatformType, CoreLiteAdsType.Rewarded);
-                    CoreAnalyticsMgr.TrackEvent("RV_Winner", BuildBidEventParams(results, _pos));
+                    //CoreAnalyticsMgr.TrackEvent("RV_Winner", BuildBidEventParams(results, _pos));
                     winner.Client.ShowRewarded();
                     CheckAndRefreshExpiredBids(CoreLiteAdsType.Rewarded);
                 }  
@@ -143,11 +143,13 @@ namespace CoreLite
         private bool IsInterstitialReady(IvType _ivType, string _adPos)
         {
             if(CorePrefs.IsRemoveAds) return false;
+           
             // 使用 CanShowInterPeek 仅做只读检查，避免与 ShowInterstitial 内已调用的 CanShowInter 重复计次
             if (CoreInterstitialRules.Instance.CanShowInterPeek(_ivType) != null)
             {
                 CoreLogUtils.Debug(" [ads] skip iv by condition");
                 CoreAnalyticsMgr.TrackEvent("IV_ShowFail_Rule_Limit",new Dictionary<string, object>() { {"Position", _adPos} } );
+                CoreAnalyticsMgr.TrackEvent("IV_ShowFail", new Dictionary<string, object>() { { "Position", _adPos } });
                 return false;
             }
 
@@ -155,6 +157,7 @@ namespace CoreLite
             {
                 CoreLogUtils.Debug(" [ads] iv not ready");
                 CoreAnalyticsMgr.TrackEvent("IV_ShowFail_Not_Ready",new Dictionary<string, object>() { {"Position", _adPos} } );
+                CoreAnalyticsMgr.TrackEvent("IV_ShowFail", new Dictionary<string, object>() { { "Position", _adPos } });
                 return false;
             }
 
@@ -219,7 +222,7 @@ namespace CoreLite
                     }
                     else
                     {
-                        CoreAnalyticsMgr.TrackEvent("IV_Winner", BuildBidEventParams(results, _adPos));
+                        //CoreAnalyticsMgr.TrackEvent("IV_Winner", BuildBidEventParams(results, _adPos));
                         CoreBidPlatformMgr.Instance.RecordBidSuccess(winner.PlatformType, CoreLiteAdsType.Interstitial);
                         winner.Client.ShowInterstitial();
                         CheckAndRefreshExpiredBids(CoreLiteAdsType.Interstitial);
@@ -238,7 +241,7 @@ namespace CoreLite
                 }
                 else
                 {
-                    CoreAnalyticsMgr.TrackEvent("IV_Winner", BuildBidEventParams(results, _adPos));
+                    //CoreAnalyticsMgr.TrackEvent("IV_Winner", BuildBidEventParams(results, _adPos));
                     CoreBidPlatformMgr.Instance.RecordBidSuccess(winner.PlatformType, CoreLiteAdsType.Interstitial);
                     winner.Client.ShowInterstitial();
                     CheckAndRefreshExpiredBids(CoreLiteAdsType.Interstitial);
@@ -286,7 +289,7 @@ namespace CoreLite
             }
 
             CoreAnalyticsMgr.TrackEvent("IV_Position", new Dictionary<string, object>() { { "Position", _adPos } });
-            CoreAnalyticsMgr.TrackEvent("IV_AchieveShow_IgnoreFrequency", new Dictionary<string, object>() { { "Position", _adPos } });
+            //CoreAnalyticsMgr.TrackEvent("IV_AchieveShow_IgnoreFrequency", new Dictionary<string, object>() { { "Position", _adPos } });
             var results = SelectBestAds(CoreLiteAdsType.Interstitial);
             var winner = results.Count > 0 ? results[0] : null;
             if (winner == null)
@@ -295,7 +298,7 @@ namespace CoreLite
             }
             else
             {
-                CoreAnalyticsMgr.TrackEvent("IV_Winner", BuildBidEventParams(results, _adPos));
+                //CoreAnalyticsMgr.TrackEvent("IV_Winner", BuildBidEventParams(results, _adPos));
                 CoreBidPlatformMgr.Instance.RecordBidSuccess(winner.PlatformType, CoreLiteAdsType.Interstitial);
                 winner.Client.ShowInterstitial();
                 CheckAndRefreshExpiredBids(CoreLiteAdsType.Interstitial);

@@ -366,13 +366,13 @@ namespace CoreLite
             var bestPlacement = CoreTpnInter.Instance.GetHighestPayingPlacement();
             if (string.IsNullOrEmpty(bestPlacement))
             {
-                CoreAnalyticsMgr.TrackEvent("IV_AchieveShow_Fail", new Dictionary<string, object>()
+               /* CoreAnalyticsMgr.TrackEvent("IV_AchieveShow_Fail", new Dictionary<string, object>()
                 {
                     { "Position", CoreAdsMgr.Instance._ivPos },
                     { "ad_platform", CorePlatformType.TPN.ToString() },
                     { "unitId", "" },
                     { "show_fail_reason", "highest_paying_placement_not_found" }
-                });
+                });*/
                 CoreAdsMgr.Instance._ivCloseCallback?.Invoke();
                 LoadInterstitial();
                 return;

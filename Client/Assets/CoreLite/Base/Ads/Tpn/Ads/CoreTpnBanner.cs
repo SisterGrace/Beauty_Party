@@ -218,11 +218,12 @@ namespace CoreLite
                         revenue = status.adInfo.publisher_revenue;
                         _placementRevenue[placementId] = revenue;
                         adId = status.adInfo.network_placement_id;
-                        source = "Topon_" + status.adInfo.network_firm_id.ToString();
+                        //source = "Topon_" + status.adInfo.network_firm_id.ToString();
+                        source = status.adInfo.network_firm_id.ToString();
                     }
                 }
                 catch { }
-                CoreAdsEvents.LogLoadedEvent(adId, source, PlatformName, loadTime, AdLoadType.Banner, placementId, revenue);
+                //CoreAdsEvents.LogLoadedEvent(adId, source, PlatformName, loadTime, AdLoadType.Banner, placementId, revenue);
                 _retryAttempts[placementId] = 0;
                 CoreLogUtils.Debug("[CoreLiteTpn] Banner OnAdLoad: " + placementId);
             }, null);
@@ -236,7 +237,7 @@ namespace CoreLite
                 if (!_placementIds.Contains(placementId)) return;
                 float loadTime = Mathf.Ceil(Time.realtimeSinceStartup - (_startLoadTimes.TryGetValue(placementId, out var t) ? t : 0));
                 string error = e?.errorMessage ?? "";
-                CoreAdsEvents.LogFailToLoadEvent(placementId, PlatformName, error, loadTime, AdLoadType.Banner);
+                //CoreAdsEvents.LogFailToLoadEvent(placementId, PlatformName, error, loadTime, AdLoadType.Banner);
                 CoreLogUtils.Debug("[CoreLiteTpn] Banner OnAdLoadFail: " + placementId + " " + error);
                 ScheduleRetry(placementId, LoadBanner);
             }, null);
@@ -255,14 +256,14 @@ namespace CoreLite
                 string format = CoreLiteAdsType.Banner.ToString();
                 int formatNumber = CoreAdsPrefs.GetAndIncrementFormatPlayCount(format);
                 int positionNumber = CoreAdsPrefs.GetAndIncrementPositionPlayCount(format);
-                CoreAnalyticsMgr.TrackEvent("BN_Show", new Dictionary<string, object>
+               /* CoreAnalyticsMgr.TrackEvent("BN_Show", new Dictionary<string, object>
                 {
                     { "ad_source", adSource },
                     { "ad_id", adId },
                     { "ad_platform", PlatformName },
                     { "unitId", placementId },
                     { "revenue", revenue }
-                });
+                });*/
                 if (revenue > 0)
                 {
                     CoreAnalyticsMgr.TrackAdImpressionEvent(
@@ -273,7 +274,7 @@ namespace CoreLite
                         positionNumber);
                 }
 #if UNITY_ANDROID
-                CoreAnalyticsMgr.TrackEvent("Up2SDK_ToponAdShow", new Dictionary<string, object>
+                /*CoreAnalyticsMgr.TrackEvent("Up2SDK_ToponAdShow", new Dictionary<string, object>
                 {
                     { "ad_platform", "Topon" },
                     { "topon_firm_id", firmId },
@@ -281,7 +282,7 @@ namespace CoreLite
                     { "ad_id", placementId },
                     { "ecpm", revenue * 1000 },
                     { "show_id", "" }
-                });
+                });*/
                 Up2SDKManager.Instance.OnToponAdShow(firmId, AdsType.Banner, placementId, revenue * 1000, "");
 #endif
                 CoreLogUtils.Debug("[CoreLiteTpn] Banner OnAdImpress: " + placementId);
@@ -328,14 +329,14 @@ namespace CoreLite
                     placementId
                 );
 #if UNITY_ANDROID
-                CoreAnalyticsMgr.TrackEvent("Up2SDK_ToponAdClick", new Dictionary<string, object>
+                /*CoreAnalyticsMgr.TrackEvent("Up2SDK_ToponAdClick", new Dictionary<string, object>
                 {
                     { "ad_platform", "Topon" },
                     { "topon_firm_id", firmId },
                     { "ads_type", "BANNER" },
                     { "ad_id", placementId },
                     { "show_id", "" }
-                });
+                });*/
                 Up2SDKManager.Instance.OnToponAdClick(firmId, AdsType.Banner, placementId, "");
 #endif
             }, null);

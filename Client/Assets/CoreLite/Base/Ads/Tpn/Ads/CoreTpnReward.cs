@@ -16,6 +16,8 @@ namespace CoreLite
         private Dictionary<string, int> _retryAttempts = new Dictionary<string, int>();
         private Dictionary<string, double> _placementRevenue = new Dictionary<string, double>();
         private Dictionary<string, bool> _receivedRewardByPlacement = new Dictionary<string, bool>();
+        // 缓存广告信息：adId, source, ecpm
+        private Dictionary<string, (string adId, string source, double ecpm)> _cachedAdInfo = new Dictionary<string, (string adId, string source, double ecpm)>();
         private bool _callbacksRegistered;
         private const string PlatformName = "TPN";
         private const int MaxRetry = 6;
@@ -171,9 +173,10 @@ namespace CoreLite
                         adId = status.adInfo.network_placement_id;
                         source = "Topon_" + status.adInfo.network_firm_id.ToString();
                     }
+                    _cachedAdInfo[placementId] = (adId, source, revenue);
                 }
                 catch { }
-
+                
                 CoreLogUtils.Debug("tpn onadload " + source + " adid:" + adId + " firm:" + e.callbackInfo.network_firm_id + " revenue:" + revenue);
                 CoreAdsEvents.LogLoadedEvent(adId, source, PlatformName, loadTime, AdLoadType.Reward, placementId, revenue);
                 if (!_retryAttempts.ContainsKey(placementId)) _retryAttempts[placementId] = 0;
@@ -216,6 +219,7 @@ namespace CoreLite
                     pos,
                     adId,
                     adSource,
+                    revenue,//单位一致
                     formatNumber,
                     CoreAdsPrefs.GetFirstShowRvTime(),
                     PlatformName,
@@ -253,14 +257,27 @@ namespace CoreLite
             {
                 var placementId = e?.placementId ?? "";
                 string errorMsg = e?.errorMessage ?? "";
+                string adId = "";
+                string adSource = "";
+                double adEcpm = 0;
+                if (_cachedAdInfo.TryGetValue(placementId, out var info))
+                {
+                    adId= info.adId;
+                    adSource = info.source;
+                    adEcpm = info.ecpm;
+                }
                 CoreLogUtils.Debug("[CoreLiteTpn] Reward OnAdVideoPlayFail: " + placementId + " " + errorMsg);
                 CoreAdsMgr.Instance._rvShowFailCallback?.Invoke(new Dictionary<string, object>
                 {
                     { "Position", CoreAdsMgr.Instance._rvPos ?? "" },
-                    { "show_fail_reason", CoreThinkingDataEvents.FormatEventName(errorMsg) },
-                    { "ad_platform", PlatformName },
-                    { "unitId", placementId }
+                    //{ "show_fail_reason", CoreThinkingDataEvents.FormatEventName(errorMsg) },
+                    //{ "ad_platform", PlatformName },
+                    //{ "unitId", placementId }
+                    {"ad_id", adId},
+                    {"ad_platform",adSource },
+                    {"ad_ecpm",adEcpm }
                 });
+
                 LoadReward(placementId);
             }, null);
         }
@@ -284,29 +301,30 @@ namespace CoreLite
                 _receivedRewardByPlacement.Remove(placementId);
                 _placementRevenue.Remove(placementId);
                 CoreLogUtils.Debug("[CoreLiteTpn] Reward OnAdVideoClose: " + placementId);
-                if (received)
-                {
+                /*if (received)
+                {*/
                     string adSource = e?.callbackInfo?.network_firm_id != null ? "Topon_" + e.callbackInfo.network_firm_id : PlatformName;
                     string adId = e?.callbackInfo?.network_placement_id ?? "";
                     CoreAdsMgr.Instance._rvCloseCallback?.Invoke(new Dictionary<string, object>
                     {
-                        { "Position", CoreAdsMgr.Instance._rvPos ?? "" },
-                        { "ad_source", adSource },
-                        { "ad_id", adId },
-                        { "ad_platform", PlatformName },
-                        { "unitId", placementId }
+                        {"isended",received }
+                        //{ "Position", CoreAdsMgr.Instance._rvPos ?? "" },
+                        //{ "ad_source", adSource },
+                        //{ "ad_id", adId },
+                        //{ "ad_platform", PlatformName },
+                        //{ "unitId", placementId }
                     });
-                }
+               /* }
                 else
                 {
                     CoreAdsMgr.Instance._rvShowFailCallback?.Invoke(new Dictionary<string, object>
                     {
                         { "Position", CoreAdsMgr.Instance._rvPos ?? "" },
-                        { "show_fail_reason", "not_received_reward" },
-                        { "ad_platform", PlatformName },
-                        { "unitId", placementId }
+                        //{ "show_fail_reason", "not_received_reward" },
+                        //{ "ad_platform", PlatformName },
+                        //{ "unitId", placementId }
                     });
-                }
+                }*/
                 LoadReward(placementId);
             }, null);
         }

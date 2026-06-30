@@ -215,11 +215,11 @@ namespace CoreLite
                 CoreAdsMgr.Instance._ivShowCallback?.Invoke(new Dictionary<string, object>
                 {
                     { "Position", pos },
-                    { "ad_source", adSource },
+                    { "ad_platform", adSource },
                     { "ad_id", adId },
-                    { "ad_platform", PlatformName },
-                    { "unitId", placementId },
-                    { "revenue", revenue }
+                    //{ "ad_platform", PlatformName },
+                    //{ "unitId", placementId },
+                    { "ad_ecpm", revenue }
                 });
                 if (revenue > 0)
                 {

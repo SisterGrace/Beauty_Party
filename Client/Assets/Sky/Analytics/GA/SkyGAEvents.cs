@@ -68,7 +68,7 @@ namespace Sky
                 {
                     { "ad_platform", platform },
                     { "ad_source", network },
-                    { "ad_unit_name", unit },
+                    //{ "ad_unit_name", unit },
                     { "ad_format", format },
                     { "value", revenue },
                     { "currency", "USD" },
@@ -79,7 +79,7 @@ namespace Sky
                 return;
             }
 
-            // 1. 原生 GA Ad 事件（无 revenue）
+            /*// 1. 原生 GA Ad 事件（无 revenue）
             GAAdType adType = GAAdType.Banner;
             switch (format.ToLower())
             {
@@ -89,24 +89,24 @@ namespace Sky
                 default: adType = GAAdType.Banner; break;
             }
             // 使用 Show 动作（或可以区分 Clicked，这里只做展示）
-            GameAnalytics.NewAdEvent(GAAdAction.Show, adType, network, unit);
+            GameAnalytics.NewAdEvent(GAAdAction.Show, adType, network, unit);*/
 
             // 2. 自定义 Design 事件携带收入详情
             var revenueProps = new Dictionary<string, object>
             {
                 { "ad_platform", platform },
                 { "ad_source", network },
-                { "ad_unit_name", unit },
+                //{ "ad_unit_name", unit },
                 { "ad_format", format },
                 { "value", revenue },
                 { "currency", "USD" },
             };
             if (!string.IsNullOrEmpty(pos))
                 revenueProps["position"] = pos;
-            if (formatNumber > 0)
+           /* if (formatNumber > 0)
                 revenueProps["format_number"] = formatNumber;
             if (positionNumber > 0)
-                revenueProps["position_number"] = positionNumber;
+                revenueProps["position_number"] = positionNumber;*/
 
             TrackEvent("ad_impression", revenueProps);
         }

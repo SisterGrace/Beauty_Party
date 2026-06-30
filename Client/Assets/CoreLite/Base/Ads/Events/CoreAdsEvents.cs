@@ -45,11 +45,12 @@ namespace CoreLite
         /// </summary>
         public static void LogStartLoadEvent(string unit, string platform, AdLoadType loadType)
         {
-            CoreAnalyticsMgr.TrackEvent(StartLoadEventNames[(int)loadType], new Dictionary<string, object>
+            CoreAnalyticsMgr.TrackEvent(StartLoadEventNames[(int)loadType]);
+           /* CoreAnalyticsMgr.TrackEvent(StartLoadEventNames[(int)loadType], new Dictionary<string, object>
             {
                 {"unitId", unit},
                 {"ad_platform", platform}
-            });
+            });*/
         }
 
         /// <summary>
@@ -62,9 +63,9 @@ namespace CoreLite
                 eventName = "IV_Fail_Loaded_MTGBidding";
             CoreAnalyticsMgr.TrackEvent(eventName, new Dictionary<string, object>
             {
-                {"unitId", unit},
-                {"ad_platform", platform},
-                {"load_fail_reason", CoreThinkingDataEvents.FormatEventName(error)},
+                //{"unitId", unit},
+                //{"ad_platform", platform},
+                //{"load_fail_reason", CoreThinkingDataEvents.FormatEventName(error)},
                 {"Time", Mathf.CeilToInt(time)}
             });
         }
@@ -79,12 +80,12 @@ namespace CoreLite
                 eventName = "IV_Loaded_MTGBidding";
             CoreAnalyticsMgr.TrackEvent(eventName, new Dictionary<string, object>
             {
-                {"ad_id", adId},
-                {"unitId", unit},
-                {"ad_ecpm", revenue},
-                {"ad_platform", adPlatform},
-                {"ad_source", source},
-                {"Time", Mathf.CeilToInt(time)}
+                {"ad_id", adId},//第三方广告ID
+                {"unitId", unit},//topon的广告位ID
+                {"ad_ecpm", revenue},//ecpm
+                //{"ad_platform", adPlatform},//聚合平台
+                {"ad_platform", source},//没有多个聚合，只有一个tpn，所以不需要记录tpn，之前ad_platform记录那个聚合平台
+                {"Time", Mathf.CeilToInt(time)}//耗时
             });
         }
 
@@ -101,17 +102,18 @@ namespace CoreLite
         /// <summary>
         /// 统一上报激励视频展示成功事件 RV_Show。各广告聚合在 RV 展示成功回调中调用，集中维护字段。
         /// </summary>
-        public static void LogRvShowEvent(string position, string adId, string adSource, int adRewardNum, int firstAdRewardTime, string adPlatform, string unitId)
+        public static void LogRvShowEvent(string position, string adId, string adSource, double ecpm , int adRewardNum, int firstAdRewardTime, string adPlatform, string unitId)
         {
             CoreAnalyticsMgr.TrackEvent("RV_Show", new Dictionary<string, object>
             {
                 {"Position", position ?? ""},
                 {"ad_id", adId ?? ""},
-                {"ad_source", adSource ?? ""},
-                {"ad_reward_num", adRewardNum},
-                {"first_ad_reward_time", firstAdRewardTime},
-                {"ad_platform", adPlatform ?? ""},
-                {"unitId", unitId ?? ""}
+                {"ad_platform", adSource ?? ""},
+                {"ad_ecpm",ecpm },
+                //{"ad_reward_num", adRewardNum},
+                //{"first_ad_reward_time", firstAdRewardTime},
+                //{"ad_platform", adPlatform ?? ""},
+                //{"unitId", unitId ?? ""}
             });
         }
 
@@ -126,10 +128,10 @@ namespace CoreLite
             {
                 {"Position", pos ?? ""},
                 {"ad_id", placement ?? ""},
-                {"ad_source", network ?? ""},
-                {"ad_platform", platform ?? ""},
-                {"ad_unit_name", unit ?? ""},
-                {"value", revenue}
+                {"ad_platform", network ?? ""},
+                //{"ad_platform", platform ?? ""},
+                //{"ad_unit_name", unit ?? ""},
+                {"ecpm", revenue}
             });
         }
     }

@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 #if FIRBASE
 using Firebase.Analytics;
+using Sky;
+
 #endif
 using UnityEngine;
 
@@ -46,23 +48,40 @@ namespace CoreLite
         public static void TrackAdImpressionEvent(double revenue, string network, string unit, string format, string platform, string pos = "", int formatNumber = 0, int positionNumber = 0)
         {
             var source = CoreAdImpressionSource.GetSource("revenue_fir","ad_impression");
+            if (revenue < 0)
+            {
+                LogTool.DebugLog($"[GA] ad_impression skipped: revenue={revenue} < 0, reporting ad_impression_error");
+                var errorProps = new Dictionary<string, object>
+                {
+                    { "ad_platform", platform },
+                    { "ad_source", network },
+                    //{ "ad_unit_name", unit },
+                    { "ad_format", format },
+                    { "value", revenue },
+                    { "currency", "USD" },
+                };
+                if (!string.IsNullOrEmpty(pos))
+                    errorProps["position"] = pos;
+                TrackEvent("ad_impression_error", errorProps);
+                return;
+            }
             if (!CoreFirebaseMgr.Instance.TrackingEnable()) return;
 #if FIRBASE
             var impressionParameters = new List<Parameter>
             {
                 new Parameter("ad_platform", platform),
                 new Parameter("ad_source", network),
-                new Parameter("ad_unit_name", unit),
+                //new Parameter("ad_unit_name", unit),
                 new Parameter("ad_format", format),
                 new Parameter("value", revenue),
                 new Parameter("currency", "USD"),
             };
             if (!string.IsNullOrEmpty(pos))
                 impressionParameters.Add(new Parameter("position", pos));
-            if (formatNumber > 0)
+            /*if (formatNumber > 0)
                 impressionParameters.Add(new Parameter("format_number", formatNumber));
             if (positionNumber > 0)
-                impressionParameters.Add(new Parameter("position_number", positionNumber));
+                impressionParameters.Add(new Parameter("position_number", positionNumber));*/
 
             FirebaseAnalytics.LogEvent(source, impressionParameters.ToArray());
 #endif
