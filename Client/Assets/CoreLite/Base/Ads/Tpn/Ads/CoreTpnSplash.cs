@@ -42,6 +42,16 @@ namespace CoreLite
         private void LoadSplash(string placementId)
         {
             if (string.IsNullOrEmpty(placementId)) return;
+            
+            // SP_Start_Load 打点
+            CoreLiteSplashAdsMgr.TrackSplashEvent("SP_Start_Load", new Dictionary<string, object>
+            {
+                // 加载开始时还没有广告信息，所以这里只能传空值或省略
+                // { "ad_platform", "" },
+                // { "ad_id", "" },
+                // { "ad_ecpm", 0 }
+            });
+            
             CoreAdsEvents.LogStartLoadEvent(placementId, PlatformName, AdLoadType.Splash);
             var jsonmap = new Dictionary<string, object>();
             ATSplashAd.Instance.loadSplashAd(placementId, jsonmap, FetchAdTimeoutMs);
@@ -133,6 +143,8 @@ namespace CoreLite
                         adId = status.adInfo.network_placement_id;
                         source = "Topon_" + status.adInfo.network_firm_id.ToString();
                     }
+                    // 缓存广告信息，供展示失败等回调使用
+                    _cachedAdInfo[placementId] = (adId, source, revenue);
                 }
                 catch { }
                 CoreAdsEvents.LogLoadedEvent(adId, source, PlatformName, loadTime, AdLoadType.Splash, placementId, revenue);
@@ -180,12 +192,12 @@ namespace CoreLite
                 string launchType = CoreLiteSplashAdsMgr.Instance != null ? CoreLiteSplashAdsMgr.Instance.CurrentLaunchType : "unknown";
                 CoreLiteSplashAdsMgr.TrackSplashEvent("SP_Show", new Dictionary<string, object>
                 {
-                    { "launch_type", launchType },
-                    { "ad_source", adSource },
+                    //{ "launch_type", launchType },  // 多余参数，已注释
+                    { "ad_platform", adSource },  // ad_platform 就是 ad_source
                     { "ad_id", adId },
-                    { "ad_platform", PlatformName },
-                    { "unitId", placementId },
-                    { "revenue", revenue }
+                    { "ad_ecpm", revenue }
+                    //{ "unitId", placementId },  // 多余参数，已注释
+                    //{ "revenue", revenue }  // 多余参数，已注释，统一用 ad_ecpm
                 });
                 if (revenue > 0)
                 {
@@ -217,7 +229,38 @@ namespace CoreLite
             Loom.QueueOnMainThread(_ =>
             {
                 var placementId = e?.placementId ?? "";
+                string adId = "";
+                string adSource = "";
+                double adEcpm = 0;
+                
+                // 尝试实时获取广告信息（最准确）
+                try
+                {
+                    var statusJson = ATSplashAd.Instance.checkAdStatus(placementId);
+                    var status = JsonUtility.FromJson<CoreLiteTpnAdStatus>(statusJson);
+                    if (status?.adInfo != null)
+                    {
+                        adId = status.adInfo.network_placement_id;
+                        adSource = "Topon_" + status.adInfo.network_firm_id.ToString();
+                        adEcpm = status.adInfo.publisher_revenue;
+                    }
+                }
+                catch
+                {
+                    // checkAdStatus 失败，说明广告已经不可用，无法获取信息
+                }
+                
                 CoreLogUtils.Debug("[CoreLiteTpn] Splash OnAdShowFail: " + placementId + " " + (e?.errorMessage ?? ""));
+                
+                // SP_ShowFail 通用打点
+                CoreLiteSplashAdsMgr.TrackSplashEvent("SP_ShowFail", new Dictionary<string, object>
+                {
+                    { "ad_platform", adSource },
+                    { "ad_id", adId },
+                    { "ad_ecpm", adEcpm }
+                });
+                
+                _cachedAdInfo.Remove(placementId);  // 清空缓存
                 CoreLiteSplashAdsMgr.Instance?.NotifyAppOpenAdDismissedFromSdk();
                 LoadSplash(placementId);
             }, null);
@@ -230,7 +273,11 @@ namespace CoreLite
                 var placementId = e?.placementId ?? "";
                 CoreLogUtils.Debug("[CoreLiteTpn] Splash OnAdClose: " + placementId);
                 _placementRevenue.Remove(placementId);
+                _cachedAdInfo.Remove(placementId);  // 清空缓存
                 CoreLiteSplashAdsMgr.Instance?.NotifyAppOpenAdDismissedFromSdk();
+                LoadSplash(placementId);
+            }, null);
+        }
                 LoadSplash(placementId);
             }, null);
         }

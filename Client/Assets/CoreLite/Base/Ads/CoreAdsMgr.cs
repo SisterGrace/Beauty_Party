@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using AnyThinkAds.Api;
 
 namespace CoreLite
 {
@@ -144,20 +145,63 @@ namespace CoreLite
         {
             if(CorePrefs.IsRemoveAds) return false;
            
-            // 使用 CanShowInterPeek 仅做只读检查，避免与 ShowInterstitial 内已调用的 CanShowInter 重复计次
+            // 使用 CanShowInterPeek 仅做只读检查,避免与 ShowInterstitial 内已调用的 CanShowInter 重复计次
             if (CoreInterstitialRules.Instance.CanShowInterPeek(_ivType) != null)
             {
                 CoreLogUtils.Debug(" [ads] skip iv by condition");
-                CoreAnalyticsMgr.TrackEvent("IV_ShowFail_Rule_Limit",new Dictionary<string, object>() { {"Position", _adPos} } );
-                CoreAnalyticsMgr.TrackEvent("IV_ShowFail", new Dictionary<string, object>() { { "Position", _adPos } });
+                
+                // 规则限制时，广告可能已经准备好了，实时获取广告信息
+                var adInfo = GetInterstitialAdInfo();
+                
+                if (!string.IsNullOrEmpty(adInfo.adSource))
+                {
+                    // 有广告信息，上报完整参数
+                    CoreAnalyticsMgr.TrackEvent("IV_ShowFail_Rule_Limit", new Dictionary<string, object>()
+                    {
+                        { "Position", _adPos },
+                        { "ad_platform", adInfo.adSource },
+                        { "ad_id", adInfo.adId },
+                        { "ad_ecpm", adInfo.adEcpm }
+                    });
+                    CoreAnalyticsMgr.TrackEvent("IV_ShowFail", new Dictionary<string, object>()
+                    {
+                        { "Position", _adPos },
+                        { "ad_platform", adInfo.adSource },
+                        { "ad_id", adInfo.adId },
+                        { "ad_ecpm", adInfo.adEcpm }
+                    });
+                }
+                else
+                {
+                    // 广告未准备好
+                    CoreAnalyticsMgr.TrackEvent("IV_ShowFail_Rule_Limit", new Dictionary<string, object>()
+                    {
+                        { "Position", _adPos }
+                    });
+                    CoreAnalyticsMgr.TrackEvent("IV_ShowFail", new Dictionary<string, object>()
+                    {
+                        { "Position", _adPos }
+                    });
+                }
                 return false;
             }
 
             if (!IsInterstitialAvailable())
             {
                 CoreLogUtils.Debug(" [ads] iv not ready");
-                CoreAnalyticsMgr.TrackEvent("IV_ShowFail_Not_Ready",new Dictionary<string, object>() { {"Position", _adPos} } );
-                CoreAnalyticsMgr.TrackEvent("IV_ShowFail", new Dictionary<string, object>() { { "Position", _adPos } });
+                CoreAnalyticsMgr.TrackEvent("IV_ShowFail_Not_Ready",new Dictionary<string, object>() 
+                { 
+                    {"Position", _adPos}
+                    // 【无法获取】广告没有填充，IsInterstitialAvailable() 返回 false
+                    // 无广告可用，无法使用 checkAdStatus
+                } );
+                CoreAnalyticsMgr.TrackEvent("IV_ShowFail", new Dictionary<string, object>() 
+                { 
+                    { "Position", _adPos }
+                    // { "ad_platform", "" },
+                    // { "ad_id", "" },
+                    // { "ad_ecpm", 0 }
+                });
                 return false;
             }
 
@@ -192,7 +236,15 @@ namespace CoreLite
                 return;
             }
 
-            CoreAnalyticsMgr.TrackEvent("IV_Position",new Dictionary<string, object>() { {"Position", _adPos} } );
+            // IV_Position 打点：触发插屏展示时机
+            var ivPosInfo = GetInterstitialAdInfo();
+            CoreAnalyticsMgr.TrackEvent("IV_Position",new Dictionary<string, object>() 
+            { 
+                {"Position", _adPos},
+                {"ad_platform", ivPosInfo.adSource},
+                {"ad_id", ivPosInfo.adId},
+                {"ad_ecpm", ivPosInfo.adEcpm}
+            } );
             string ivRuleMsg = CoreInterstitialRules.Instance.CanShowInter(_IvType);
             bool ruleAllowsShow = ivRuleMsg == null;
             // 规则未通过时必须直接返回：CheckIfReachFirstNTimes 会先自增计数再返回失败，
@@ -213,9 +265,19 @@ namespace CoreLite
             {
                 _action(MakeHandCallbackInfo(true, "success", true), () =>
                 {
-                    CoreAnalyticsMgr.TrackEvent("IV_AchieveShow_Match",new Dictionary<string, object>() { {"Position", _adPos} } );
                     var results = SelectBestAds(CoreLiteAdsType.Interstitial);
                     var winner = results.Count > 0 ? results[0] : null;
+                    
+                    // IV_AchieveShow_Match 打点：调用展示API前，获取将要展示的广告信息
+                    var matchInfo = GetInterstitialAdInfo();
+                    CoreAnalyticsMgr.TrackEvent("IV_AchieveShow_Match",new Dictionary<string, object>() 
+                    { 
+                        {"Position", _adPos},
+                        {"ad_platform", matchInfo.adSource},
+                        {"ad_id", matchInfo.adId},
+                        {"ad_ecpm", matchInfo.adEcpm}
+                    } );
+                    
                     if (winner == null)
                     {
                         _ivCloseCallback?.Invoke();
@@ -232,9 +294,19 @@ namespace CoreLite
             }
             else
             { 
-                CoreAnalyticsMgr.TrackEvent("IV_AchieveShow_Match",new Dictionary<string, object>() { {"Position", _adPos} } );
                 var results = SelectBestAds(CoreLiteAdsType.Interstitial);
                 var winner = results.Count > 0 ? results[0] : null;
+                
+                // IV_AchieveShow_Match 打点：调用展示API前，获取将要展示的广告信息
+                var matchInfo = GetInterstitialAdInfo();
+                CoreAnalyticsMgr.TrackEvent("IV_AchieveShow_Match",new Dictionary<string, object>() 
+                { 
+                    {"Position", _adPos},
+                    {"ad_platform", matchInfo.adSource},
+                    {"ad_id", matchInfo.adId},
+                    {"ad_ecpm", matchInfo.adEcpm}
+                } );
+                
                 if (winner == null)
                 {
                     _ivCloseCallback?.Invoke();
@@ -288,7 +360,15 @@ namespace CoreLite
                 return;
             }
 
-            CoreAnalyticsMgr.TrackEvent("IV_Position", new Dictionary<string, object>() { { "Position", _adPos } });
+            // IV_Position 打点：触发插屏展示时机（忽略频次版本）
+            var ivPosInfo2 = GetInterstitialAdInfo();
+            CoreAnalyticsMgr.TrackEvent("IV_Position", new Dictionary<string, object>() 
+            { 
+                { "Position", _adPos },
+                { "ad_platform", ivPosInfo2.adSource },
+                { "ad_id", ivPosInfo2.adId },
+                { "ad_ecpm", ivPosInfo2.adEcpm }
+            });
             //CoreAnalyticsMgr.TrackEvent("IV_AchieveShow_IgnoreFrequency", new Dictionary<string, object>() { { "Position", _adPos } });
             var results = SelectBestAds(CoreLiteAdsType.Interstitial);
             var winner = results.Count > 0 ? results[0] : null;
@@ -446,6 +526,35 @@ namespace CoreLite
         #endregion
 
         #region  Others
+        
+        /// <summary>
+        /// 获取插屏广告信息（adId, adSource, adEcpm），用于打点上报
+        /// </summary>
+        private (string adId, string adSource, double adEcpm) GetInterstitialAdInfo()
+        {
+            string adId = "";
+            string adSource = "";
+            double adEcpm = 0;
+            
+            string bestPlacement = CoreTpnInter.Instance.GetHighestPayingPlacement();
+            if (!string.IsNullOrEmpty(bestPlacement))
+            {
+                try
+                {
+                    var statusJson = ATInterstitialAd.Instance.checkAdStatus(bestPlacement);
+                    var status = JsonUtility.FromJson<CoreLiteTpnAdStatus>(statusJson);
+                    if (status?.adInfo != null)
+                    {
+                        adId = status.adInfo.network_placement_id;
+                        adSource = "Topon_" + status.adInfo.network_firm_id.ToString();
+                        adEcpm = status.adInfo.publisher_revenue;
+                    }
+                }
+                catch { }
+            }
+            
+            return (adId, adSource, adEcpm);
+        }
 
         /// <summary>
         /// 构建竞价事件参数：竞价成功的平台与收益、竞价失败的平台与收益

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using AnyThinkAds.Api;
 
 namespace CoreLite
 {
@@ -137,6 +138,35 @@ namespace CoreLite
         {
             _skipNextHotSplashCheck = true;
         }
+        
+        /// <summary>
+        /// 获取开屏广告信息（adId, adSource, adEcpm），用于打点上报
+        /// </summary>
+        private (string adId, string adSource, double adEcpm) GetSplashAdInfo()
+        {
+            string adId = "";
+            string adSource = "";
+            double adEcpm = 0;
+            
+            string bestPlacement = CoreTpnSplash.Instance.GetHighestPayingPlacement();
+            if (!string.IsNullOrEmpty(bestPlacement))
+            {
+                try
+                {
+                    var statusJson = ATSplashAd.Instance.checkAdStatus(bestPlacement);
+                    var status = JsonUtility.FromJson<CoreLiteTpnAdStatus>(statusJson);
+                    if (status?.adInfo != null)
+                    {
+                        adId = status.adInfo.network_placement_id;
+                        adSource = "Topon_" + status.adInfo.network_firm_id.ToString();
+                        adEcpm = status.adInfo.publisher_revenue;
+                    }
+                }
+                catch { }
+            }
+            
+            return (adId, adSource, adEcpm);
+        }
 
         private void CheckSplashAd(bool isCold)
         {
@@ -149,9 +179,25 @@ namespace CoreLite
                 StartCoroutine(FlushColdStartSplashEvents());
             }
 
+            // 获取开屏广告信息（用于 SP_Position 和 SP_AchieveShow_Match）
+            var spAdInfo = GetSplashAdInfo();
+
+            // SP_Position 打点：触发开屏展示时机
+            TrackSplashEvent("SP_Position", new Dictionary<string, object>
+            {
+                { "launch_type", CurrentLaunchType },
+                { "ad_platform", spAdInfo.adSource },
+                { "ad_id", spAdInfo.adId },
+                { "ad_ecpm", spAdInfo.adEcpm }
+            });
+            
+            // SP_AchieveShow_Match 打点：调用展示API
             TrackSplashEvent("SP_AchieveShow_Match", new Dictionary<string, object>
             {
-                { "launch_type", CurrentLaunchType }
+                { "launch_type", CurrentLaunchType },
+                { "ad_platform", spAdInfo.adSource },
+                { "ad_id", spAdInfo.adId },
+                { "ad_ecpm", spAdInfo.adEcpm }
             });
 
             if (!isCold)
@@ -197,10 +243,17 @@ namespace CoreLite
                 }
                 else
                 {
-                    TrackSplashEvent("SP_ShowFail_Not_Ready", new Dictionary<string, object>
-                    {
-                        { "launch_type", CurrentLaunchType }
-                    });
+                        TrackSplashEvent("SP_ShowFail_Not_Ready", new Dictionary<string, object>
+                        {
+                            //{ "launch_type", CurrentLaunchType }  // 多余参数，已注释
+                            // 【无法获取】广告没有填充，IsSplashAvailable() 返回 false，无法使用 checkAdStatus
+                        });
+                        
+                        // SP_ShowFail 通用打点
+                        TrackSplashEvent("SP_ShowFail", new Dictionary<string, object>
+                        {
+                            // 没有填充时拿不到 ad_platform/ad_id/ad_ecpm
+                        });
                     CoreAdsMgr.Instance.LoadSplash();
                 }   
             }
@@ -226,8 +279,16 @@ namespace CoreLite
                         {
                             TrackSplashEvent("SP_ShowFail_Not_Ready", new Dictionary<string, object>
                             {
-                                { "launch_type", CurrentLaunchType }
+                                //{ "launch_type", CurrentLaunchType }  // 多余参数，已注释
+                                // 【无法获取】广告没有填充，IsSplashAvailable() 返回 false，无法使用 checkAdStatus
                             });
+                            
+                            // SP_ShowFail 通用打点
+                            TrackSplashEvent("SP_ShowFail", new Dictionary<string, object>
+                            {
+                                // 没有填充时拿不到 ad_platform/ad_id/ad_ecpm
+                            });
+                            
                             OnSplashAdClose?.Invoke();
                         }
                     }
@@ -254,8 +315,16 @@ namespace CoreLite
                         {
                             TrackSplashEvent("SP_ShowFail_Not_Ready", new Dictionary<string, object>
                             {
-                                { "launch_type", CurrentLaunchType }
+                                //{ "launch_type", CurrentLaunchType }  // 多余参数，已注释
+                                // 【无法获取】广告没有填充，IsSplashAvailable() 返回 false，无法使用 checkAdStatus
                             });
+                            
+                            // SP_ShowFail 通用打点
+                            TrackSplashEvent("SP_ShowFail", new Dictionary<string, object>
+                            {
+                                // 没有填充时拿不到 ad_platform/ad_id/ad_ecpm
+                            });
+                            
                             OnSplashAdClose?.Invoke();
                         }  
                     }

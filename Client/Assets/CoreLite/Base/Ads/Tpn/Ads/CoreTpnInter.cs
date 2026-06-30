@@ -15,6 +15,8 @@ namespace CoreLite
         private Dictionary<string, float> _startLoadTimes = new Dictionary<string, float>();
         private Dictionary<string, int> _retryAttempts = new Dictionary<string, int>();
         private Dictionary<string, double> _placementRevenue = new Dictionary<string, double>();
+        // 缓存广告信息：adId, source, ecpm
+        private Dictionary<string, (string adId, string source, double ecpm)> _cachedAdInfo = new Dictionary<string, (string adId, string source, double ecpm)>();
         private bool _callbacksRegistered;
         private const string PlatformName = "TPN";
         private const int MaxRetry = 6;
@@ -164,6 +166,8 @@ namespace CoreLite
                         adId = status.adInfo.network_placement_id;
                         source = "Topon_" + status.adInfo.network_firm_id.ToString();
                     }
+                    // 缓存广告信息，供展示失败等回调使用
+                    _cachedAdInfo[placementId] = (adId, source, revenue);
                 }
                 catch { }
                 CoreAdsEvents.LogLoadedEvent(adId, source, PlatformName, loadTime, AdLoadType.Interstitial, placementId, revenue);
@@ -192,7 +196,39 @@ namespace CoreLite
             Loom.QueueOnMainThread(_ =>
             {
                 var placementId = e?.placementId ?? "";
+                string adId = "";
+                string adSource = "";
+                double adEcpm = 0;
+                
+                // 尝试实时获取广告信息（最准确）
+                try
+                {
+                    var statusJson = ATInterstitialAd.Instance.checkAdStatus(placementId);
+                    var status = JsonUtility.FromJson<CoreLiteTpnAdStatus>(statusJson);
+                    if (status?.adInfo != null)
+                    {
+                        adId = status.adInfo.network_placement_id;
+                        adSource = "Topon_" + status.adInfo.network_firm_id.ToString();
+                        adEcpm = status.adInfo.publisher_revenue;
+                    }
+                }
+                catch
+                {
+                    // checkAdStatus 失败，说明广告已经不可用，无法获取信息
+                }
+                
                 CoreLogUtils.Debug("[CoreLiteTpn] Inter OnAdShowFail: " + placementId);
+                
+                // IV_ShowFail 通用打点
+                CoreAnalyticsMgr.TrackEvent("IV_ShowFail", new Dictionary<string, object>
+                {
+                    { "Position", CoreAdsMgr.Instance._ivPos ?? "" },
+                    { "ad_platform", adSource },
+                    { "ad_id", adId },
+                    { "ad_ecpm", adEcpm }
+                });
+                
+                _cachedAdInfo.Remove(placementId);  // 清空缓存
                 CoreAdsMgr.Instance._ivCloseCallback?.Invoke();
                 LoadInter(placementId);
             }, null);
@@ -215,11 +251,10 @@ namespace CoreLite
                 CoreAdsMgr.Instance._ivShowCallback?.Invoke(new Dictionary<string, object>
                 {
                     { "Position", pos },
-                    { "ad_platform", adSource },
+                    { "ad_platform", adSource },  // ad_platform 就是 ad_source
                     { "ad_id", adId },
-                    //{ "ad_platform", PlatformName },
-                    //{ "unitId", placementId },
                     { "ad_ecpm", revenue }
+                    //{ "unitId", placementId }  // 多余参数，已注释
                 });
                 if (revenue > 0)
                 {
@@ -253,6 +288,7 @@ namespace CoreLite
                 var placementId = e?.placementId ?? "";
                 CoreLogUtils.Debug("[CoreLiteTpn] Inter OnAdClose: " + placementId);
                 _placementRevenue.Remove(placementId);
+                _cachedAdInfo.Remove(placementId);  // 清空缓存
                 CoreAdsMgr.Instance._ivCloseCallback?.Invoke();
                 LoadInter(placementId);
             }, null);

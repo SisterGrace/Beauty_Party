@@ -260,12 +260,24 @@ namespace CoreLite
                 string adId = "";
                 string adSource = "";
                 double adEcpm = 0;
-                if (_cachedAdInfo.TryGetValue(placementId, out var info))
+                
+                // 尝试实时获取广告信息（最准确）
+                try
                 {
-                    adId= info.adId;
-                    adSource = info.source;
-                    adEcpm = info.ecpm;
+                    var statusJson = ATRewardedVideo.Instance.checkAdStatus(placementId);
+                    var status = JsonUtility.FromJson<CoreLiteTpnAdStatus>(statusJson);
+                    if (status?.adInfo != null)
+                    {
+                        adId = status.adInfo.network_placement_id;
+                        adSource = "Topon_" + status.adInfo.network_firm_id.ToString();
+                        adEcpm = status.adInfo.publisher_revenue;
+                    }
                 }
+                catch
+                {
+                    // checkAdStatus 失败，说明广告已经不可用，无法获取信息
+                }
+                
                 CoreLogUtils.Debug("[CoreLiteTpn] Reward OnAdVideoPlayFail: " + placementId + " " + errorMsg);
                 CoreAdsMgr.Instance._rvShowFailCallback?.Invoke(new Dictionary<string, object>
                 {
@@ -278,6 +290,7 @@ namespace CoreLite
                     {"ad_ecpm",adEcpm }
                 });
 
+                _cachedAdInfo.Remove(placementId);  // 清空缓存
                 LoadReward(placementId);
             }, null);
         }
@@ -300,6 +313,7 @@ namespace CoreLite
                 bool received = _receivedRewardByPlacement.TryGetValue(placementId, out var r) && r;
                 _receivedRewardByPlacement.Remove(placementId);
                 _placementRevenue.Remove(placementId);
+                _cachedAdInfo.Remove(placementId);  // 清空缓存
                 CoreLogUtils.Debug("[CoreLiteTpn] Reward OnAdVideoClose: " + placementId);
                 /*if (received)
                 {*/
