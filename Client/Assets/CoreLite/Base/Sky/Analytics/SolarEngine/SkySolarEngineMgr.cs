@@ -20,8 +20,16 @@ namespace Sky
         private const bool EnableLog = true;
 
         public bool IsInitialized { get; private set; }
+        
+        // 记录应用启动时间，用于计算 Pass_Time
+        private float _appStartTime;
 
         public bool TrackingEnable() => IsInitialized;
+        
+        void Awake()
+        {
+            _appStartTime = Time.realtimeSinceStartup;
+        }
 
         // 从 SkyConfigData（Resources/SkyConfigData.asset）读取热云 AppKey
         private static string GetAppKey()
@@ -60,6 +68,9 @@ namespace Sky
             IsInitialized = true;
             LogTool.DebugLog("[SolarEngine] Init triggered, appKey=" + appKey + ", log=" + EnableLog,
                 LogTool.Color.yellow);
+            
+            // 上报热云初始化事件
+            CoreLite.CoreAnalyticsMgr.TrackEvent("track_init");
         }
 
         #region 事件上报
@@ -118,6 +129,23 @@ namespace Sky
 
                 // 走项目统一上报通道，自动分发到 GA + 热云本身（事件名约定）
                 Sky.SkyAnalyticsMgr.DesignEvent("SE", "Attribution", "Success", true, network);
+                
+                // 计算从启动到获取归因成功的时间（秒）
+                float passTime = Time.realtimeSinceStartup - _appStartTime;
+                int passTimeSeconds = Mathf.CeilToInt(passTime);
+                
+                // 上报获取热云信息成功事件
+                CoreLite.CoreAnalyticsMgr.TrackEvent("track_get_success", new Dictionary<string, object>
+                {
+                    { "Pass_Time", passTimeSeconds }
+                });
+                
+                // 上报获取到ad_network事件
+                CoreLite.CoreAnalyticsMgr.TrackEvent("track_get_time", new Dictionary<string, object>
+                {
+                    { "Pass_Time", passTimeSeconds },
+                    { "ad_network", network }
+                });
             }
             catch (Exception e)
             {
