@@ -144,7 +144,8 @@ namespace GameLogic
 					GameModule.UI.ShowUI<Panel_Shop>();
 					break;
 				case ActivityType.Discard:
-					GameModule.UI.ShowUI<Panel_Discard>();
+					// 禁用 Discord 社区入口
+					// GameModule.UI.ShowUI<Panel_Discard>();
 					break;
 				case ActivityType.H5Check:
 					SDKManager.Instance.ForceShowH5Ad();
