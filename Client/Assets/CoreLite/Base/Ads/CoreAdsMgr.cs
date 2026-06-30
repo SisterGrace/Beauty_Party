@@ -384,6 +384,16 @@ namespace CoreLite
             {
                 //CoreAnalyticsMgr.TrackEvent("IV_Winner", BuildBidEventParams(results, _adPos));
                 CoreBidPlatformMgr.Instance.RecordBidSuccess(winner.PlatformType, CoreLiteAdsType.Interstitial);
+                // 在 ShowInterstitialIgnoreFrequency 的 winner != null 分支中
+                var matchInfo = GetInterstitialAdInfo();
+                CoreAnalyticsMgr.TrackEvent("IV_AchieveShow_Match", new Dictionary<string, object>()
+                {
+                    {"Position", _adPos},
+                    {"ad_platform", "TPN"},
+                    {"ad_source", matchInfo.adSource},
+                    {"ad_id", matchInfo.adId},
+                    {"ad_ecpm", matchInfo.adEcpm}
+                });
                 winner.Client.ShowInterstitial();
                 CheckAndRefreshExpiredBids(CoreLiteAdsType.Interstitial);
             }
