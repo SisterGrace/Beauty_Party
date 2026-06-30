@@ -81,10 +81,10 @@ namespace CoreLite
             CoreAnalyticsMgr.TrackEvent(eventName, new Dictionary<string, object>
             {
                 {"ad_id", adId},//第三方广告ID
-                {"unitId", unit},//topon的广告位ID
+                //{"unitId", unit},//topon的广告位ID
                 {"ad_ecpm", revenue},//ecpm
-                //{"ad_platform", adPlatform},//聚合平台
-                {"ad_platform", source},//没有多个聚合，只有一个tpn，所以不需要记录tpn，之前ad_platform记录那个聚合平台
+                {"ad_platform", adPlatform},//聚合平台
+                {"ad_source", source},
                 {"Time", Mathf.CeilToInt(time)}//耗时
             });
         }
@@ -124,6 +124,7 @@ namespace CoreLite
         /// </summary>
         public static void LogClickEvent(AdLoadType loadType, double revenue, string pos, string placement, string network, string platform, string unit)
         {
+            return;
             CoreAnalyticsMgr.TrackEvent(ClickEventNames[(int)loadType], new Dictionary<string, object>
             {
                 {"Position", pos ?? ""},

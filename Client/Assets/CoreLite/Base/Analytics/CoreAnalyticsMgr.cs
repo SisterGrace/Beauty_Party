@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ThinkingData.Analytics;
 using UnityEngine;
+using UnityEngine.UIElements;
 using static Codice.Client.Common.EventTracking.TrackFeatureUseEvent.Features.DesktopGUI.Filters;
 
 namespace CoreLite
@@ -44,6 +45,7 @@ namespace CoreLite
         public static void TrackEvent(string eventName)
         {
             if (!AnalyticsOver) return;
+            if (!BoolUp(eventName)) return;
             CoreFirebaseEvents.TrackEvent(eventName);
             Sky.SkyGAEvents.TrackEvent(eventName);
             Sky.SkySolarEngineEvents.TrackEvent(eventName);
@@ -58,6 +60,7 @@ namespace CoreLite
         public static void TrackEvent(string eventName, string key, object value)
         {
             if (!AnalyticsOver) return;
+            if (!BoolUp(eventName)) return;
             CoreFirebaseEvents.TrackEvent(eventName, key, value);
             Sky.SkyGAEvents.TrackEvent(eventName, key, value);
             Sky.SkySolarEngineEvents.TrackEvent(eventName, key, value);
@@ -68,13 +71,17 @@ namespace CoreLite
             CoreThinkingDataEvents.TrackEvent(eventName, key, value);
 #endif
         }
-
+        static bool BoolUp(string eventName)
+        {
+            if (eventName.Contains("Up2SDK") || eventName.Contains("IAP") || eventName.Contains("RV_AchieveShow_Match") || eventName.Contains("Parameter_Connect")
+               || eventName.Contains("User_") || eventName.Contains("BN_") || eventName.Contains("RV_Button_Show") || eventName.Contains("SP_Winner")|| eventName.Contains("SP_ShowSkip") 
+               ) return false;
+            return true;
+        }
         public static void TrackEvent(string eventName, Dictionary<string, object> dict)
         {
             if (!AnalyticsOver) return;
-            if (eventName.Contains("Up2SDK")|| eventName.Contains("IAP") || eventName.Contains("RV_AchieveShow_Match") || eventName.Contains("Parameter_Connect")
-                || eventName.Contains("User_") || eventName.Contains("BN_")|| eventName.Contains("RV_Button_Show")
-                ) return;
+            if (!BoolUp(eventName)) return;
             if (dict == null)
             {
                 dict = new Dictionary<string, object>();

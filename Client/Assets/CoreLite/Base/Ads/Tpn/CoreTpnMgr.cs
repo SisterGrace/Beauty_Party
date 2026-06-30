@@ -322,7 +322,7 @@ namespace CoreLite
                 CoreAdsMgr.Instance._rvShowFailCallback?.Invoke(new Dictionary<string, object>
                 {
                     { "Position", CoreAdsMgr.Instance._rvPos ?? "" },
-                    { "show_fail_reason", "not_ready" },
+                    //{ "show_fail_reason", "not_ready" },
                     { "ad_platform", ClientName },
                     { "unitId", "" }
                 });
@@ -335,9 +335,9 @@ namespace CoreLite
                 CoreAdsMgr.Instance._rvShowFailCallback?.Invoke(new Dictionary<string, object>
                 {
                     { "Position", CoreAdsMgr.Instance._rvPos ?? "" },
-                    { "show_fail_reason", "highest_paying_ad_not_found" },
+                    //{ "show_fail_reason", "highest_paying_ad_not_found" },
                     { "ad_platform", ClientName },
-                    { "unitId", "" }
+                    //{ "unitId", "" }
                 });
                 LoadRewarded();
                 return;
@@ -377,11 +377,31 @@ namespace CoreLite
                 LoadInterstitial();
                 return;
             }
+            
+            // 获取广告信息用于 IV_AchieveShow 打点
+            string adId = "";
+            string adSource = "";
+            double adEcpm = 0;
+            try
+            {
+                var statusJson = ATInterstitialAd.Instance.checkAdStatus(bestPlacement);
+                var status = JsonUtility.FromJson<CoreLiteTpnAdStatus>(statusJson);
+                if (status?.adInfo != null)
+                {
+                    adId = status.adInfo.network_placement_id;
+                    adSource = "Topon_" + status.adInfo.network_firm_id.ToString();
+                    adEcpm = status.adInfo.publisher_revenue;
+                }
+            }
+            catch { }
+            
             CoreAnalyticsMgr.TrackEvent("IV_AchieveShow", new Dictionary<string, object>
             {
                 { "Position", CoreAdsMgr.Instance._ivPos },
-                { "ad_platform", ClientName },
-                { "unitId", bestPlacement }
+                { "ad_platform", "TPN" },
+                { "ad_source", adSource },
+                { "ad_id", adId },
+                { "ad_ecpm", adEcpm }
             });
             CoreTpnInter.Instance.ShowInter(bestPlacement);
         }

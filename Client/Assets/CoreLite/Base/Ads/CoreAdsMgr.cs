@@ -106,7 +106,7 @@ namespace CoreLite
                     _rvShowFailCallback?.Invoke(new Dictionary<string, object>()
                     { 
                         { "Position", CoreAdsMgr.Instance._rvPos ?? ""},
-                        { "show_fail_reason","winner is null"},
+                        //{ "show_fail_reason","winner is null"},
                         { "ad_platform", CorePlatformType.NULL.ToString() },
                     });
                 }
@@ -124,7 +124,7 @@ namespace CoreLite
                 _rvShowFailCallback?.Invoke(new Dictionary<string, object>()
                 { 
                     { "Position", CoreAdsMgr.Instance._rvPos ?? ""},
-                    { "show_fail_reason","not ready"},
+                    //{ "show_fail_reason","not ready"},
                     { "ad_platform", CorePlatformType.NULL.ToString() },
                 });
                     
@@ -270,18 +270,7 @@ namespace CoreLite
                 {
                     var results = SelectBestAds(CoreLiteAdsType.Interstitial);
                     var winner = results.Count > 0 ? results[0] : null;
-                    
-                    // IV_AchieveShow_Match 打点：调用展示API前，获取将要展示的广告信息
-                    var matchInfo = GetInterstitialAdInfo();
-                    CoreAnalyticsMgr.TrackEvent("IV_AchieveShow_Match",new Dictionary<string, object>() 
-                    { 
-                        {"Position", _adPos},
-                        {"ad_platform", "TPN"},
-                        {"ad_source", matchInfo.adSource},
-                        {"ad_id", matchInfo.adId},
-                        {"ad_ecpm", matchInfo.adEcpm}
-                    } );
-                    
+                                        
                     if (winner == null)
                     {
                         _ivCloseCallback?.Invoke();
@@ -290,6 +279,16 @@ namespace CoreLite
                     {
                         //CoreAnalyticsMgr.TrackEvent("IV_Winner", BuildBidEventParams(results, _adPos));
                         CoreBidPlatformMgr.Instance.RecordBidSuccess(winner.PlatformType, CoreLiteAdsType.Interstitial);
+                        // IV_AchieveShow_Match 打点：调用展示API前，获取将要展示的广告信息
+                        var matchInfo = GetInterstitialAdInfo();
+                        CoreAnalyticsMgr.TrackEvent("IV_AchieveShow_Match", new Dictionary<string, object>()
+                    {
+                        {"Position", _adPos},
+                        {"ad_platform", "TPN"},
+                        {"ad_source", matchInfo.adSource},
+                        {"ad_id", matchInfo.adId},
+                        {"ad_ecpm", matchInfo.adEcpm}
+                    });
                         winner.Client.ShowInterstitial();
                         CheckAndRefreshExpiredBids(CoreLiteAdsType.Interstitial);
                     }
@@ -301,17 +300,6 @@ namespace CoreLite
                 var results = SelectBestAds(CoreLiteAdsType.Interstitial);
                 var winner = results.Count > 0 ? results[0] : null;
                 
-                // IV_AchieveShow_Match 打点：调用展示API前，获取将要展示的广告信息
-                var matchInfo = GetInterstitialAdInfo();
-                CoreAnalyticsMgr.TrackEvent("IV_AchieveShow_Match",new Dictionary<string, object>() 
-                { 
-                    {"Position", _adPos},
-                    {"ad_platform", "TPN"},
-                    {"ad_source", matchInfo.adSource},
-                    {"ad_id", matchInfo.adId},
-                    {"ad_ecpm", matchInfo.adEcpm}
-                } );
-                
                 if (winner == null)
                 {
                     _ivCloseCallback?.Invoke();
@@ -320,6 +308,16 @@ namespace CoreLite
                 {
                     //CoreAnalyticsMgr.TrackEvent("IV_Winner", BuildBidEventParams(results, _adPos));
                     CoreBidPlatformMgr.Instance.RecordBidSuccess(winner.PlatformType, CoreLiteAdsType.Interstitial);
+                    // IV_AchieveShow_Match 打点：调用展示API前，获取将要展示的广告信息
+                    var matchInfo = GetInterstitialAdInfo();
+                    CoreAnalyticsMgr.TrackEvent("IV_AchieveShow_Match", new Dictionary<string, object>()
+                {
+                    {"Position", _adPos},
+                    {"ad_platform", "TPN"},
+                    {"ad_source", matchInfo.adSource},
+                    {"ad_id", matchInfo.adId},
+                    {"ad_ecpm", matchInfo.adEcpm}
+                });
                     winner.Client.ShowInterstitial();
                     CheckAndRefreshExpiredBids(CoreLiteAdsType.Interstitial);
                 }
