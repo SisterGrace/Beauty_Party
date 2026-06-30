@@ -186,7 +186,8 @@ namespace CoreLite
             TrackSplashEvent("SP_Position", new Dictionary<string, object>
             {
                 { "launch_type", CurrentLaunchType },
-                { "ad_platform", spAdInfo.adSource },
+                { "ad_platform", "TPN" },
+                { "ad_source", spAdInfo.adSource },
                 { "ad_id", spAdInfo.adId },
                 { "ad_ecpm", spAdInfo.adEcpm }
             });
@@ -195,7 +196,8 @@ namespace CoreLite
             TrackSplashEvent("SP_AchieveShow_Match", new Dictionary<string, object>
             {
                 { "launch_type", CurrentLaunchType },
-                { "ad_platform", spAdInfo.adSource },
+                { "ad_platform", "TPN" },
+                { "ad_source", spAdInfo.adSource },
                 { "ad_id", spAdInfo.adId },
                 { "ad_ecpm", spAdInfo.adEcpm }
             });

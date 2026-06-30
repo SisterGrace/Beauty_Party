@@ -15,6 +15,12 @@ namespace CoreLite
         private Dictionary<string, float> _startLoadTimes = new Dictionary<string, float>();
         private Dictionary<string, int> _retryAttempts = new Dictionary<string, int>();
         private Dictionary<string, double> _placementRevenue = new Dictionary<string, double>();
+        /// <summary>
+        /// 缓存每个广告位的广告信息：adId（第三方广告ID）, source（广告网络来源）, ecpm（千次展示收益）
+        /// 用于在展示失败/关闭时上报精确的广告源信息
+        /// </summary>
+        private Dictionary<string, (string adId, string source, double ecpm)> _cachedAdInfo
+            = new Dictionary<string, (string adId, string source, double ecpm)>();
         private bool _callbacksRegistered;
         private const string PlatformName = "TPN";
         private const int MaxRetry = 6;
@@ -193,7 +199,8 @@ namespace CoreLite
                 CoreLiteSplashAdsMgr.TrackSplashEvent("SP_Show", new Dictionary<string, object>
                 {
                     //{ "launch_type", launchType },  // 多余参数，已注释
-                    { "ad_platform", adSource },  // ad_platform 就是 ad_source
+                    { "ad_platform", PlatformName },
+                    { "ad_source", adSource },
                     { "ad_id", adId },
                     { "ad_ecpm", revenue }
                     //{ "unitId", placementId },  // 多余参数，已注释
@@ -255,7 +262,8 @@ namespace CoreLite
                 // SP_ShowFail 通用打点
                 CoreLiteSplashAdsMgr.TrackSplashEvent("SP_ShowFail", new Dictionary<string, object>
                 {
-                    { "ad_platform", adSource },
+                    { "ad_platform",PlatformName },
+                    { "ad_source", adSource },
                     { "ad_id", adId },
                     { "ad_ecpm", adEcpm }
                 });
@@ -275,9 +283,6 @@ namespace CoreLite
                 _placementRevenue.Remove(placementId);
                 _cachedAdInfo.Remove(placementId);  // 清空缓存
                 CoreLiteSplashAdsMgr.Instance?.NotifyAppOpenAdDismissedFromSdk();
-                LoadSplash(placementId);
-            }, null);
-        }
                 LoadSplash(placementId);
             }, null);
         }

@@ -1,4 +1,5 @@
 using AdjustSdk;
+using CodiceApp.EventTracking.Plastic;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -52,7 +53,6 @@ namespace CoreLite
 #if SSThinkingData
             CoreThinkingDataEvents.TrackEvent(eventName);
 #endif
-            Sky.SkySolarEngineEvents.TrackEvent(eventName);
         }
 
         public static void TrackEvent(string eventName, string key, object value)
@@ -110,8 +110,16 @@ namespace CoreLite
         {
             if (!impression) return;
             CoreLogUtils.Debug("TrackAdImpressionEvent"+" revenue:"+revenue+" network:"+network+" unit:"+unit+" placement:"+placement+" format:"+format+" platform:"+platform+" pos:"+pos+" format_number:"+formatNumber+" position_number:"+positionNumber);
+            
+            // 上报买量消耗成本事件（热云）
+            CoreAnalyticsMgr.TrackEvent("track_ad_spend", new Dictionary<string, object>
+            {
+                { "ad_network", Sky.SkySolarEnginePrefs.HasAttribution ? Sky.SkySolarEnginePrefs.Network : "Unknown" }
+            });
+            
             CoreFirebaseEvents.TrackAdImpressionEvent(revenue, network, unit, format, platform, pos, formatNumber, positionNumber);
             Sky.SkyGAEvents.TrackAdImpressionEvent(revenue, network, unit, format, platform, pos, formatNumber, positionNumber);
+            //Sky.SkySolarEngineEvents.TrackAdImpressionEvent(revenue, network, unit, format, platform, pos, formatNumber, positionNumber);
 #if ADJUST
             CoreAdjustEvents.TrackAdImpressionEvent(revenue, network, unit, placement);
 #endif

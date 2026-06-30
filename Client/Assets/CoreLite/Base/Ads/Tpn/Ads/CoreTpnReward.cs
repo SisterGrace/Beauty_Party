@@ -283,11 +283,11 @@ namespace CoreLite
                 {
                     { "Position", CoreAdsMgr.Instance._rvPos ?? "" },
                     //{ "show_fail_reason", CoreThinkingDataEvents.FormatEventName(errorMsg) },
-                    //{ "ad_platform", PlatformName },
                     //{ "unitId", placementId }
-                    {"ad_id", adId},
-                    {"ad_platform",adSource },
-                    {"ad_ecpm",adEcpm }
+                    { "ad_platform", PlatformName},
+                    { "ad_source", adSource },
+                    { "ad_id", adId },
+                    { "ad_ecpm", adEcpm }
                 });
 
                 _cachedAdInfo.Remove(placementId);  // 清空缓存

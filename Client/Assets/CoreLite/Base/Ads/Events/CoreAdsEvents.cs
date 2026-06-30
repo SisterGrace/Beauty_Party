@@ -107,12 +107,12 @@ namespace CoreLite
             CoreAnalyticsMgr.TrackEvent("RV_Show", new Dictionary<string, object>
             {
                 {"Position", position ?? ""},
+                {"ad_platform", "TPN"},
+                {"ad_source", adSource ?? ""},
                 {"ad_id", adId ?? ""},
-                {"ad_platform", adSource ?? ""},
                 {"ad_ecpm",ecpm },
                 //{"ad_reward_num", adRewardNum},
                 //{"first_ad_reward_time", firstAdRewardTime},
-                //{"ad_platform", adPlatform ?? ""},
                 //{"unitId", unitId ?? ""}
             });
         }

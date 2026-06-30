@@ -223,7 +223,8 @@ namespace CoreLite
                 CoreAnalyticsMgr.TrackEvent("IV_ShowFail", new Dictionary<string, object>
                 {
                     { "Position", CoreAdsMgr.Instance._ivPos ?? "" },
-                    { "ad_platform", adSource },
+                    { "ad_platform", PlatformName },
+                    { "ad_source", adSource },
                     { "ad_id", adId },
                     { "ad_ecpm", adEcpm }
                 });
@@ -251,10 +252,10 @@ namespace CoreLite
                 CoreAdsMgr.Instance._ivShowCallback?.Invoke(new Dictionary<string, object>
                 {
                     { "Position", pos },
-                    { "ad_platform", adSource },  // ad_platform 就是 ad_source
+                    { "ad_platform",PlatformName },
+                    { "ad_source", adSource },
                     { "ad_id", adId },
                     { "ad_ecpm", revenue }
-                    //{ "unitId", placementId }  // 多余参数，已注释
                 });
                 if (revenue > 0)
                 {

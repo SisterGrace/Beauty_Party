@@ -159,14 +159,16 @@ namespace CoreLite
                     CoreAnalyticsMgr.TrackEvent("IV_ShowFail_Rule_Limit", new Dictionary<string, object>()
                     {
                         { "Position", _adPos },
-                        { "ad_platform", adInfo.adSource },
+                        { "ad_platform", "TPN" },
+                        { "ad_source", adInfo.adSource },
                         { "ad_id", adInfo.adId },
                         { "ad_ecpm", adInfo.adEcpm }
                     });
                     CoreAnalyticsMgr.TrackEvent("IV_ShowFail", new Dictionary<string, object>()
                     {
                         { "Position", _adPos },
-                        { "ad_platform", adInfo.adSource },
+                        { "ad_platform", "TPN" },
+                        { "ad_source", adInfo.adSource },
                         { "ad_id", adInfo.adId },
                         { "ad_ecpm", adInfo.adEcpm }
                     });
@@ -241,7 +243,8 @@ namespace CoreLite
             CoreAnalyticsMgr.TrackEvent("IV_Position",new Dictionary<string, object>() 
             { 
                 {"Position", _adPos},
-                {"ad_platform", ivPosInfo.adSource},
+                {"ad_platform", "TPN"},
+                {"ad_source", ivPosInfo.adSource},
                 {"ad_id", ivPosInfo.adId},
                 {"ad_ecpm", ivPosInfo.adEcpm}
             } );
@@ -273,7 +276,8 @@ namespace CoreLite
                     CoreAnalyticsMgr.TrackEvent("IV_AchieveShow_Match",new Dictionary<string, object>() 
                     { 
                         {"Position", _adPos},
-                        {"ad_platform", matchInfo.adSource},
+                        {"ad_platform", "TPN"},
+                        {"ad_source", matchInfo.adSource},
                         {"ad_id", matchInfo.adId},
                         {"ad_ecpm", matchInfo.adEcpm}
                     } );
@@ -302,7 +306,8 @@ namespace CoreLite
                 CoreAnalyticsMgr.TrackEvent("IV_AchieveShow_Match",new Dictionary<string, object>() 
                 { 
                     {"Position", _adPos},
-                    {"ad_platform", matchInfo.adSource},
+                    {"ad_platform", "TPN"},
+                    {"ad_source", matchInfo.adSource},
                     {"ad_id", matchInfo.adId},
                     {"ad_ecpm", matchInfo.adEcpm}
                 } );
@@ -365,7 +370,8 @@ namespace CoreLite
             CoreAnalyticsMgr.TrackEvent("IV_Position", new Dictionary<string, object>() 
             { 
                 { "Position", _adPos },
-                { "ad_platform", ivPosInfo2.adSource },
+                { "ad_platform", "TPN" },
+                { "ad_source", ivPosInfo2.adSource },
                 { "ad_id", ivPosInfo2.adId },
                 { "ad_ecpm", ivPosInfo2.adEcpm }
             });
