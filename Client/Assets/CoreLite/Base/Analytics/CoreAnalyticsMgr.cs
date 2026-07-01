@@ -121,7 +121,7 @@ namespace CoreLite
             // 上报买量消耗成本事件（热云）
             CoreAnalyticsMgr.TrackEvent("track_ad_spend", new Dictionary<string, object>
             {
-                { "ad_network", Sky.SkySolarEnginePrefs.HasAttribution ? Sky.SkySolarEnginePrefs.Network : "Unknown" }
+                { "ad_network", Sky.SkySolarEnginePrefs.HasAttribution ? Sky.SkySolarEnginePrefs.Network : "" }
             });
             
             CoreFirebaseEvents.TrackAdImpressionEvent(revenue, network, unit, format, platform, pos, formatNumber, positionNumber);

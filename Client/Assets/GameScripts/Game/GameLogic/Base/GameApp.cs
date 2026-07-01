@@ -204,8 +204,8 @@ public partial class GameApp:Singleton<GameApp>
     {
         if (Sky.SkySolarEnginePrefs.HasAttribution)
         {
-            return Sky.SkySolarEnginePrefs.Network ?? "Unknown";
+            return Sky.SkySolarEnginePrefs.Network ?? "";
         }
-        return "Unknown";
+        return "";
     }
 }
