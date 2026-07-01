@@ -46,6 +46,7 @@ namespace CoreLite
         {
             //if (!AnalyticsOver) return;
             if (!BoolUp(eventName)) return;
+            CoreLogUtils.Debug("[CoreAnalyticsMgr] eventName:" + eventName);
             CoreFirebaseEvents.TrackEvent(eventName);
             Sky.SkyGAEvents.TrackEvent(eventName);
             Sky.SkySolarEngineEvents.TrackEvent(eventName);
@@ -61,6 +62,7 @@ namespace CoreLite
         {
             //if (!AnalyticsOver) return;
             if (!BoolUp(eventName)) return;
+            CoreLogUtils.Debug("[CoreAnalyticsMgr] eventName:" + eventName);
             CoreFirebaseEvents.TrackEvent(eventName, key, value);
             Sky.SkyGAEvents.TrackEvent(eventName, key, value);
             Sky.SkySolarEngineEvents.TrackEvent(eventName, key, value);
@@ -82,6 +84,7 @@ namespace CoreLite
         {
             //if (!AnalyticsOver) return;
             if (!BoolUp(eventName)) return;
+            CoreLogUtils.Debug("[CoreAnalyticsMgr] eventName:" + eventName);
             if (dict == null)
             {
                 dict = new Dictionary<string, object>();
