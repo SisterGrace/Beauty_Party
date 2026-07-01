@@ -174,7 +174,7 @@ public partial class GameApp:Singleton<GameApp>
             string adNetwork = GetCurrentAdNetwork();
             CoreLite.CoreAnalyticsMgr.TrackEvent("ta_app_end", new Dictionary<string, object>
             {
-                { "#duration", (int)duration },
+                { "duration", (int)duration },
                 { "ad_network", adNetwork }
             });
         }
