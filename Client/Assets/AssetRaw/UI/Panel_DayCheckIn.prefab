@@ -237,6 +237,7 @@ GameObject:
   - component: {fileID: 8815293361798195120}
   - component: {fileID: 2770732992711559951}
   - component: {fileID: 683835204890680455}
+  - component: {fileID: 2187104650660791242}
   m_Layer: 5
   m_Name: Btn_Check
   m_TagString: Untagged
@@ -320,7 +321,19 @@ MonoBehaviour:
   soundName: 
   effectTarget: {fileID: 0}
   thisImager: {fileID: 0}
-  CurentCanvasGroup: {fileID: 0}
+  CurentCanvasGroup: {fileID: 2187104650660791242}
+--- !u!225 &2187104650660791242
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6451921505010371048}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &6554159156777923518
 GameObject:
   m_ObjectHideFlags: 0

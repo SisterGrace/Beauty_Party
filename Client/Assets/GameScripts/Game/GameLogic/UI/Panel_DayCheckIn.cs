@@ -28,6 +28,11 @@ namespace GameLogic
 			if (_activityData == null) return;
 			CreateDaysList();
 			SetCheckBtn();
+			// 确保按钮锁被释放，防止禁用按钮被点击后锁定所有按钮
+			if (GameModule.UI != null)
+			{
+				GameModule.UI.IsButtonLock = false;
+			}
 			SDKManager.Instance.LogEvent("Sign_Show");
 		}
 		private void CreateDaysList()
@@ -63,6 +68,8 @@ namespace GameLogic
 		{
 			bool isCanCheck = _activityData.CanCheckInToday();
 			//mMask.SetActive(!isCanCheck);
+			// 设置按钮启用/禁用状态（控制变灰和点击）
+			mCheck.ButtonEnabled = isCanCheck;
 			if (isCanCheck)
 			{
 				mCheckState.SetLanguage("uitps_daycheck_check");
@@ -102,6 +109,11 @@ namespace GameLogic
 					SDKManager.Instance.LogEvent("Sign_Click", "Time", checkInDay);
 					SetCheckBtn();
 					CreateDaysList();
+					// 释放按钮锁，防止禁用按钮导致其他按钮无法点击
+					if (GameModule.UI != null)
+					{
+						GameModule.UI.IsButtonLock = false;
+					}
 					bool hasRedPoint = UserController.Instance.CheckDayCheckInRedPoint();
 					GameEvent.Send(EventType.DayCheckInRedPoint, hasRedPoint, "");
 				}
