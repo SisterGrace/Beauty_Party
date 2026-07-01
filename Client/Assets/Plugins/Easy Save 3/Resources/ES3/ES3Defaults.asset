@@ -50,7 +50,6 @@ MonoBehaviour:
     - GameBase
     - AVProVideo.Runtime
     - spine-csharp
-    - Sky
     - Coffee.UIParticle
     - TK_Engine.Editor
     - spine-unity
@@ -77,15 +76,15 @@ MonoBehaviour:
     - Coffee.SoftMaskForUGUI
     - AVProVideo.Editor
     - GUPS.Obfuscator
-    - SkyEditor
     - Coffee.UIParticle.Editor
     - Purchasing.Common
     - UniTask.TextMeshPro
-    - SkyFirebaseEditor
     - _AVProVideo.Extensions.VideoPlayer
     - StompyRobot.SRF.Editor
     - Assembly-CSharp
     - ParticleImage.Editor
+    - SkyEditor
+    - SkyFirebaseEditor
     - AdjustSdk.Editor
     - HybridCLR.Runtime
     - AVProVideo.Extensions.VisualEffectGraph

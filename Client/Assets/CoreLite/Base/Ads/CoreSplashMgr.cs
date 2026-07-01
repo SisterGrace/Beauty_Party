@@ -185,7 +185,7 @@ namespace CoreLite
             // SP_Position 打点：触发开屏展示时机
             TrackSplashEvent("SP_Position", new Dictionary<string, object>
             {
-                { "launch_type", CurrentLaunchType },
+                //{ "launch_type", CurrentLaunchType },
                 { "ad_platform", "TPN" },
                 { "ad_source", spAdInfo.adSource },
                 { "ad_id", spAdInfo.adId },
@@ -195,7 +195,7 @@ namespace CoreLite
             // SP_AchieveShow_Match 打点：调用展示API
             TrackSplashEvent("SP_AchieveShow_Match", new Dictionary<string, object>
             {
-                { "launch_type", CurrentLaunchType },
+                //{ "launch_type", CurrentLaunchType },
                 { "ad_platform", "TPN" },
                 { "ad_source", spAdInfo.adSource },
                 { "ad_id", spAdInfo.adId },
@@ -343,7 +343,7 @@ namespace CoreLite
         {
             TrackSplashEvent("SP_ShowSkip", new Dictionary<string, object>
             {
-                { "launch_type", CurrentLaunchType },
+                //{ "launch_type", CurrentLaunchType },
                 { "reason", reason }
             });
         }

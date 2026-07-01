@@ -117,7 +117,7 @@ namespace Sky
                 var creative = ExtractString(json, "adcreative_name", "creative_name", "creative");
                 var clickId  = ExtractString(json, "click_id", "clickId", "click_label");
 
-                if (string.IsNullOrEmpty(network)) network = "Organic";
+                if (string.IsNullOrEmpty(network)) network = "";
 
                 SkySolarEnginePrefs.HasAttribution = true;
                 SkySolarEnginePrefs.Network    = network;
