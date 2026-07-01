@@ -124,13 +124,18 @@ public class UIButton : MonoBehaviour, IPointerClickHandler, IPointerDownHandler
     {
         if (_isProcessingClick) return;
         if (GameModule.UI.IsButtonLock) return;
-        GameModule.UI.IsButtonLock = true;
-        _isProcessingClick = true;
+
+        // 禁用的按钮不应该触发全局锁，直接返回
         if (!_thisEnabled)
         {
             _listener3?.Invoke();
             return;
         }
+
+        // 只有启用的按钮才触发全局锁
+        GameModule.UI.IsButtonLock = true;
+        _isProcessingClick = true;
+
         PlaySound();
         PlayAnim();
         if (isPlayAnim)
