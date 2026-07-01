@@ -28,6 +28,7 @@ namespace Sky
         
         void Awake()
         {
+            AppLifecycleListener.Instance.Init();
             _appStartTime = Time.realtimeSinceStartup;
         }
 
