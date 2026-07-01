@@ -4,10 +4,24 @@ using UnityEngine;
 
 public class AppLifecycleListener : SkySingleton <AppLifecycleListener>
 {
+    bool first = true;
     private float _foregroundStartTime;
     public void Init()
     {
         LogTool.DebugLog("AppLifecycleListener:init", LogTool.Color.lightblue);
+        if(first)
+        {
+            first = false;
+            string adNetwork = GetCurrentAdNetwork();
+            CoreLite.CoreAnalyticsMgr.TrackEvent("ta_app_start", new Dictionary<string, object>
+            {
+                { "ad_network", adNetwork }
+            });
+        }
+        else
+        {
+            
+        }
     }
     void Awake()
     {

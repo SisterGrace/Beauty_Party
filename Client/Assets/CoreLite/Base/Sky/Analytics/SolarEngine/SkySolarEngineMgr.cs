@@ -28,7 +28,6 @@ namespace Sky
         
         void Awake()
         {
-            AppLifecycleListener.Instance.Init();
             _appStartTime = Time.realtimeSinceStartup;
         }
 
@@ -69,7 +68,7 @@ namespace Sky
             IsInitialized = true;
             LogTool.DebugLog("[SolarEngine] Init triggered, appKey=" + appKey + ", log=" + EnableLog,
                 LogTool.Color.yellow);
-
+            AppLifecycleListener.Instance.Init();//没有初始化完成的时候无法打点上报！！！！所以开始游戏的上报要写这里！！！
             // 上报热云初始化事件
             CoreLite.CoreAnalyticsMgr.TrackEvent("track_init", new Dictionary<string, object>
             {
