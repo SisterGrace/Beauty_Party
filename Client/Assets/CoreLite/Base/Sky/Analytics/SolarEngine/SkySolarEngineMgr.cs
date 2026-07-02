@@ -68,9 +68,12 @@ namespace Sky
             IsInitialized = true;
             LogTool.DebugLog("[SolarEngine] Init triggered, appKey=" + appKey + ", log=" + EnableLog,
                 LogTool.Color.yellow);
-            
+            AppLifecycleListener.Instance.Init();//没有初始化完成的时候无法打点上报！！！！所以开始游戏的上报要写这里！！！
             // 上报热云初始化事件
-            CoreLite.CoreAnalyticsMgr.TrackEvent("track_init");
+            CoreLite.CoreAnalyticsMgr.TrackEvent("track_init", new Dictionary<string, object>
+            {
+                { "ad_network", SkySolarEnginePrefs.HasAttribution ? SkySolarEnginePrefs.Network : "" }
+            });
         }
 
         #region 事件上报
@@ -118,9 +121,14 @@ namespace Sky
                 var clickId  = ExtractString(json, "click_id", "clickId", "click_label");
 
                 if (string.IsNullOrEmpty(network)) network = "";
-
+                // ---- 新增处理逻辑：截断 + 空值转空字符串 ----
+                string finalNetwork = network ?? "";           // 1. 如果 null 则转为空字符串
+                if (finalNetwork.Length > 10)                  // 2. 如果超过 10 个字符则截断
+                {
+                    finalNetwork = finalNetwork.Substring(0, 10);
+                }
                 SkySolarEnginePrefs.HasAttribution = true;
-                SkySolarEnginePrefs.Network    = network;
+                SkySolarEnginePrefs.Network    = finalNetwork;
                 SkySolarEnginePrefs.Campaign   = campaign;
                 SkySolarEnginePrefs.Adgroup    = adgroup;
                 SkySolarEnginePrefs.Creative   = creative;
@@ -128,23 +136,24 @@ namespace Sky
                 SkySolarEnginePrefs.IsPaidUser = !IsOrganic(network);
 
                 // 走项目统一上报通道，自动分发到 GA + 热云本身（事件名约定）
-                Sky.SkyAnalyticsMgr.DesignEvent("SE", "Attribution", "Success", true, network);
+                Sky.SkyAnalyticsMgr.DesignEvent("SE", "Attribution", "Success", true, finalNetwork);
                 
                 // 计算从启动到获取归因成功的时间（秒）
                 float passTime = Time.realtimeSinceStartup - _appStartTime;
                 int passTimeSeconds = Mathf.CeilToInt(passTime);
-                
+
                 // 上报获取热云信息成功事件
                 CoreLite.CoreAnalyticsMgr.TrackEvent("track_get_success", new Dictionary<string, object>
                 {
-                    { "Pass_Time", passTimeSeconds }
+                    { "Pass_Time", passTimeSeconds },
+                    { "ad_network", finalNetwork }  // 新增
                 });
-                
+
                 // 上报获取到ad_network事件
                 CoreLite.CoreAnalyticsMgr.TrackEvent("track_get_time", new Dictionary<string, object>
                 {
                     { "Pass_Time", passTimeSeconds },
-                    { "ad_network", network }
+                    { "ad_network", finalNetwork }
                 });
             }
             catch (Exception e)

@@ -166,28 +166,6 @@ public partial class GameApp:Singleton<GameApp>
 
     private void OnApplicationPause(bool isPause)
     {
-        // 上报应用启动/退出事件（替代ThinkingData的自动采集）
-        if (isPause)
-        {
-            // 应用进入后台 - 上报 ta_app_end
-            float duration = Time.realtimeSinceStartup;
-            string adNetwork = GetCurrentAdNetwork();
-            CoreLite.CoreAnalyticsMgr.TrackEvent("ta_app_end", new Dictionary<string, object>
-            {
-                { "#duration", (int)duration },
-                { "ad_network", adNetwork }
-            });
-        }
-        else
-        {
-            // 应用从后台返回或启动 - 上报 ta_app_start
-            string adNetwork = GetCurrentAdNetwork();
-            CoreLite.CoreAnalyticsMgr.TrackEvent("ta_app_start", new Dictionary<string, object>
-            {
-                { "ad_network", adNetwork }
-            });
-        }
-        
         var listLogic = _listLogicMgr;
         var logicCnt = listLogic.Count;
         for (int i = 0; i < logicCnt; i++)
@@ -195,17 +173,5 @@ public partial class GameApp:Singleton<GameApp>
             var logic = listLogic[i];
             logic.OnApplicationPause(isPause);
         }
-    }
-    
-    /// <summary>
-    /// 获取当前的广告渠道（从热云归因获取）
-    /// </summary>
-    private string GetCurrentAdNetwork()
-    {
-        if (Sky.SkySolarEnginePrefs.HasAttribution)
-        {
-            return Sky.SkySolarEnginePrefs.Network ?? "";
-        }
-        return "";
     }
 }
