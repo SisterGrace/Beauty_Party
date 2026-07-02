@@ -229,19 +229,44 @@ public class UIButton : MonoBehaviour, IPointerClickHandler, IPointerDownHandler
     }
 
     private Material _defaultMaterial;
+    private GameObject _maskObject; // 禁用状态的遮罩对象
     private void SetGray()
     {
         if (CurentCanvasGroup == null) return;
+
+        // 查找或缓存遮罩对象
+        if (_maskObject == null)
+        {
+            Transform maskTrans = transform.Find("Obj_Mask");
+            if (maskTrans != null)
+            {
+                _maskObject = maskTrans.gameObject;
+            }
+        }
+
         if (!_thisEnabled)
         {
             //_defaultMaterial = thisImager.material;
             //thisImager.material = AssetManager.Instance.GrayMaterial;
-            CurentCanvasGroup.alpha = 0.5f;
+            // 不再修改 alpha，避免透明穿透问题
+            // CurentCanvasGroup.alpha = 0.5f;
+
+            // 显示遮罩层表示禁用状态
+            if (_maskObject != null)
+            {
+                _maskObject.SetActive(true);
+            }
         }
         else
         {
             //thisImager.material = _defaultMaterial;
-            CurentCanvasGroup.alpha = 1f;
+            // CurentCanvasGroup.alpha = 1f;
+
+            // 隐藏遮罩层
+            if (_maskObject != null)
+            {
+                _maskObject.SetActive(false);
+            }
         }
     }
     //播放按钮特效
