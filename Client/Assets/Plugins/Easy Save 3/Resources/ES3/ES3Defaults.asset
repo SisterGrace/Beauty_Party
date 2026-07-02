@@ -76,12 +76,12 @@ MonoBehaviour:
     - Coffee.SoftMaskForUGUI
     - AVProVideo.Editor
     - GUPS.Obfuscator
-    - Assembly-CSharp
     - Coffee.UIParticle.Editor
     - Purchasing.Common
     - UniTask.TextMeshPro
     - _AVProVideo.Extensions.VideoPlayer
     - StompyRobot.SRF.Editor
+    - Assembly-CSharp
     - ParticleImage.Editor
     - SkyEditor
     - SkyFirebaseEditor
@@ -97,6 +97,7 @@ MonoBehaviour:
     - FirebaseMessagingActivityGenerator
     - _AVProVideo.Extensions.VideoPlayer.Editor
     - UniTask.DOTween
+    - SkyTopOnAdEditor
     showAdvancedSettings: 0
   addMgrToSceneAutomatically: 0
   autoUpdateReferences: 1
