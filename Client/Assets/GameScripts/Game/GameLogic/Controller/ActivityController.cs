@@ -59,7 +59,8 @@ namespace GameLogic
                                 GameModule.UI.AddOrderPanel<Panel_DayCheckIn>(cfg.Order, false);
                                 break;
                             case ActivityType.Discard:
-                                GameModule.UI.AddOrderPanel<Panel_Discard>(cfg.Order, false);
+                                // 禁用 Discord 社区弹窗
+                                // GameModule.UI.AddOrderPanel<Panel_Discard>(cfg.Order, false);
                                 break;
                         }
                     }
