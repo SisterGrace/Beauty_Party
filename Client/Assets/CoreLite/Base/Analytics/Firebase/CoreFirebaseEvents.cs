@@ -36,7 +36,19 @@ namespace CoreLite
             List<Parameter> parmlist = new List<Parameter>();
             foreach (var item in dict)
             {
-                parmlist.Add(new Parameter(item.Key, item.Value.ToString()));
+                if (item.Value == null)
+                    continue;
+                // 根据实际类型分别处理
+                if (item.Value is int intVal)
+                    parmlist.Add(new Parameter(item.Key, intVal));
+                else if (item.Value is long longVal)
+                    parmlist.Add(new Parameter(item.Key, longVal));
+                else if (item.Value is double doubleVal)
+                    parmlist.Add(new Parameter(item.Key, doubleVal));
+                else if (item.Value is float floatVal)
+                    parmlist.Add(new Parameter(item.Key, floatVal));
+                else
+                    parmlist.Add(new Parameter(item.Key, item.Value.ToString()));
             }
             FirebaseAnalytics.LogEvent(eventName, parmlist.ToArray());
 #endif
@@ -50,7 +62,7 @@ namespace CoreLite
             var source = CoreAdImpressionSource.GetSource("revenue_fir","ad_impression");
             if (revenue < 0)
             {
-                LogTool.DebugLog($"[GA] ad_impression skipped: revenue={revenue} < 0, reporting ad_impression_error");
+                LogTool.DebugLog($"[Firebase] ad_impression skipped: revenue={revenue} < 0, reporting ad_impression_error");
                 var errorProps = new Dictionary<string, object>
                 {
                     { "ad_platform", platform },
