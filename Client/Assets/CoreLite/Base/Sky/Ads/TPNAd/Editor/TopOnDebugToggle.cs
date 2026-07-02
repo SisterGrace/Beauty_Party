@@ -2,20 +2,51 @@ using UnityEngine;
 using UnityEditor;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 public class TopOnDebugToggle
 {
     private const string MenuItemName = "Tools/TopOn Debug";
     private const string XmlFileName = "DebuggerUIDependencies.xml";
+    private const string MacroSymbol = "TOPON_TEST";
+
+    private static float _waitTimer = 0f;
+    private static bool _isWaiting = false;
+    private static bool _pendingMacroState = false;
 
     [MenuItem(MenuItemName)]
     private static void ToggleDebug()
     {
+        if (_isWaiting)
+        {
+            EditorApplication.update -= WaitAndSetMacro;
+            _isWaiting = false;
+        }
+
         bool isEnabled = EditorPrefs.GetBool("TopOnDebugEnabled", false);
         isEnabled = !isEnabled;
         EditorPrefs.SetBool("TopOnDebugEnabled", isEnabled);
+
         SetDebugState(isEnabled);
-        ForceResolve();
+        bool forceCalled = ForceResolve();
+
+        _pendingMacroState = isEnabled;
+        _waitTimer = 10f;
+        _isWaiting = true;
+        EditorApplication.update += WaitAndSetMacro;
+        Debug.Log($"已触发 Force Resolve，等待 10 秒后修改宏...");
+    }
+
+    private static void WaitAndSetMacro()
+    {
+        _waitTimer -= Time.deltaTime;
+        if (_waitTimer <= 0f)
+        {
+            EditorApplication.update -= WaitAndSetMacro;
+            _isWaiting = false;
+            SetMacro(_pendingMacroState);
+            Debug.Log($"延迟 10 秒结束，宏已{(_pendingMacroState ? "添加" : "移除")} {MacroSymbol}");
+        }
     }
 
     [MenuItem(MenuItemName, true)]
@@ -25,9 +56,9 @@ public class TopOnDebugToggle
         return true;
     }
 
+    // ---------- 修改 XML（最彻底：提取核心内容） ----------
     private static void SetDebugState(bool enabled)
     {
-        // 查找XML文件
         string[] guids = AssetDatabase.FindAssets(Path.GetFileNameWithoutExtension(XmlFileName));
         if (guids.Length == 0)
         {
@@ -49,37 +80,39 @@ public class TopOnDebugToggle
         }
 
         string content = File.ReadAllText(fullPath);
-        bool isCommented = content.TrimStart().StartsWith("<!--") && content.TrimEnd().EndsWith("-->");
 
-        if (enabled && isCommented)
+        // 用正则提取 <dependencies> ... </dependencies> 核心内容（忽略注释和前缀）
+        string pattern = @"<dependencies\b[^>]*>(.*?)</dependencies>";
+        Match match = Regex.Match(content, pattern, RegexOptions.Singleline);
+        string coreContent = match.Success ? match.Value : null;
+
+        if (string.IsNullOrEmpty(coreContent))
         {
-            // 取消注释：去掉最外层的 <!-- 和 -->
-            content = content.Trim();
-            if (content.StartsWith("<!--") && content.EndsWith("-->"))
-            {
-                content = content.Substring(3, content.Length - 6);
-                // 如果开头或结尾有换行符，保留原样
-            }
-            File.WriteAllText(fullPath, content);
-            Debug.Log("TopOn Debug 已开启：取消注释 XML。");
+            Debug.LogError("无法提取 <dependencies> 核心内容，文件可能已损坏。");
+            return;
         }
-        else if (!enabled && !isCommented)
+
+        // 根据状态决定是否注释
+        if (enabled)
         {
-            // 注释整个文件
-            content = "<!--\n" + content + "\n-->";
-            File.WriteAllText(fullPath, content);
-            Debug.Log("TopOn Debug 已关闭：注释 XML。");
+            // 开启：直接写核心内容（不加注释）
+            File.WriteAllText(fullPath, coreContent);
+            Debug.Log("TopOn Debug 已开启：取消注释 XML。");
         }
         else
         {
-            Debug.Log("TopOn Debug 状态未改变，无需操作。");
+            // 关闭：用注释包装核心内容
+            File.WriteAllText(fullPath, "<!--" + coreContent + "-->");
+            Debug.Log("TopOn Debug 已关闭：注释 XML。");
         }
+
+        AssetDatabase.ImportAsset(path);
         AssetDatabase.Refresh();
     }
 
-    private static void ForceResolve()
+    // ---------- Force Resolve ----------
+    private static bool ForceResolve()
     {
-        // 尝试通过常见菜单路径执行 Force Resolve
         string[] menuPaths = new string[]
         {
             "Assets/External Dependency Manager/Android Resolver/Force Resolve",
@@ -97,7 +130,6 @@ public class TopOnDebugToggle
             }
         }
 
-        // 若菜单无效，尝试反射调用 Google.JarResolver.PlayServicesResolver.ForceResolve()
         if (!executed)
         {
             try
@@ -123,6 +155,45 @@ public class TopOnDebugToggle
         if (!executed)
         {
             Debug.LogWarning("无法自动执行 Force Resolve，请手动通过菜单或窗口执行。");
+        }
+        return executed;
+    }
+
+    // ---------- 宏定义管理 ----------
+    private static void SetMacro(bool enabled)
+    {
+        BuildTargetGroup buildTargetGroup = EditorUserBuildSettings.selectedBuildTargetGroup;
+        string currentSymbols = PlayerSettings.GetScriptingDefineSymbolsForGroup(buildTargetGroup);
+        var symbolsList = currentSymbols.Split(';').Select(s => s.Trim()).Where(s => !string.IsNullOrEmpty(s)).ToList();
+
+        bool changed = false;
+        if (enabled)
+        {
+            if (!symbolsList.Contains(MacroSymbol))
+            {
+                symbolsList.Add(MacroSymbol);
+                changed = true;
+            }
+        }
+        else
+        {
+            if (symbolsList.Contains(MacroSymbol))
+            {
+                symbolsList.Remove(MacroSymbol);
+                changed = true;
+            }
+        }
+
+        if (changed)
+        {
+            string newSymbols = string.Join(";", symbolsList);
+            PlayerSettings.SetScriptingDefineSymbolsForGroup(buildTargetGroup, newSymbols);
+            Debug.Log($"宏定义已更新：{(enabled ? "添加" : "移除")} {MacroSymbol}");
+            AssetDatabase.Refresh();
+        }
+        else
+        {
+            Debug.Log($"宏定义 {MacroSymbol} 状态未变，无需操作。");
         }
     }
 }
