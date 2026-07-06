@@ -55,9 +55,9 @@ namespace Sky
 
         /// <summary>
         /// 广告收益事件上报
-        /// 说明：GameAnalytics 原生 Ad 事件不支持 revenue，因此：
-        /// - 仍调用 NewAdEvent 记录广告展示（不带金额）
-        /// - 额外上报一个 Design 事件 ad_impression_with_revenue 携带金额信息
+        /// </summary>
+        /// <summary>
+        /// 广告收益事件上报（适配 SolarEngine 预置事件 _appImp）
         /// </summary>
         public static void TrackAdImpressionEvent(double revenue, string network, string unit, string format, string platform, string pos = "", int formatNumber = 0, int positionNumber = 0)
         {
@@ -65,50 +65,49 @@ namespace Sky
             {
                 LogTool.DebugLog($"[SolarEngine] ad_impression skipped: revenue={revenue} < 0, reporting ad_impression_error");
                 var errorProps = new Dictionary<string, object>
-                {
-                    { "ad_platform", platform },
-                    { "ad_source", network },
-                    //{ "ad_unit_name", unit },
-                    { "ad_format", format },
-                    { "value", revenue },
-                    { "currency", "USD" },
-                };
+        {
+            { "ad_platform", platform },
+            { "ad_source", network },
+            { "ad_format", format },
+            { "value", revenue },
+            { "currency", "USD" },
+        };
                 if (!string.IsNullOrEmpty(pos))
                     errorProps["position"] = pos;
+                // 错误事件可以保留自定义，或者也改为预置 _appImp（收入为0），这里按原逻辑保留
                 TrackEvent("ad_impression_error", errorProps);
                 return;
             }
 
-            /*// 1. 原生 GA Ad 事件（无 revenue）
-            GAAdType adType = GAAdType.Banner;
-            switch (format.ToLower())
-            {
-                case "rewarded": adType = GAAdType.RewardedVideo; break;
-                case "interstitial": adType = GAAdType.Interstitial; break;
-                case "banner": adType = GAAdType.Banner; break;
-                default: adType = GAAdType.Banner; break;
-            }
-            // 使用 Show 动作（或可以区分 Clicked，这里只做展示）
-            GameAnalytics.NewAdEvent(GAAdAction.Show, adType, network, unit);*/
+            // 重要：计算 eCPM（千次展示收益）
+            // 假设 revenue 是单次展示收益（例如 0.002 USD），则 ecpm = 0.002 * 1000 = 2.0
+            // 如果业务侧传入的 revenue 本身就是 eCPM，则不需要乘以 1000，请根据实际情况调整。
+            double ecpm = revenue * 1000;
 
-            // 2. 自定义 Design 事件携带收入详情
+            // 构造 SolarEngine 预置事件 _appImp 的参数字典
             var revenueProps = new Dictionary<string, object>
-            {
-                { "ad_platform", platform },
-                { "ad_source", network },
-                //{ "ad_unit_name", unit },
-                { "ad_format", format },
-                { "value", revenue },
-                { "currency", "USD" },
-            };
+    {
+        // 必填：收益字段（必须是 ecpm，单位与 currency 对应）
+        { "ecpm", ecpm },
+        { "currency", "USD" },
+        
+        // 必填：广告平台标识（建议使用官方枚举值，如 admob, csj, pangle 等）
+        { "ad_platform", platform },
+        // 广告网络名称（如 admob, facebook 等）
+        { "ad_source", network },
+        // 广告位 ID（对应方法的 unit 参数）
+        { "ad_unit_id", unit },
+        // 广告形式（如 rewarded, interstitial, banner）
+        { "ad_format", format },
+    };
+
+            // 可选：广告位置
             if (!string.IsNullOrEmpty(pos))
                 revenueProps["position"] = pos;
-            /* if (formatNumber > 0)
-                 revenueProps["format_number"] = formatNumber;
-             if (positionNumber > 0)
-                 revenueProps["position_number"] = positionNumber;*/
 
-            TrackEvent("ad_impression", revenueProps);
+            // 关键改动：改为调用 TrackPresetEvent，事件名固定为 _appImp
+            // 这样 SolarEngine 后台才会将其识别为广告收益，归因到 ROI 报表中
+            TrackPresetEvent("_appImp", revenueProps);
         }
 
     }
