@@ -485,10 +485,15 @@ namespace GameLogic
             {
                 callback1?.Invoke();
             }));
-            seq.Append(Icon.transform.DOScaleY(1.7f, 0.1f).SetEase(Ease.InOutBack));
+            //翻回来时的 Y 缩放终值应为 1，之前误写成 1.7 导致图标被永久拉长
+            seq.Append(Icon.transform.DOScaleY(1f, 0.1f).SetEase(Ease.OutBack));
             seq.OnComplete(() =>
             {
-                callback2.Invoke();
+                //兜底：防止动画被 Kill 后残留异常缩放
+                Icon.transform.localScale = Vector3.one;
+                //翻转开头关掉了 Bg，这里恢复，避免后续消除等流程看不到背景
+                Bg.GetComponent<Image>().enabled = true;
+                callback2?.Invoke();
                 //Destroy(c1);
             });
         }
