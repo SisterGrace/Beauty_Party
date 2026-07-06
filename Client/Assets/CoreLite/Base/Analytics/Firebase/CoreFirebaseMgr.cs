@@ -47,7 +47,7 @@ namespace CoreLite
                         // 2. Fetch 任务异常（网络错误、超时等）
                         if (fetchTask.IsFaulted)
                         {
-                            Debug.LogError($"[Firebase] 远程配置 Fetch 异常: {fetchTask.Exception}");
+                            Debug.LogError($"[Firebase] 远程配置 Fetch 异常 可能时未挂载VPN : {fetchTask.Exception}");
                             return;
                         }
 
