@@ -16,11 +16,17 @@ namespace Sky
     }
     public class SkyAnalyticsMgr
     {
+        static bool _isInitialized = false;
         static public void init()
         {
             Sky.SkyGAMgr.Instance.Init();
             // 【新增】SolarEngine（热云）最小接入：与 GA 并列初始化
             Sky.SkySolarEngineMgr.Instance.Init();
+            _isInitialized = true;
+        }
+        public static bool TrackingEnable()
+        {
+            return _isInitialized;
         }
         static BlueSkyLogType _logType = BlueSkyLogType.GA | BlueSkyLogType.Reyun;
         static public void DesignEvent(string sort, string type, string position, bool onlyFirst = false, string extra = "")
