@@ -37,7 +37,6 @@ namespace GameLogic
 			AudioManager.Play(AudioType.Sound, AudioDef.Fail);
 			SDKManager.Instance.LogEvent("RV_Button_Show", "Position", "RV_Revive");
 			LevelController.Instance.FirstLose();
-			SDKManager.Instance.Button_ShowIV(HCIVPositionName.IV_Victory,IvType.IV1);
 		}
 
 		protected override void RegisterEvent()
@@ -129,7 +128,7 @@ namespace GameLogic
 		}
 		protected override void Close()
 		{
-			base.Close();
+            base.Close();
 			
 		}
 		protected override void OnDestroy()

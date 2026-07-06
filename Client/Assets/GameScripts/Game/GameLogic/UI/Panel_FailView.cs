@@ -49,7 +49,8 @@ namespace GameLogic
 
 		private void ClickClose(GameObject obj)
 		{
-			_currentTipIndex++;
+            SDKManager.Instance.Button_ShowIV(HCIVPositionName.IV_Fail, IvType.IV1);
+            _currentTipIndex++;
 			//当关闭次数大于关闭提示次数，直接关闭面板并返回主界面
 			if (_currentTipIndex>_closeTipTimes)
 			{
