@@ -219,7 +219,7 @@ namespace CoreLite
                     pos,
                     adId,
                     adSource,
-                    revenue,//单位一致
+                    revenue,
                     formatNumber,
                     CoreAdsPrefs.GetFirstShowRvTime(),
                     PlatformName,
@@ -259,7 +259,7 @@ namespace CoreLite
                 string errorMsg = e?.errorMessage ?? "";
                 string adId = "";
                 string adSource = "";
-                double adEcpm = 0;
+                double adRrevenue = 0;
                 
                 // 尝试实时获取广告信息（最准确）
                 try
@@ -270,7 +270,7 @@ namespace CoreLite
                     {
                         adId = status.adInfo.network_placement_id;
                         adSource = "Topon_" + status.adInfo.network_firm_id.ToString();
-                        adEcpm = status.adInfo.publisher_revenue;
+                        adRrevenue = status.adInfo.publisher_revenue;
                     }
                 }
                 catch
@@ -287,7 +287,7 @@ namespace CoreLite
                     { "ad_platform", PlatformName},
                     { "ad_source", adSource },
                     { "ad_id", adId },
-                    { "ad_ecpm", adEcpm }
+                    { "ad_ecpm", adRrevenue*1000 }
                 });
 
                 _cachedAdInfo.Remove(placementId);  // 清空缓存

@@ -381,7 +381,7 @@ namespace CoreLite
             // 获取广告信息用于 IV_AchieveShow 打点
             string adId = "";
             string adSource = "";
-            double adEcpm = 0;
+            double adRevenue = 0;
             try
             {
                 var statusJson = ATInterstitialAd.Instance.checkAdStatus(bestPlacement);
@@ -390,7 +390,7 @@ namespace CoreLite
                 {
                     adId = status.adInfo.network_placement_id;
                     adSource = "Topon_" + status.adInfo.network_firm_id.ToString();
-                    adEcpm = status.adInfo.publisher_revenue;
+                    adRevenue = status.adInfo.publisher_revenue;
                 }
             }
             catch { }
@@ -401,7 +401,7 @@ namespace CoreLite
                 { "ad_platform", "TPN" },
                 { "ad_source", adSource },
                 { "ad_id", adId },
-                { "ad_ecpm", adEcpm }
+                { "ad_ecpm", adRevenue*1000 }
             });
             CoreTpnInter.Instance.ShowInter(bestPlacement);
         }

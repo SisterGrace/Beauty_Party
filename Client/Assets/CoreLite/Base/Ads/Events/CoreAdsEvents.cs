@@ -82,7 +82,7 @@ namespace CoreLite
             {
                 {"ad_id", adId},//第三方广告ID
                 //{"unitId", unit},//topon的广告位ID
-                {"ad_ecpm", revenue},//ecpm
+                {"ad_ecpm", revenue*1000},//ecpm
                 {"ad_platform", adPlatform},//聚合平台
                 {"ad_source", source},
                 {"Time", Mathf.CeilToInt(time)}//耗时
@@ -102,7 +102,7 @@ namespace CoreLite
         /// <summary>
         /// 统一上报激励视频展示成功事件 RV_Show。各广告聚合在 RV 展示成功回调中调用，集中维护字段。
         /// </summary>
-        public static void LogRvShowEvent(string position, string adId, string adSource, double ecpm , int adRewardNum, int firstAdRewardTime, string adPlatform, string unitId)
+        public static void LogRvShowEvent(string position, string adId, string adSource, double revenue, int adRewardNum, int firstAdRewardTime, string adPlatform, string unitId)
         {
             CoreAnalyticsMgr.TrackEvent("RV_Show", new Dictionary<string, object>
             {
@@ -110,7 +110,7 @@ namespace CoreLite
                 {"ad_platform", "TPN"},
                 {"ad_source", adSource ?? ""},
                 {"ad_id", adId ?? ""},
-                {"ad_ecpm",ecpm },
+                {"ad_ecpm",revenue*1000 },
                 //{"ad_reward_num", adRewardNum},
                 //{"first_ad_reward_time", firstAdRewardTime},
                 //{"unitId", unitId ?? ""}

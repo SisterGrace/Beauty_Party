@@ -198,7 +198,7 @@ namespace CoreLite
                 var placementId = e?.placementId ?? "";
                 string adId = "";
                 string adSource = "";
-                double adEcpm = 0;
+                double adRevenue = 0;
                 
                 // 尝试实时获取广告信息（最准确）
                 try
@@ -209,7 +209,7 @@ namespace CoreLite
                     {
                         adId = status.adInfo.network_placement_id;
                         adSource = "Topon_" + status.adInfo.network_firm_id.ToString();
-                        adEcpm = status.adInfo.publisher_revenue;
+                        adRevenue = status.adInfo.publisher_revenue;
                     }
                 }
                 catch
@@ -226,7 +226,7 @@ namespace CoreLite
                     { "ad_platform", PlatformName },
                     { "ad_source", adSource },
                     { "ad_id", adId },
-                    { "ad_ecpm", adEcpm }
+                    { "ad_ecpm", adRevenue*1000 }
                 });
                 
                 _cachedAdInfo.Remove(placementId);  // 清空缓存
@@ -255,7 +255,7 @@ namespace CoreLite
                     { "ad_platform",PlatformName },
                     { "ad_source", adSource },
                     { "ad_id", adId },
-                    { "ad_ecpm", revenue }
+                    { "ad_ecpm", revenue*1000 }
                 });
                 if (revenue > 0)
                 {

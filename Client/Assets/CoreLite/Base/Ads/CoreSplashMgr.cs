@@ -159,7 +159,7 @@ namespace CoreLite
                     {
                         adId = status.adInfo.network_placement_id;
                         adSource = "Topon_" + status.adInfo.network_firm_id.ToString();
-                        adEcpm = status.adInfo.publisher_revenue;
+                        adEcpm = status.adInfo.publisher_revenue*1000;
                     }
                 }
                 catch { }
