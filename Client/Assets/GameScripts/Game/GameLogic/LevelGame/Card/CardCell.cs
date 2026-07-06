@@ -479,18 +479,31 @@ namespace GameLogic
         //卡牌翻转
         public void FlipCardIcon(Action callback1 = null,Action callback2 = null)
         {
+            //先 Kill 掉可能残留的动画，但不重置 scale，保留当前静止值
+            Icon.transform.DOKill();
+
+            //以进入函数那一刻的 scale 作为"这张牌真正的静止基准"
+            //Reversible 卡在 SetReversible 里被设为 (0.9,0.9,0.9)，普通卡为 (1,1,1)
+            //上一次翻牌若被中途 Kill 导致 Y 卡在 0，用 X 或 1 兜底
+            Vector3 restScale = Icon.transform.localScale;
+            if (restScale.y < 0.01f)
+            {
+                restScale.y = restScale.x > 0.01f ? restScale.x : 1f;
+                Icon.transform.localScale = restScale;
+            }
+
             Sequence seq = DOTween.Sequence();
             Bg.GetComponent<Image>().enabled = false;
             seq.Append(Icon.transform.DOScaleY(0, 0.1f).SetEase(Ease.Linear).OnComplete(() =>
             {
                 callback1?.Invoke();
             }));
-            //翻回来时的 Y 缩放终值应为 1，之前误写成 1.7 导致图标被永久拉长
-            seq.Append(Icon.transform.DOScaleY(1f, 0.1f).SetEase(Ease.OutBack));
+            //恢复到本次进入前的静止 Y，动态跟随而不是硬编码
+            seq.Append(Icon.transform.DOScaleY(restScale.y, 0.1f).SetEase(Ease.OutBack));
             seq.OnComplete(() =>
             {
-                //兜底：防止动画被 Kill 后残留异常缩放
-                Icon.transform.localScale = Vector3.one;
+                //兜底：动画被 Kill 或异常打断时也保证恢复到基准
+                Icon.transform.localScale = restScale;
                 //翻转开头关掉了 Bg，这里恢复，避免后续消除等流程看不到背景
                 Bg.GetComponent<Image>().enabled = true;
                 callback2?.Invoke();
