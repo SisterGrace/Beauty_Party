@@ -54,6 +54,22 @@ namespace CoreLite
 #endif            
             _adNetworks.Add(CoreTpnMgr.Instance);
         }
+        /// <summary>
+        /// 重新加载所有广告网络（配置变化时调用）
+        /// </summary>
+        public void ReloadAllAdUnits()
+        {
+            foreach (var network in _adNetworks)
+            {
+                // 如果是 TPN，调用其已有的 ReloadAdUnits 方法
+                if (network is CoreTpnMgr tpnMgr)
+                {
+                    tpnMgr.ReloadAdUnits();
+                }
+                // 如果有其他平台，在此扩展
+            }
+            CoreLogUtils.Debug("[AdsMgr] All ad units reloaded.");
+        }
 
         #region  Rewarded Video
         public bool IsRewardedVideoAvailable()

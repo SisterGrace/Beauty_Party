@@ -21,6 +21,16 @@ namespace CoreLite
         private const string PlatformName = "TPN";
         private const int MaxRetry = 6;
 
+        // CoreTpnInter.cs
+        public void ClearAd()
+        {
+            _placementIds.Clear();          // 清空列表
+            _placementRevenue.Clear();
+            _retryAttempts.Clear();
+            _cachedAdInfo.Clear();
+            CoreLogUtils.Debug("[CoreLiteTpn] Inter ads cleared.");
+        }
+
         public void SetPlacementIds(List<string> placementIds)
         {
             _placementIds = placementIds != null ? new List<string>(placementIds) : new List<string>();

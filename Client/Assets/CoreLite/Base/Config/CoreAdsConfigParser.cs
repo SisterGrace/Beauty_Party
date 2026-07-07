@@ -6,11 +6,22 @@ using UnityEngine;
 
 namespace CoreLite
 {
-    public static class CoreAdsConfigParser 
+    public static class CoreAdsConfigParser
     {
-        
         private static AdsConfig _config;
-        private static Dictionary<string,object> _configDict = new Dictionary<string, object>();
+        private static Dictionary<string, object> _configDict = new Dictionary<string, object>();
+
+        private static bool _enableOnlineAdUnits = false;
+        public static bool IsOnlineAdUnitsEnabled => _enableOnlineAdUnits;
+
+        // 【新增】缓存上一次成功解析的原始 JSON 字符串，用于变更检测
+        private static string _lastParsedJson = null;
+
+        public static void SetEnableOnlineAdUnits(bool enabled)
+        {
+            _enableOnlineAdUnits = enabled;
+            CoreLogUtils.Info($"AdConfig online ad units override: {enabled}");
+        }
 
         private static CoreGameConfigData GameConfigOrNull()
         {
@@ -24,73 +35,90 @@ namespace CoreLite
             return new List<string> { placementId };
         }
 
-        public static AdsConfig Parse(string json)
+        /// <summary>
+        /// 解析 AdUnits JSON，并通过 out changed 参数告知调用者配置内容是否发生了实质变化。
+        /// </summary>
+        public static AdsConfig Parse(string json, out bool changed)
         {
-            CoreLogUtils.Info("AdConfig start parsed jsonstr:"+json);
+            changed = false;
+
+            // 如果当前 JSON 与上次缓存完全一致，直接返回，不做任何更新
+            if (_lastParsedJson == json)
+            {
+                CoreLogUtils.Debug("AdUnits JSON unchanged, skip reload.");
+                return _config;
+            }
+
+            // 内容发生了变化（或首次加载），开始解析
+            CoreLogUtils.Info("AdUnits JSON changed, parsing new config...");
             try
             {
                 if (string.IsNullOrEmpty(json))
                 {
                     CoreLogUtils.Error("AdsConfig JSON string is null or empty");
+                    // 即使为空，也要记录变更（用于清空逻辑）
+                    _lastParsedJson = json;
+                    _config = null;
+                    _configDict.Clear();
+                    changed = true;
                     return null;
                 }
 
-                _config = JsonUtility.FromJson<AdsConfig>(json);
-                _configDict = JsonToDictionary(json);
+                // 尝试解析新 JSON
+                var newConfig = JsonUtility.FromJson<AdsConfig>(json);
+                var newDict = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
 
-                if (_config == null)
+                if (newConfig == null)
                 {
                     CoreLogUtils.Error("Failed to parse JSON to AdConfig");
                     return null;
                 }
 
-                CoreLogUtils.Info("AdConfig parsed successfully");
+                // 解析成功，更新缓存和配置
+                _lastParsedJson = json;
+                _config = newConfig;
+                _configDict = newDict;
+
+                // 读取远程开关
+                bool onlineEnabled = CoreFirebaseMgr.Instance.GetConfigBool("enable_online_ad_units", false);
+                SetEnableOnlineAdUnits(onlineEnabled);
+
+                changed = true;
+                CoreLogUtils.Info("AdConfig parsed successfully (changed=true)");
                 return _config;
             }
             catch (Exception e)
             {
                 CoreLogUtils.Error($"Error parsing AdConfig: {e.Message}");
+                changed = false; // 解析失败不触发重载
                 return null;
             }
         }
-        
-        public static Dictionary<string,object> JsonToDictionary(string jsonStr)
+
+        public static Dictionary<string, object> JsonToDictionary(string jsonStr)
         {
-            Dictionary<string,object> dic= JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonStr);
+            Dictionary<string, object> dic = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonStr);
             return dic;
         }
 
-#region  LevelPlay
+        #region  LevelPlay
         public static List<string> GetLevelPlayAdUnits(CoreLiteAdsType adType)
         {
-
             if (_config == null)
-            {
                 return new List<string>();
-            }
 
             switch (adType)
             {
-                
                 case CoreLiteAdsType.Rewarded:
                     if (_configDict.ContainsKey("levelplay_rewarded_units"))
-                    {
                         return _config.levelplay_rewarded_units ?? new List<string>();
-                    }
                     else
-                    {
-                        return new List<string> ();
-                    }
- 
+                        return new List<string>();
                 case CoreLiteAdsType.Interstitial:
                     if (_configDict.ContainsKey("levelplay_interstitial_units"))
-                    {
                         return _config.levelplay_interstitial_units ?? new List<string>();
-                    }
                     else
-                    {
-                        return new List<string> ();
-                    }
+                        return new List<string>();
                 default:
                     return new List<string>();
             }
@@ -101,39 +129,26 @@ namespace CoreLite
             if (_config == null) return "";
             return _config.levelplay_app_key ?? "";
         }
-#endregion
+        #endregion
 
         #region  Max
         public static List<string> GetMaxAdUnits(CoreLiteAdsType adType)
         {
-
             if (_config == null)
-            {
                 return new List<string>();
-            }
 
             switch (adType)
             {
-                
                 case CoreLiteAdsType.Rewarded:
                     if (_configDict.ContainsKey("max_rewarded_units"))
-                    {
                         return _config.max_rewarded_units ?? new List<string>();
-                    }
                     else
-                    {
-                        return new List<string> ();
-                    }
- 
+                        return new List<string>();
                 case CoreLiteAdsType.Interstitial:
                     if (_configDict.ContainsKey("max_interstitial_units"))
-                    {
                         return _config.max_interstitial_units ?? new List<string>();
-                    }
                     else
-                    {
-                        return new List<string> ();
-                    }
+                        return new List<string>();
                 default:
                     return new List<string>();
             }
@@ -144,49 +159,31 @@ namespace CoreLite
             if (_config == null) return "";
             return _config.max_app_key ?? "";
         }
-#endregion
+        #endregion
 
-#region  Pangle
-
+        #region  Pangle
         public static List<string> GetPangleAdUnits(CoreLiteAdsType adType)
         {
-
             if (_config == null)
-            {
                 return new List<string>();
-            }
 
             switch (adType)
             {
-                
                 case CoreLiteAdsType.Rewarded:
                     if (_configDict.ContainsKey("pangle_rewarded_units"))
-                    {
                         return _config.pangle_rewarded_units ?? new List<string>();
-                    }
                     else
-                    {
-                        return new List<string> ();
-                    }
- 
+                        return new List<string>();
                 case CoreLiteAdsType.Interstitial:
                     if (_configDict.ContainsKey("pangle_interstitial_units"))
-                    {
                         return _config.pangle_interstitial_units ?? new List<string>();
-                    }
                     else
-                    {
-                        return new List<string> ();
-                    }
+                        return new List<string>();
                 case CoreLiteAdsType.Splash:
                     if (_configDict.ContainsKey("pangle_splash_units"))
-                    {
                         return _config.pangle_splash_units ?? new List<string>();
-                    }
                     else
-                    {
-                        return new List<string> ();
-                    }
+                        return new List<string>();
                 default:
                     return new List<string>();
             }
@@ -197,12 +194,19 @@ namespace CoreLite
             if (_config == null) return "";
             return _config.pangle_app_id ?? "";
         }
-#endregion
-        
-#region  MTG
+        #endregion
 
+        #region  MTG
         public static List<MtgAdUnit> GetMtgInterstitialAdUnits()
         {
+            // 如果开启在线下发，优先使用在线配置
+            if (_enableOnlineAdUnits && _config != null && _configDict.ContainsKey("mtg_interstitial_units"))
+            {
+                // 在线配置中可能存在，直接返回（可能为空列表）
+                return _config.mtg_interstitial_units ?? new List<MtgAdUnit>();
+            }
+
+            // 否则使用本地配置
             var m = GameConfigOrNull()?.mtgLocalConfig;
             if (m == null || string.IsNullOrEmpty(m.interstitialPlacementId) || string.IsNullOrEmpty(m.interstitialUnitId))
             {
@@ -216,9 +220,15 @@ namespace CoreLite
             };
         }
 
-        // 获取MTG激励广告单元列表
         public static List<MtgAdUnit> GetMtgRewardedAdUnits()
         {
+            // 如果开启在线下发，优先使用在线配置
+            if (_enableOnlineAdUnits && _config != null && _configDict.ContainsKey("mtg_rewarded_units"))
+            {
+                return _config.mtg_rewarded_units ?? new List<MtgAdUnit>();
+            }
+
+            // 否则使用本地配置
             var m = GameConfigOrNull()?.mtgLocalConfig;
             if (m == null || string.IsNullOrEmpty(m.rewardedPlacementId) || string.IsNullOrEmpty(m.rewardedUnitId))
             {
@@ -241,11 +251,37 @@ namespace CoreLite
         {
             return GameConfigOrNull()?.mtgLocalConfig?.appKey ?? "";
         }
-#endregion
+        #endregion
 
-#region TPN
+        #region TPN
         public static List<string> GetTpnAdUnits(CoreLiteAdsType adType)
         {
+            // 如果开启在线下发，优先使用在线配置
+            if (_enableOnlineAdUnits && _config != null)
+            {
+                switch (adType)
+                {
+                    case CoreLiteAdsType.Rewarded:
+                        if (_configDict.ContainsKey("topon_rewarded_units"))
+                            return _config.topon_rewarded_units ?? new List<string>();
+                        break;
+                    case CoreLiteAdsType.Interstitial:
+                        if (_configDict.ContainsKey("topon_interstitial_units"))
+                            return _config.topon_interstitial_units ?? new List<string>();
+                        break;
+                    case CoreLiteAdsType.Splash:
+                        if (_configDict.ContainsKey("topon_splash_units"))
+                            return _config.topon_splash_units ?? new List<string>();
+                        break;
+                    case CoreLiteAdsType.Banner:
+                        if (_configDict.ContainsKey("topon_banner_units"))
+                            return _config.topon_banner_units ?? new List<string>();
+                        break;
+                }
+                // 在线配置中不存在该 key，继续回退到本地
+            }
+
+            // 关闭开关或在线缺失时，使用本地配置
             var t = GameConfigOrNull()?.toponLocalConfig;
             if (t == null)
                 return new List<string>();
@@ -274,9 +310,9 @@ namespace CoreLite
         {
             return GameConfigOrNull()?.toponLocalConfig?.appKey ?? "";
         }
-#endregion
+        #endregion
 
-#region Kwai
+        #region Kwai
         public static string GetKwaiAppId()
         {
             if (_config == null) return "";
@@ -289,9 +325,6 @@ namespace CoreLite
             return _config.kwai_app_token ?? "";
         }
 
-        /// <summary>
-        /// 获取 Kwai 广告位 ID 列表。JSON key：kwai_interstitial_units / kwai_rewarded_units。
-        /// </summary>
         public static List<string> GetKwaiAdUnits(CoreLiteAdsType adType)
         {
             if (_config == null) return new List<string>();
@@ -309,10 +342,9 @@ namespace CoreLite
                     return new List<string>();
             }
         }
-#endregion
+        #endregion
 
-#region Admob
-
+        #region Admob
         // TODO: 测试完成后移除此标记并删除 GetAdmobTestUnits 方法，恢复正式广告位
         private static readonly bool USE_TEST_AD_UNITS = false;
 
@@ -335,9 +367,6 @@ namespace CoreLite
             }
         }
 
-        /// <summary>
-        /// 获取 Admob 广告单元ID。仅来自在线参数，无在线时返回空。
-        /// </summary>
         public static List<string> GetAdmobAdUnits(CoreLiteAdsType adType)
         {
             if (USE_TEST_AD_UNITS)
@@ -383,13 +412,10 @@ namespace CoreLite
                 default:
                     return new List<string>();
             }
-        } 
-#endregion 
+        }
+        #endregion 
 
         #region Ad Quality
-        /// <summary>
-        /// 获取 Ad Quality app key。优先使用独立字段 ad_quality_app_key，为空时回退到 levelplay_app_key。
-        /// </summary>
         public static string GetAdQualityAppKey()
         {
             if (_config == null) return "";
@@ -400,19 +426,13 @@ namespace CoreLite
         #endregion
 
         #region 获取广告过期时间
-        /// <summary>
-        /// 获取广告过期时间（秒）。-1 或 ≤0 表示不启用过期判定。
-        /// </summary>
         public static int GetAdExpireInSec()
         {
             int value = _config?.ad_expire_in_sec ?? -1;
             return value > 0 ? value : -1;
         }
-
         #endregion
     }
-
-    
 
     [Serializable]
     public class MtgAdUnit
@@ -430,9 +450,7 @@ namespace CoreLite
         public List<string> admob_rewarded_units;
         public List<string> admob_banner_units;
         public List<string> admob_native_units;
-        /// <summary> 在线 AdUnits JSON：全屏 Native 多广告位。 </summary>
         public List<string> admob_native_fullscreen_units;
-        /// <summary> 在线 AdUnits JSON：Small 模板 Native 多广告位。 </summary>
         public List<string> admob_native_small_units;
 
         public List<string> levelplay_interstitial_units;
@@ -455,8 +473,8 @@ namespace CoreLite
         public List<string> max_native_units;
         public string max_app_key;
 
-        public List<string> mtg_interstitial_units;
-        public List<string> mtg_rewarded_units;
+        public List<MtgAdUnit> mtg_interstitial_units;
+        public List<MtgAdUnit> mtg_rewarded_units;
         public string mtg_app_id;
         public string mtg_app_key;
 
@@ -472,12 +490,8 @@ namespace CoreLite
         public List<string> kwai_interstitial_units;
         public List<string> kwai_rewarded_units;
 
-        // Ad Quality 配置
         public string ad_quality_app_key;
 
-        // 通用配置
         public int ad_expire_in_sec;
-    
     }
 }
-

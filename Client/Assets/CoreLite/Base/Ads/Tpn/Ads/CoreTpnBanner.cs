@@ -25,6 +25,15 @@ namespace CoreLite
         private const int BannerRefWidth = 320;
         private const int BannerRefHeight = 50;
 
+        public void ClearAd()
+        {
+            _placementIds.Clear();          // 清空列表
+            _placementRevenue.Clear();
+            _retryAttempts.Clear();
+            //_cachedAdInfo.Clear();
+            CoreLogUtils.Debug("[CoreTpnBanner]  ads cleared.");
+        }
+
         public void SetPlacementIds(List<string> placementIds)
         {
             _placementIds = placementIds != null ? new List<string>(placementIds) : new List<string>();

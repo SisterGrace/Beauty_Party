@@ -26,6 +26,14 @@ namespace CoreLite
         private const int MaxRetry = 6;
         private const int FetchAdTimeoutMs = 5000;
 
+        public void ClearAd()
+        {
+            _placementIds.Clear();          // 清空列表
+            _placementRevenue.Clear();
+            _retryAttempts.Clear();
+            _cachedAdInfo.Clear();
+            CoreLogUtils.Debug("[CoreTpnSplash]  ads cleared.");
+        }
         public void SetPlacementIds(List<string> placementIds)
         {
             _placementIds = placementIds != null ? new List<string>(placementIds) : new List<string>();

@@ -23,6 +23,8 @@ namespace CoreLite
         /// </summary>
         void Initialize();
 
+        void ClearAllAds(); // 立即停止并清除该平台所有广告（配置变为空时调用）
+
         #region 横幅广告功能
 
         /// <summary>

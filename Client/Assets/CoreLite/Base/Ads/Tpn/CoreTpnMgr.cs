@@ -310,8 +310,13 @@ namespace CoreLite
             _isInitialized = false;
             CoreLogUtils.Error("[CoreLiteTpn] SDK init failed appId:" + _appId + " message:" + (message ?? ""));
         }
-        // 在 CoreTpnMgr 类中添加以下方法
-
+        public void ClearAllAds()
+        {
+            CoreTpnInter.Instance.ClearAd();
+            CoreTpnReward.Instance.ClearAd();
+            CoreTpnSplash.Instance.ClearAd();
+            CoreTpnBanner.Instance.ClearAd();
+        }
         public void ReloadAdUnits()
         {
             if (!_isInitialized)
@@ -319,8 +324,16 @@ namespace CoreLite
                 CoreLogUtils.Debug("[CoreLiteTpn] ReloadAdUnits called but SDK not initialized, skip");
                 return;
             }
+            // 兜底：如果开关未开启，直接跳过（防御性）
+            if (!CoreAdsConfigParser.IsOnlineAdUnitsEnabled)
+            {
+                CoreLogUtils.Debug("[CoreLiteTpn] Online ad units disabled, skip reload.");
+                return;
+            }
+            // 1. 先清空所有旧的广告状态（内部列表）
+            ClearAllAds();
 
-            // 重新读取配置
+            // 2. 重新读取配置
             var interUnits = CoreAdsConfigParser.GetTpnAdUnits(CoreLiteAdsType.Interstitial);
             var rewardUnits = CoreAdsConfigParser.GetTpnAdUnits(CoreLiteAdsType.Rewarded);
             var splashUnits = CoreAdsConfigParser.GetTpnAdUnits(CoreLiteAdsType.Splash);
@@ -336,7 +349,7 @@ namespace CoreLite
                 + " splash:" + (splashUnits?.Count ?? 0)
                 + " banner:" + (bannerUnits?.Count ?? 0));
 
-            // 重新加载所有广告（清除旧缓存，重新请求）
+            // 3. 重新加载广告（如果列表为空，各个 Load 方法内部会跳过）
             LoadInterstitial();
             LoadRewarded();
             LoadSplash();

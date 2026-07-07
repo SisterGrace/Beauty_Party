@@ -80,7 +80,7 @@ namespace CoreLite
                                 Sky.LogTool.DebugLog("[Firebase] 远程配置 成功！ ", Sky.LogTool.Color.purple);
                                 // ---- 原有的初始化逻辑（保持不变） ----
                                 _isInitialized = true;
-                                CoreAdsConfigParser.Parse(GetConfigStr("AdUnits"));
+                                CheckAndReloadAdUnitsIfChanged();
                                 FirebaseMessaging.TokenReceived += OnTokenReceived; // 建议只注册一次，这里可删除
 #if ADJUST
                                 CoreAdjustEvents.UpdateEventToken();
@@ -101,6 +101,25 @@ namespace CoreLite
                     });
             });
 #endif
+        }
+        /// <summary>
+        /// 检查远程 AdUnits 配置是否发生变化，若变化则触发所有广告网络重新加载。
+        /// </summary>
+        public void CheckAndReloadAdUnitsIfChanged()
+        {
+            string adUnitsJson = GetConfigStr("AdUnits");
+            bool configChanged = false;
+            CoreAdsConfigParser.Parse(adUnitsJson, out configChanged);
+
+            if (configChanged && CoreAdsConfigParser.IsOnlineAdUnitsEnabled)
+            {
+                CoreLogUtils.Info("[Firebase] AdUnits changed, reloading all ad units.");
+                CoreAdsMgr.Instance.ReloadAllAdUnits();
+            }
+            else
+            {
+                CoreLogUtils.Debug("[Firebase] AdUnits unchanged 或者 IsOnlineAdUnitsEnabled == false, skip reload.");
+            }
         }
 
         public string GetConfigStr(string key, string defaultValue = "")
