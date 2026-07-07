@@ -310,7 +310,38 @@ namespace CoreLite
             _isInitialized = false;
             CoreLogUtils.Error("[CoreLiteTpn] SDK init failed appId:" + _appId + " message:" + (message ?? ""));
         }
+        // 在 CoreTpnMgr 类中添加以下方法
 
+        public void ReloadAdUnits()
+        {
+            if (!_isInitialized)
+            {
+                CoreLogUtils.Debug("[CoreLiteTpn] ReloadAdUnits called but SDK not initialized, skip");
+                return;
+            }
+
+            // 重新读取配置
+            var interUnits = CoreAdsConfigParser.GetTpnAdUnits(CoreLiteAdsType.Interstitial);
+            var rewardUnits = CoreAdsConfigParser.GetTpnAdUnits(CoreLiteAdsType.Rewarded);
+            var splashUnits = CoreAdsConfigParser.GetTpnAdUnits(CoreLiteAdsType.Splash);
+            var bannerUnits = CoreAdsConfigParser.GetTpnAdUnits(CoreLiteAdsType.Banner);
+
+            CoreTpnInter.Instance.SetPlacementIds(interUnits ?? new List<string>());
+            CoreTpnReward.Instance.SetPlacementIds(rewardUnits ?? new List<string>());
+            CoreTpnSplash.Instance.SetPlacementIds(splashUnits ?? new List<string>());
+            CoreTpnBanner.Instance.SetPlacementIds(bannerUnits ?? new List<string>());
+
+            CoreLogUtils.Debug("[CoreLiteTpn] Ad units reloaded, inter:" + (interUnits?.Count ?? 0)
+                + " reward:" + (rewardUnits?.Count ?? 0)
+                + " splash:" + (splashUnits?.Count ?? 0)
+                + " banner:" + (bannerUnits?.Count ?? 0));
+
+            // 重新加载所有广告（清除旧缓存，重新请求）
+            LoadInterstitial();
+            LoadRewarded();
+            LoadSplash();
+            LoadBanner();
+        }
         #region Rewarded
         public double GetRewardedRevenue() => CoreTpnReward.Instance.GetRewardRevenue();
         public bool IsRewardedAvailable() => CoreTpnReward.Instance.IsRewardReady();

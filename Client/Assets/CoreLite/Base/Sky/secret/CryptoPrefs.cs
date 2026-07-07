@@ -46,7 +46,21 @@ public static class CryptoPrefs
     {
         return PlayerPrefs.GetString(key, defaultValue);
     }
+    // ---------- Long ----------
+    public static void SetLong(string key, long value)
+    {
+        PlayerPrefs.SetString(key, value.ToString());
+    }
 
+    public static long GetLong(string key, long defaultValue = 0)
+    {
+        string val = PlayerPrefs.GetString(key, null);
+        if (string.IsNullOrEmpty(val))
+            return defaultValue;
+        if (long.TryParse(val, out long result))
+            return result;
+        return defaultValue;
+    }
     // ---------- Management ----------
     public static bool HasKey(string key)
     {

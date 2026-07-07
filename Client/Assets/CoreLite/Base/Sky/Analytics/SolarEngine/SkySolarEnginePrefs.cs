@@ -1,29 +1,22 @@
 //using CoreLite;
+using System;
 
 namespace Sky
 {
-    // 【新增】SolarEngine 归因结果本地缓存。
-    // 设计参照 CoreLite.CoreAdjustPrefs：把 SDK 回调的归因字段落到 PlayerPrefs，
-    // App 第二次启动可在 SDK 回调到达前直接读缓存，给业务层 0 延迟的归因结果。
-    //
-    // 复用 CoreLite.CryptoPrefs（已在 Sky.asmdef 引用列表中），不重复实现 KV 存储。
     public static class SkySolarEnginePrefs
     {
-        // 是否完成过一次成功的归因回调，用于热启动判断
         public static bool HasAttribution
         {
             get => CryptoPrefs.GetBool("se_has_attribution", false);
             set => CryptoPrefs.SetBool("se_has_attribution", value);
         }
 
-        // 是否买量用户（!= "Organic" 视为买量），方便业务侧直接读
         public static bool IsPaidUser
         {
             get => CryptoPrefs.GetBool("se_is_paid_user", false);
             set => CryptoPrefs.SetBool("se_is_paid_user", value);
         }
 
-        // 渠道名（自然量为 "Organic"），对齐 CoreAdjustPrefs.AdjustNetwork
         public static string Network
         {
             get => CryptoPrefs.GetString("se_network");
@@ -52,6 +45,25 @@ namespace Sky
         {
             get => CryptoPrefs.GetString("se_click_label");
             set => CryptoPrefs.SetString("se_click_label", value);
+        }
+
+        // ---- 新增 ----
+        public static bool IsFinalized
+        {
+            get => CryptoPrefs.GetBool("se_is_finalized", false);
+            set => CryptoPrefs.SetBool("se_is_finalized", value);
+        }
+
+        public static long FirstStartTicks
+        {
+            get => CryptoPrefs.GetLong("se_first_start_ticks", 0);
+            set => CryptoPrefs.SetLong("se_first_start_ticks", value);
+        }
+
+        public static int ElapsedSeconds
+        {
+            get => CryptoPrefs.GetInt("se_elapsed_seconds", 0);
+            set => CryptoPrefs.SetInt("se_elapsed_seconds", value);
         }
     }
 }

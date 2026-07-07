@@ -9,6 +9,7 @@ using Firebase;
 using Firebase.Extensions;
 using Firebase.Messaging;
 using Firebase.RemoteConfig;
+using Firebase.Crashlytics;   // 显式启用 Crashlytics 所需
 #endif
 using Newtonsoft.Json.Linq;
 using UnityEngine;
@@ -39,6 +40,10 @@ namespace CoreLite
                     Debug.LogError($"[Firebase] 依赖不可用: {task.Result}");
                     return;
                 }
+
+                // ---- 新增：显式启用 Crashlytics ----
+                FirebaseCrashlytics.Crashlytics.SetCrashlyticsCollectionEnabled(true);
+                Debug.Log("[Firebase] Crashlytics collection enabled");
 
                 // 依赖检查通过，开始拉取远程配置
                 FirebaseRemoteConfig.DefaultInstance.FetchAsync(TimeSpan.Zero)
@@ -83,8 +88,8 @@ namespace CoreLite
                                 CoreAdsConfigParser.Parse(GetConfigStr("AdUnits"));
                                 FirebaseMessaging.TokenReceived += OnTokenReceived; // 建议只注册一次，这里可删除
 #if ADJUST
-                        CoreAdjustEvents.UpdateEventToken();
-                        ApplyAdjustInitByRemoteConfig();
+                                CoreAdjustEvents.UpdateEventToken();
+                                ApplyAdjustInitByRemoteConfig();
 #endif
                                 CoreSdkMgr.OnFirebaseActivated?.Invoke();
                                 CoreAnalyticsMgr.TrackEvent("Parameter_Connect",
@@ -96,7 +101,7 @@ namespace CoreLite
                                 GroupingSet();
                                 CoreBidPlatformMgr.Instance.InitializePlatformStates(
                                     CoreAdsConfigParser.GetAdExpireInSec());
-                               
+
                             });
                     });
             });
@@ -107,22 +112,22 @@ namespace CoreLite
         {
             if (!_isInitialized)
             {
-                Sky.LogTool.DebugLog("未初始化"+ key +" :"+ defaultValue,Sky.LogTool.Color.red);
+                Sky.LogTool.DebugLog("未初始化" + key + " :" + defaultValue, Sky.LogTool.Color.red);
                 return defaultValue;
             }
             var value = GetRemoteValue(key);
-            Sky.LogTool.DebugLog("GetRemotekey:"+key+" GetRemoteValue:" + value,Sky.LogTool.Color.lightblue);
+            Sky.LogTool.DebugLog("GetRemotekey:" + key + " GetRemoteValue:" + value, Sky.LogTool.Color.lightblue);
             if (string.IsNullOrEmpty(value)) return defaultValue;
             return value;
         }
-            
-        public int GetConfigInt(string key, int defaultValue = 0) => 
+
+        public int GetConfigInt(string key, int defaultValue = 0) =>
             _isInitialized && int.TryParse(GetRemoteValue(key), out int value) ? value : defaultValue;
 #if FIRBASE
-        public bool GetConfigBool(string key, bool defaultValue = false) => 
+        public bool GetConfigBool(string key, bool defaultValue = false) =>
             _isInitialized ? FirebaseRemoteConfig.DefaultInstance.GetValue(key).BooleanValue : defaultValue;
 
-        private string GetRemoteValue(string key) => 
+        private string GetRemoteValue(string key) =>
             FirebaseRemoteConfig.DefaultInstance.GetValue(key).StringValue;
 #else
         public bool GetConfigBool(string key, bool defaultValue = false)
@@ -141,14 +146,14 @@ namespace CoreLite
 #if FIRBASE
         private void OnTokenReceived(object sender, Firebase.Messaging.TokenReceivedEventArgs token)
         {
-            Adjust.SetPushToken(token?.Token); 
+            Adjust.SetPushToken(token?.Token);
         }
 #endif
 
         private void GroupingSet()
         {
             string value = GetConfigStr("Grouping");
-            if(string.IsNullOrEmpty(value)) return;
+            if (string.IsNullOrEmpty(value)) return;
             var eventName = $"Grouping_{value}";
             CoreAnalyticsMgr.TrackEvent(eventName);
         }
@@ -199,4 +204,3 @@ namespace CoreLite
 #endif
     }
 }
-

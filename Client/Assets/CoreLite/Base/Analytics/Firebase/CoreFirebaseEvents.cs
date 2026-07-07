@@ -67,7 +67,7 @@ namespace CoreLite
                 {
                     { "ad_platform", platform },
                     { "ad_source", network },
-                    //{ "ad_unit_name", unit },
+                    { "ad_unit_name", unit },
                     { "ad_format", format },
                     { "value", revenue },
                     { "currency", "USD" },
@@ -83,17 +83,17 @@ namespace CoreLite
             {
                 new Parameter("ad_platform", platform),
                 new Parameter("ad_source", network),
-                //new Parameter("ad_unit_name", unit),
+                new Parameter("ad_unit_name", unit),
                 new Parameter("ad_format", format),
                 new Parameter("value", revenue),
                 new Parameter("currency", "USD"),
             };
             if (!string.IsNullOrEmpty(pos))
                 impressionParameters.Add(new Parameter("position", pos));
-            /*if (formatNumber > 0)
+            if (formatNumber > 0)
                 impressionParameters.Add(new Parameter("format_number", formatNumber));
             if (positionNumber > 0)
-                impressionParameters.Add(new Parameter("position_number", positionNumber));*/
+                impressionParameters.Add(new Parameter("position_number", positionNumber));
 
             FirebaseAnalytics.LogEvent(source, impressionParameters.ToArray());
 #endif

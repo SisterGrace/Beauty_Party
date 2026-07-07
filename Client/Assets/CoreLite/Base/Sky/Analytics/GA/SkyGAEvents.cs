@@ -68,7 +68,7 @@ namespace Sky
                 {
                     { "ad_platform", platform },
                     { "ad_source", network },
-                    //{ "ad_unit_name", unit },
+                    { "ad_unit_name", unit },
                     { "ad_format", format },
                     { "value", revenue },
                     { "currency", "USD" },
@@ -96,17 +96,17 @@ namespace Sky
             {
                 { "ad_platform", platform },
                 { "ad_source", network },
-                //{ "ad_unit_name", unit },
+                { "ad_unit_name", unit },
                 { "ad_format", format },
                 { "value", revenue },
                 { "currency", "USD" },
             };
             if (!string.IsNullOrEmpty(pos))
                 revenueProps["position"] = pos;
-           /* if (formatNumber > 0)
+            if (formatNumber > 0)
                 revenueProps["format_number"] = formatNumber;
             if (positionNumber > 0)
-                revenueProps["position_number"] = positionNumber;*/
+                revenueProps["position_number"] = positionNumber;
 
             TrackEvent("ad_impression", revenueProps);
         }

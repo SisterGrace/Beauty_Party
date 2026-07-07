@@ -17,53 +17,157 @@ namespace CoreLite
         public string _nativeSmallPos = "";
 
         public Action _rvShowCallback;
-        public Action<Dictionary<string,object>> _ivShowCallback;
-        public Action<Dictionary<string,object>> _rvCloseCallback;
-        public Action<Dictionary<string,object>> _rvShowFailCallback;
+        public Action<Dictionary<string, object>> _ivShowCallback;
+        public Action<Dictionary<string, object>> _rvCloseCallback;
+        public Action<Dictionary<string, object>> _rvShowFailCallback;
         public Action _ivCloseCallback;
         public Action _nativeFullscreenCloseCallback;
         private List<ICoreAdService> _adNetworks = new List<ICoreAdService>();
-        
+
+        // ---- 新增：广告是否启用（在线参数为空时禁用） ----
+        private bool _adEnabled = true;
+        // ---- 新增：远程配置是否已应用 ----
+        private bool _remoteConfigApplied = false;
+        // ---- 新增：缓存开屏回调 ----
+        private Action _splashAction;
+
         public void Init(Action _action)
         {
-            // 广告 ID 全部走本地 CoreGameConfigData，初始化在此一次性完成，无需等在线参数。
+            // 初始化广告网络（但先不加载广告，等待远程配置）
             InitializeAdNetworks();
             CoreBidPlatformMgr.Instance.InitializePlatformStates(CoreAdsConfigParser.GetAdExpireInSec());
-            foreach (var network in _adNetworks)
-            {
-                CoreLogUtils.Debug("[CoreLiteAds] init sdk network:" + network.ClientName);
-                network.Initialize();
-            }
 
-            if (CorePrefs.IsRemoveAds)
+            // 检查 Firebase 是否已激活（远程配置已拉取）
+            if (CoreFirebaseMgr.Instance != null && CoreFirebaseMgr.Instance.TrackingEnable())
             {
-                _action?.Invoke();
+                // 已激活，直接应用配置
+                ApplyRemoteConfig(CoreFirebaseMgr.Instance.GetConfigStr("AdUnits", ""));
+                // 加载开屏（如果启用）
+                ShowSplashWithCallback(_action);
             }
             else
             {
-                CoreLiteSplashAdsMgr.Instance.OnSplashAdClose = _action;
-                CoreLiteSplashAdsMgr.Instance.SetSplash();
+                // 订阅 Firebase 激活事件
+                CoreSdkMgr.OnFirebaseActivated += OnFirebaseActivated;
+                _splashAction = _action;
+                // 但需求要求"开屏需要本地参数请求"，所以先使用本地参数加载开屏（但不展示，等待配置？）
+                // 为了体验，可以先加载但不展示，等配置回来后再展示，或者直接展示（如果在线参数为空则禁用）
+                // 这里我们选择先用本地参数初始化并加载，但展示等待配置（避免在线参数禁用时已展示）
+                // 但更好的做法是：先用本地参数预加载（只加载不展示），等配置回来后再决定是否展示。
+                // 为了简化，我们先加载，然后展示时再判断 _adEnabled，如果禁用则不展示。
+                // 这里我们直接调用 SetSplash，它会检测 _adEnabled？但 _adEnabled 还未确定，所以先缓存。
+                // 我们改为：在 OnFirebaseActivated 中调用 ShowSplashWithCallback
+                // 但在此之前，为了让开屏尽快准备，我们先用本地参数加载（只加载不展示）
+                foreach (var network in _adNetworks)
+                {
+                    network.Initialize(); // 确保网络初始化（但加载可能依赖本地参数）
+                    network.LoadSplash(); // 预加载开屏（本地参数）
+                }
+                // 注意：不调用 SetSplash 展示，等待配置
+                CoreLogUtils.Debug("[CoreAdsMgr] Waiting for Firebase config before showing splash");
             }
+        }
+
+        private void OnFirebaseActivated()
+        {
+            CoreSdkMgr.OnFirebaseActivated -= OnFirebaseActivated;
+            ApplyRemoteConfig(CoreFirebaseMgr.Instance.GetConfigStr("AdUnits", ""));
+            // 加载开屏（展示）
+            ShowSplashWithCallback(_splashAction);
+            _splashAction = null;
+        }
+
+        /// <summary>
+        /// 应用远程配置（在线参数 AdUnits）
+        /// </summary>
+        /// <param name="adUnitsJson">JSON 字符串</param>
+        public void ApplyRemoteConfig(string adUnitsJson)
+        {
+            if (_remoteConfigApplied) return; // 避免重复应用
+            _remoteConfigApplied = true;
+
+            // 解析配置（CoreAdsConfigParser 需实现 Parse 并更新内部数据）
+            CoreAdsConfigParser.Parse(adUnitsJson);
+
+            // 检查在线参数是否为空（所有平台的广告位都为空）
+            bool hasValidUnits = CheckAnyAdUnitAvailable();
+
+            if (!hasValidUnits)
+            {
+                _adEnabled = false;
+                CoreLogUtils.Debug("[CoreAdsMgr] Remote config AdUnits is empty, ads disabled");
+                // 清理已加载的广告（可选）
+                foreach (var net in _adNetworks)
+                {
+                    net.HideBanner(); // 至少隐藏banner
+                    // 其他类型广告无法直接清理，但后续 Show 会被拦截
+                }
+                return;
+            }
+
+            _adEnabled = true;
+            CoreLogUtils.Debug("[CoreAdsMgr] Applying remote config, reloading ad units");
+
+            // 刷新各广告网络广告位（目前仅 TPN 实现，其他可扩展）
+            foreach (var network in _adNetworks)
+            {
+                if (network is CoreTpnMgr tpn)
+                {
+                    tpn.ReloadAdUnits();
+                }
+                // 其他平台类似
+            }
+        }
+
+        private bool CheckAnyAdUnitAvailable()
+        {
+            // 检查 TPN 各广告类型是否有有效 ID
+            var types = new[] { CoreLiteAdsType.Interstitial, CoreLiteAdsType.Rewarded, CoreLiteAdsType.Splash, CoreLiteAdsType.Banner };
+            foreach (var type in types)
+            {
+                var list = CoreAdsConfigParser.GetTpnAdUnits(type);
+                if (list != null && list.Count > 0) return true;
+            }
+            // 可扩展其他平台检查
+            return false;
+        }
+
+        private void ShowSplashWithCallback(Action callback)
+        {
+            if (CorePrefs.IsRemoveAds || !_adEnabled)
+            {
+                callback?.Invoke();
+                return;
+            }
+            CoreLiteSplashAdsMgr.Instance.OnSplashAdClose = callback;
+            CoreLiteSplashAdsMgr.Instance.SetSplash();
         }
 
         private void InitializeAdNetworks()
         {
 #if UNITY_ANDROID
-            Debug.Log("CoreAdsMgr InitializeAdNetworks: Android platform"); 
+            Debug.Log("CoreAdsMgr InitializeAdNetworks: Android platform");
             //_adNetworks.Add(CoreMtgMgr.Instance);
-#endif            
+#endif
             _adNetworks.Add(CoreTpnMgr.Instance);
         }
 
         #region  Rewarded Video
         public bool IsRewardedVideoAvailable()
         {
+            if (!_adEnabled || CorePrefs.IsRemoveAds) return false;
             return _adNetworks.Any(network => network.IsRewardedAvailable());
         }
 
         public void ShowRewardedVideo(string _pos, Action _closeCallback, Action _showFailCallback)
         {
-            CoreAnalyticsMgr.TrackEvent("RV_Button_Click",new Dictionary<string, object>() { {"Position", _pos} } );
+            if (!_adEnabled || CorePrefs.IsRemoveAds)
+            {
+                _showFailCallback?.Invoke();
+                return;
+            }
+
+            CoreAnalyticsMgr.TrackEvent("RV_Button_Click", new Dictionary<string, object>() { { "Position", _pos } });
             _rvPos = _pos;
 
             var rvDidEnterFullscreen = false;
@@ -82,7 +186,7 @@ namespace CoreLite
                 if (rvDidEnterFullscreen)
                     CoreLiteSplashAdsMgr.Instance.SkipNextHotResumeSplashCheck();
                 _adActive = false;
-                CoreAnalyticsMgr.TrackEvent("RV_Close",dic);
+                CoreAnalyticsMgr.TrackEvent("RV_Close", dic);
                 CoreLiteSplashAdsMgr.Instance._backgroundTime = Time.realtimeSinceStartup;
                 _closeCallback?.Invoke();
             };
@@ -91,20 +195,20 @@ namespace CoreLite
             {
                 CoreLogUtils.Debug(" [ads] rewarded video show fail callback");
                 _adActive = false;
-                CoreAnalyticsMgr.TrackEvent("RV_ShowFail",dic);
+                CoreAnalyticsMgr.TrackEvent("RV_ShowFail", dic);
                 _showFailCallback?.Invoke();
             };
 
-            if(IsRewardedVideoAvailable())
+            if (IsRewardedVideoAvailable())
             {
                 CoreLogUtils.Debug("CoreLite show rewarded video");
                 var results = SelectBestAds(CoreLiteAdsType.Rewarded);
                 var winner = results.Count > 0 ? results[0] : null;
-                CoreLogUtils.Debug("CoreLite show rewarded video winner:"+winner?.ClientName);
+                CoreLogUtils.Debug("CoreLite show rewarded video winner:" + winner?.ClientName);
                 if (winner == null)
                 {
                     _rvShowFailCallback?.Invoke(new Dictionary<string, object>()
-                    { 
+                    {
                         { "Position", CoreAdsMgr.Instance._rvPos ?? ""},
                         //{ "show_fail_reason","winner is null"},
                         { "ad_platform", CorePlatformType.NULL.ToString() },
@@ -116,19 +220,19 @@ namespace CoreLite
                     //CoreAnalyticsMgr.TrackEvent("RV_Winner", BuildBidEventParams(results, _pos));
                     winner.Client.ShowRewarded();
                     CheckAndRefreshExpiredBids(CoreLiteAdsType.Rewarded);
-                }  
+                }
             }
             else
             {
                 CoreLogUtils.Debug("CoreLite rewarded not ready");
                 _rvShowFailCallback?.Invoke(new Dictionary<string, object>()
-                { 
+                {
                     { "Position", CoreAdsMgr.Instance._rvPos ?? ""},
                     //{ "show_fail_reason","not ready"},
                     { "ad_platform", CorePlatformType.NULL.ToString() },
                 });
-                    
-                CoreAnalyticsMgr.TrackEvent("RV_ShowFail_Not_Ready",new Dictionary<string, object>() { {"Position", _pos} } );
+
+                CoreAnalyticsMgr.TrackEvent("RV_ShowFail_Not_Ready", new Dictionary<string, object>() { { "Position", _pos } });
             }
         }
         #endregion
@@ -137,22 +241,23 @@ namespace CoreLite
         #region  Interstitial
         private bool IsInterstitialAvailable()
         {
+            if (!_adEnabled || CorePrefs.IsRemoveAds) return false;
             return _adNetworks.Any(network => network.IsInterstitialAvailable());
         }
 
-        
-        private bool IsInterstitialReady(IvType _ivType, string _adPos)
+
+        /*private bool IsInterstitialReady(IvType _ivType, string _adPos)
         {
-            if(CorePrefs.IsRemoveAds) return false;
-           
+            if (CorePrefs.IsRemoveAds || !_adEnabled) return false;
+
             // 使用 CanShowInterPeek 仅做只读检查,避免与 ShowInterstitial 内已调用的 CanShowInter 重复计次
             if (CoreInterstitialRules.Instance.CanShowInterPeek(_ivType) != null)
             {
                 CoreLogUtils.Debug(" [ads] skip iv by condition");
-                
+
                 // 规则限制时，广告可能已经准备好了，实时获取广告信息
                 var adInfo = GetInterstitialAdInfo();
-                
+
                 if (!string.IsNullOrEmpty(adInfo.adSource))
                 {
                     // 有广告信息，上报完整参数
@@ -191,14 +296,14 @@ namespace CoreLite
             if (!IsInterstitialAvailable())
             {
                 CoreLogUtils.Debug(" [ads] iv not ready");
-                CoreAnalyticsMgr.TrackEvent("IV_ShowFail_Not_Ready",new Dictionary<string, object>() 
-                { 
+                CoreAnalyticsMgr.TrackEvent("IV_ShowFail_Not_Ready", new Dictionary<string, object>()
+                {
                     {"Position", _adPos}
                     // 【无法获取】广告没有填充，IsInterstitialAvailable() 返回 false
                     // 无广告可用，无法使用 checkAdStatus
-                } );
-                CoreAnalyticsMgr.TrackEvent("IV_ShowFail", new Dictionary<string, object>() 
-                { 
+                });
+                CoreAnalyticsMgr.TrackEvent("IV_ShowFail", new Dictionary<string, object>()
+                {
                     { "Position", _adPos }
                     // { "ad_platform", "" },
                     // { "ad_id", "" },
@@ -208,7 +313,7 @@ namespace CoreLite
             }
 
             return true;
-        }
+        }*/
 
         public void ShowInterstitial(string _adPos, IvType _IvType = IvType.IV1, Action _closeCallback = null, Action<HandCallbackInfo, Action> _action = null)
         {
@@ -220,7 +325,7 @@ namespace CoreLite
                 ivDidEnterFullscreen = true;
                 _adActive = true;
                 CoreInterstitialRules.Instance._videoStartTime = Time.realtimeSinceStartup;
-                CoreAnalyticsMgr.TrackEvent("IV_Show",eventValue);
+                CoreAnalyticsMgr.TrackEvent("IV_Show", eventValue);
             };
 
             _ivCloseCallback = () =>
@@ -231,86 +336,120 @@ namespace CoreLite
                 CoreLiteSplashAdsMgr.Instance._backgroundTime = Time.realtimeSinceStartup;
                 _closeCallback?.Invoke();
             };
-            
-            if(CorePrefs.IsRemoveAds)
+
+            // ---- 移除广告或广告禁用检查 ----
+            if (CorePrefs.IsRemoveAds || !_adEnabled)
             {
                 _closeCallback?.Invoke();
                 return;
             }
 
-            // IV_Position 打点：触发插屏展示时机
+            // ---- IV_Position 打点 ----
             var ivPosInfo = GetInterstitialAdInfo();
-            CoreAnalyticsMgr.TrackEvent("IV_Position",new Dictionary<string, object>() 
-            { 
-                {"Position", _adPos},
-                {"ad_platform", "TPN"},
-                {"ad_source", ivPosInfo.adSource},
-                {"ad_id", ivPosInfo.adId},
-                {"ad_ecpm", ivPosInfo.adEcpm}
-            } );
-            string ivRuleMsg = CoreInterstitialRules.Instance.CanShowInter(_IvType);
-            bool ruleAllowsShow = ivRuleMsg == null;
-            // 规则未通过时必须直接返回：CheckIfReachFirstNTimes 会先自增计数再返回失败，
-            // 随后 CanShowInterPeek 会读到已写入的更大值，易误判为可通过频次，从而错误展示。
-            if (!ruleAllowsShow)
+            CoreAnalyticsMgr.TrackEvent("IV_Position", new Dictionary<string, object>()
+    {
+        {"Position", _adPos},
+        {"ad_platform", "TPN"},
+        {"ad_source", ivPosInfo.adSource},
+        {"ad_id", ivPosInfo.adId},
+        {"ad_ecpm", ivPosInfo.adEcpm}
+    });
+
+            // ---- 1. 规则预检查（只读，不消耗计数） ----
+            string peekMsg = CoreInterstitialRules.Instance.CanShowInterPeek(_IvType);
+            if (peekMsg != null)
             {
-                _action?.Invoke(MakeHandCallbackInfo(false, ivRuleMsg ?? "Interstitial blocked by rules.", false), null);
+                // 规则拦截，上报 IV_ShowFail_Rule_Limit（包含广告信息，如果有的话）
+                var adInfo = GetInterstitialAdInfo();
+                if (!string.IsNullOrEmpty(adInfo.adSource))
+                {
+                    CoreAnalyticsMgr.TrackEvent("IV_ShowFail_Rule_Limit", new Dictionary<string, object>()
+            {
+                { "Position", _adPos },
+                { "ad_platform", "TPN" },
+                { "ad_source", adInfo.adSource },
+                { "ad_id", adInfo.adId },
+                { "ad_ecpm", adInfo.adEcpm }
+            });
+                    CoreAnalyticsMgr.TrackEvent("IV_ShowFail", new Dictionary<string, object>()
+            {
+                { "Position", _adPos },
+                { "ad_platform", "TPN" },
+                { "ad_source", adInfo.adSource },
+                { "ad_id", adInfo.adId },
+                { "ad_ecpm", adInfo.adEcpm }
+            });
+                }
+                else
+                {
+                    CoreAnalyticsMgr.TrackEvent("IV_ShowFail_Rule_Limit", new Dictionary<string, object>() { { "Position", _adPos } });
+                    CoreAnalyticsMgr.TrackEvent("IV_ShowFail", new Dictionary<string, object>() { { "Position", _adPos } });
+                }
+                _action?.Invoke(MakeHandCallbackInfo(false, peekMsg, false), null);
                 return;
             }
 
-            if (!IsInterstitialReady(_IvType, _adPos))
+            // ---- 2. 广告就绪检查 ----
+            if (!IsInterstitialAvailable())
             {
-                _action?.Invoke(MakeHandCallbackInfo(false, "Interstitial ad can not show yet.", ruleAllowsShow), null);
+                CoreLogUtils.Debug(" [ads] iv not ready");
+                CoreAnalyticsMgr.TrackEvent("IV_ShowFail_Not_Ready", new Dictionary<string, object>() { { "Position", _adPos } });
+                CoreAnalyticsMgr.TrackEvent("IV_ShowFail", new Dictionary<string, object>() { { "Position", _adPos } });
+                _action?.Invoke(MakeHandCallbackInfo(false, "Interstitial ad not ready.", true), null);
+                LoadInterstitial(); // 触发加载
                 return;
             }
 
+            // ---- 3. 消耗规则计数（展示前最后一次确认） ----
+            string ruleMsg = CoreInterstitialRules.Instance.CanShowInter(_IvType);
+            if (ruleMsg != null)
+            {
+                // 理论上不会发生，但若发生，上报规则失败并返回
+                var adInfo = GetInterstitialAdInfo();
+                if (!string.IsNullOrEmpty(adInfo.adSource))
+                {
+                    CoreAnalyticsMgr.TrackEvent("IV_ShowFail_Rule_Limit", new Dictionary<string, object>()
+            {
+                { "Position", _adPos },
+                { "ad_platform", "TPN" },
+                { "ad_source", adInfo.adSource },
+                { "ad_id", adInfo.adId },
+                { "ad_ecpm", adInfo.adEcpm }
+            });
+                    CoreAnalyticsMgr.TrackEvent("IV_ShowFail", new Dictionary<string, object>()
+            {
+                { "Position", _adPos },
+                { "ad_platform", "TPN" },
+                { "ad_source", adInfo.adSource },
+                { "ad_id", adInfo.adId },
+                { "ad_ecpm", adInfo.adEcpm }
+            });
+                }
+                else
+                {
+                    CoreAnalyticsMgr.TrackEvent("IV_ShowFail_Rule_Limit", new Dictionary<string, object>() { { "Position", _adPos } });
+                    CoreAnalyticsMgr.TrackEvent("IV_ShowFail", new Dictionary<string, object>() { { "Position", _adPos } });
+                }
+                _action?.Invoke(MakeHandCallbackInfo(false, ruleMsg, false), null);
+                return;
+            }
+
+            // ---- 4. 执行展示（根据是否有 _action 回调走不同分支） ----
             if (_action != null)
             {
                 _action(MakeHandCallbackInfo(true, "success", true), () =>
                 {
                     var results = SelectBestAds(CoreLiteAdsType.Interstitial);
                     var winner = results.Count > 0 ? results[0] : null;
-                                        
                     if (winner == null)
                     {
                         _ivCloseCallback?.Invoke();
                     }
                     else
                     {
-                        //CoreAnalyticsMgr.TrackEvent("IV_Winner", BuildBidEventParams(results, _adPos));
                         CoreBidPlatformMgr.Instance.RecordBidSuccess(winner.PlatformType, CoreLiteAdsType.Interstitial);
-                        // IV_AchieveShow_Match 打点：调用展示API前，获取将要展示的广告信息
                         var matchInfo = GetInterstitialAdInfo();
                         CoreAnalyticsMgr.TrackEvent("IV_AchieveShow_Match", new Dictionary<string, object>()
-                    {
-                        {"Position", _adPos},
-                        {"ad_platform", "TPN"},
-                        {"ad_source", matchInfo.adSource},
-                        {"ad_id", matchInfo.adId},
-                        {"ad_ecpm", matchInfo.adEcpm}
-                    });
-                        winner.Client.ShowInterstitial();
-                        CheckAndRefreshExpiredBids(CoreLiteAdsType.Interstitial);
-                    }
-                });
-                _action = null;
-            }
-            else
-            { 
-                var results = SelectBestAds(CoreLiteAdsType.Interstitial);
-                var winner = results.Count > 0 ? results[0] : null;
-                
-                if (winner == null)
-                {
-                    _ivCloseCallback?.Invoke();
-                }
-                else
-                {
-                    //CoreAnalyticsMgr.TrackEvent("IV_Winner", BuildBidEventParams(results, _adPos));
-                    CoreBidPlatformMgr.Instance.RecordBidSuccess(winner.PlatformType, CoreLiteAdsType.Interstitial);
-                    // IV_AchieveShow_Match 打点：调用展示API前，获取将要展示的广告信息
-                    var matchInfo = GetInterstitialAdInfo();
-                    CoreAnalyticsMgr.TrackEvent("IV_AchieveShow_Match", new Dictionary<string, object>()
                 {
                     {"Position", _adPos},
                     {"ad_platform", "TPN"},
@@ -318,6 +457,32 @@ namespace CoreLite
                     {"ad_id", matchInfo.adId},
                     {"ad_ecpm", matchInfo.adEcpm}
                 });
+                        winner.Client.ShowInterstitial();
+                        CheckAndRefreshExpiredBids(CoreLiteAdsType.Interstitial);
+                    }
+                });
+                _action = null;
+            }
+            else
+            {
+                var results = SelectBestAds(CoreLiteAdsType.Interstitial);
+                var winner = results.Count > 0 ? results[0] : null;
+                if (winner == null)
+                {
+                    _ivCloseCallback?.Invoke();
+                }
+                else
+                {
+                    CoreBidPlatformMgr.Instance.RecordBidSuccess(winner.PlatformType, CoreLiteAdsType.Interstitial);
+                    var matchInfo = GetInterstitialAdInfo();
+                    CoreAnalyticsMgr.TrackEvent("IV_AchieveShow_Match", new Dictionary<string, object>()
+            {
+                {"Position", _adPos},
+                {"ad_platform", "TPN"},
+                {"ad_source", matchInfo.adSource},
+                {"ad_id", matchInfo.adId},
+                {"ad_ecpm", matchInfo.adEcpm}
+            });
                     winner.Client.ShowInterstitial();
                     CheckAndRefreshExpiredBids(CoreLiteAdsType.Interstitial);
                 }
@@ -351,7 +516,7 @@ namespace CoreLite
                 _closeCallback?.Invoke();
             };
 
-            if (CorePrefs.IsRemoveAds)
+            if (CorePrefs.IsRemoveAds || !_adEnabled)
             {
                 _closeCallback?.Invoke();
                 return;
@@ -365,8 +530,8 @@ namespace CoreLite
 
             // IV_Position 打点：触发插屏展示时机（忽略频次版本）
             var ivPosInfo2 = GetInterstitialAdInfo();
-            CoreAnalyticsMgr.TrackEvent("IV_Position", new Dictionary<string, object>() 
-            { 
+            CoreAnalyticsMgr.TrackEvent("IV_Position", new Dictionary<string, object>()
+            {
                 { "Position", _adPos },
                 { "ad_platform", "TPN" },
                 { "ad_source", ivPosInfo2.adSource },
@@ -416,14 +581,14 @@ namespace CoreLite
 
         public bool IsBannerAvailable()
         {
-            if (CorePrefs.IsRemoveAds) return false;
+            if (CorePrefs.IsRemoveAds || !_adEnabled) return false;
             return _adNetworks.Any(network => network.IsBannerReady());
         }
 
         /// <returns>是否已向竞价胜出方发起展示（无填充时为 false）。</returns>
         public bool ShowBanner()
         {
-            if (CorePrefs.IsRemoveAds) return false;
+            if (CorePrefs.IsRemoveAds || !_adEnabled) return false;
             var results = SelectBestAds(CoreLiteAdsType.Banner);
             var winner = results.Count > 0 ? results[0] : null;
             if (winner == null)
@@ -446,10 +611,18 @@ namespace CoreLite
 
         public void HideBanner()
         {
+            if (!_adEnabled) return;
             foreach (var network in _adNetworks)
             {
                 network.HideBanner();
             }
+        }
+
+        public void LoadBanner()
+        {
+            if (!_adEnabled || CorePrefs.IsRemoveAds) return;
+            foreach (var network in _adNetworks)
+                network.LoadBanner();
         }
         #endregion
 
@@ -457,24 +630,24 @@ namespace CoreLite
         #region  Splash
         public void LoadSplash()
         {
-            if(CorePrefs.IsRemoveAds) return;
+            if (CorePrefs.IsRemoveAds || !_adEnabled) return;
             foreach (var network in _adNetworks)
             {
-                CoreLogUtils.Debug("init ads sdk network:"+network.ToString());
+                CoreLogUtils.Debug("init ads sdk network:" + network.ToString());
                 network.LoadSplash();
             }
         }
 
         public bool IsSplashAvailable()
         {
-            if(CorePrefs.IsRemoveAds) return false;
+            if (CorePrefs.IsRemoveAds || !_adEnabled) return false;
             return _adNetworks.Any(network => network.IsSplashAvailable());
         }
 
         /// <returns>是否已向竞价胜出方发起展示（无填充时为 false）。</returns>
         public bool ShowSplash()
         {
-            if (CorePrefs.IsRemoveAds) return false;
+            if (CorePrefs.IsRemoveAds || !_adEnabled) return false;
             var results = SelectBestAds(CoreLiteAdsType.Splash);
             var winner = results.Count > 0 ? results[0] : null;
             if (winner != null)
@@ -500,6 +673,7 @@ namespace CoreLite
         /// <returns>当前最高出价，单位与各网络一致；无可用出价时返回 -1</returns>
         public double GetCurrentRewardedVideoBidPrice()
         {
+            if (!_adEnabled) return -1;
             var results = SelectBestAds(CoreLiteAdsType.Rewarded);
             return results.Count > 0 ? results[0].Revenue : -1;
         }
@@ -511,6 +685,7 @@ namespace CoreLite
         /// <returns>当前可用插屏最高出价；无可用出价时返回 -1</returns>
         public double GetCurrentInterstitialBidPrice(IvType ivType = IvType.IV1)
         {
+            if (!_adEnabled) return -1;
             var results = SelectBestAds(CoreLiteAdsType.Interstitial);
             return results.Count > 0 ? results[0].Revenue : -1;
         }
@@ -521,18 +696,21 @@ namespace CoreLite
         /// <returns>当前最高出价；无可用出价时返回 -1</returns>
         public double GetCurrentNativeBidPrice()
         {
+            if (!_adEnabled) return -1;
             var results = SelectBestAds(CoreLiteAdsType.Native);
             return results.Count > 0 ? results[0].Revenue : -1;
         }
 
         public double GetCurrentNativeFullscreenBidPrice()
         {
+            if (!_adEnabled) return -1;
             var results = SelectBestAds(CoreLiteAdsType.NativeFullscreen);
             return results.Count > 0 ? results[0].Revenue : -1;
         }
 
         public double GetCurrentSmallNativeBidPrice()
         {
+            if (!_adEnabled) return -1;
             var results = SelectBestAds(CoreLiteAdsType.NativeSmall);
             return results.Count > 0 ? results[0].Revenue : -1;
         }
@@ -540,7 +718,7 @@ namespace CoreLite
         #endregion
 
         #region  Others
-        
+
         /// <summary>
         /// 获取插屏广告信息（adId, adSource, adEcpm），用于打点上报
         /// </summary>
@@ -549,7 +727,7 @@ namespace CoreLite
             string adId = "";
             string adSource = "";
             double adEcpm = 0;
-            
+
             string bestPlacement = CoreTpnInter.Instance.GetHighestPayingPlacement();
             if (!string.IsNullOrEmpty(bestPlacement))
             {
@@ -561,12 +739,12 @@ namespace CoreLite
                     {
                         adId = status.adInfo.network_placement_id;
                         adSource = "Topon_" + status.adInfo.network_firm_id.ToString();
-                        adEcpm = status.adInfo.publisher_revenue*1000;
+                        adEcpm = status.adInfo.publisher_revenue * 1000;
                     }
                 }
                 catch { }
             }
-            
+
             return (adId, adSource, adEcpm);
         }
 
@@ -612,17 +790,17 @@ namespace CoreLite
                         isAvailable = client.IsRewardedAvailable();
                         revenue = isAvailable ? client.GetRewardedRevenue() : -1;
                         break;
-                        
+
                     case CoreLiteAdsType.Interstitial:
                         isAvailable = client.IsInterstitialAvailable();
                         revenue = isAvailable ? client.GetInterstitialRevenue() : -1;
                         break;
-                        
+
                     case CoreLiteAdsType.Banner:
                         isAvailable = client.IsBannerReady();
                         revenue = isAvailable ? client.GetBannerRevenue() : -1;
                         break;
-                        
+
                     case CoreLiteAdsType.Splash:
                         isAvailable = client.IsSplashAvailable();
                         revenue = isAvailable ? client.GetSplashRevenue() : -1;
@@ -739,11 +917,20 @@ namespace CoreLite
             }
         }
 
-        
-
-        
+        // ---- 新增：加载方法（供外部调用） ----
+        public void LoadInterstitial()
+        {
+            if (!_adEnabled || CorePrefs.IsRemoveAds) return;
+            foreach (var network in _adNetworks)
+                network.LoadInterstitial();
+        }
+        public void LoadRewarded()
+        {
+            if (!_adEnabled || CorePrefs.IsRemoveAds) return;
+            foreach (var network in _adNetworks)
+                network.LoadRewarded();
+        }
 
         #endregion
     }
 }
-

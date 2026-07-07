@@ -70,6 +70,7 @@ namespace Sky
             { "ad_source", network },
             { "ad_format", format },
             { "value", revenue },
+            { "ad_unit_id", unit },
             { "currency", "USD" },
         };
                 if (!string.IsNullOrEmpty(pos))

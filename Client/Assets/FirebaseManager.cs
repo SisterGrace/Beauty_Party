@@ -1,4 +1,4 @@
-using UnityEngine;
+/*using UnityEngine;
 using System.Collections.Generic;
 using Firebase;
 using Firebase.Analytics;
@@ -193,4 +193,4 @@ namespace CoreLite
             FirebaseAnalytics.LogEvent(FirebaseAnalytics.EventShare, parameters.ToArray());
         }
     }
-}
+}*/
