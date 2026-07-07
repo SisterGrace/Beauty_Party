@@ -33,7 +33,7 @@ public class FirebaseModeSwitcher : EditorWindow
     private static void SwitchMode(bool isTestMode)
     {
         // 1. 更新宏定义
-        SetScriptingDefineSymbol(isTestMode);
+        //SetScriptingDefineSymbol(isTestMode);
 
         // 2. 文件重命名（使得 google-services.json 指向正确的环境）
         if (!RenameFiles(isTestMode))
@@ -49,7 +49,14 @@ public class FirebaseModeSwitcher : EditorWindow
             return;
         }
 
+        // 强制刷新资源数据库（已有）
         AssetDatabase.Refresh();
+        // 通过菜单项触发 Force Resolve（需确保项目已安装 Google Play Services Resolver）
+        bool resolved = EditorApplication.ExecuteMenuItem("Assets/External Dependency Manager/Android Resolver/Force Resolve");
+        if (!resolved)
+        {
+            Debug.LogWarning("无法自动执行 Force Resolve，请手动执行 Assets/Play Services Resolver/Android Resolver/Force Resolve。");
+        }
         Debug.Log($"Firebase mode switched to {(isTestMode ? "TEST" : "PROD")} successfully.");
     }
 
