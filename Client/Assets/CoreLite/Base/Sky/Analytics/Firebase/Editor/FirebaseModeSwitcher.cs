@@ -7,7 +7,7 @@ public class FirebaseModeSwitcher : EditorWindow
 {
     // ========== 配置区域 ==========
     // Firebase 配置文件夹相对路径（相对于 Assets）
-    private static readonly string FirebaseFolder = "Sky/Analytics/Firebase";
+    private static readonly string FirebaseFolder = "CoreLite/Base/Sky/Analytics/Firebase";
 
     // 是否同时修改 iOS Bundle Identifier（默认 false，仅修改 Android）
     private static readonly bool UpdateIOSBundleId = false;
