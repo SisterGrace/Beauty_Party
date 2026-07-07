@@ -11,21 +11,22 @@ namespace CoreLite
 {
     public static class CoreFirebaseEvents
     {
-        private const string REVENUE_CONFIG_KEY = "revenue_fir";
-        private const string DEFAULT_SOURCE = "ad_impression";
         public static void TrackEvent(string eventName)
         {
             if (!CoreFirebaseMgr.Instance.TrackingEnable()) return;
 #if FIRBASE
-            FirebaseAnalytics.LogEvent(eventName);
+            var safeName = CoreStringUtils.SanitizeEventName(eventName, allowUnicode: true, maxLength: 40);
+            FirebaseAnalytics.LogEvent(safeName);
 #endif
+
         }
 
         public static void TrackEvent(string eventName, string key, object value)
         {
             if (!CoreFirebaseMgr.Instance.TrackingEnable()) return;
 #if FIRBASE
-            FirebaseAnalytics.LogEvent(eventName, key, value.ToString());
+            var safeName = CoreStringUtils.SanitizeEventName(eventName, allowUnicode: true, maxLength: 40);
+            FirebaseAnalytics.LogEvent(safeName, key, value.ToString());
 #endif
         }
 
@@ -50,7 +51,8 @@ namespace CoreLite
                 else
                     parmlist.Add(new Parameter(item.Key, item.Value.ToString()));
             }
-            FirebaseAnalytics.LogEvent(eventName, parmlist.ToArray());
+            var safeName = CoreStringUtils.SanitizeEventName(eventName, allowUnicode: true, maxLength: 40);
+            FirebaseAnalytics.LogEvent(safeName, parmlist.ToArray());
 #endif
         }
 
@@ -59,7 +61,8 @@ namespace CoreLite
         /// <param name="positionNumber">第几次展示该点位的广告（1、2、3…），每个广告触发点位独立统计</param>
         public static void TrackAdImpressionEvent(double revenue, string network, string unit, string format, string platform, string pos = "", int formatNumber = 0, int positionNumber = 0)
         {
-            var source = CoreAdImpressionSource.GetSource("revenue_fir","ad_impression");
+            //var source = CoreAdImpressionSource.GetSource("revenue_fir","ad_impression");
+            var source = "ad_impression";
             if (revenue < 0)
             {
                 LogTool.DebugLog($"[Firebase] ad_impression skipped: revenue={revenue} < 0, reporting ad_impression_error");

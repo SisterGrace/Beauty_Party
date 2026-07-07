@@ -9,7 +9,6 @@ using Firebase;
 using Firebase.Extensions;
 using Firebase.Messaging;
 using Firebase.RemoteConfig;
-using Firebase.Crashlytics;   // 显式启用 Crashlytics 所需
 #endif
 using Newtonsoft.Json.Linq;
 using UnityEngine;
@@ -40,10 +39,6 @@ namespace CoreLite
                     Debug.LogError($"[Firebase] 依赖不可用: {task.Result}");
                     return;
                 }
-
-                // ---- 新增：显式启用 Crashlytics ----
-                FirebaseCrashlytics.Crashlytics.SetCrashlyticsCollectionEnabled(true);
-                Debug.Log("[Firebase] Crashlytics collection enabled");
 
                 // 依赖检查通过，开始拉取远程配置
                 FirebaseRemoteConfig.DefaultInstance.FetchAsync(TimeSpan.Zero)

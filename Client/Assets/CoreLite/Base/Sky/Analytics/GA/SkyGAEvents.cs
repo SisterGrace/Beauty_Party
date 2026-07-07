@@ -18,7 +18,8 @@ namespace Sky
         public static void TrackEvent(string eventName)
         {
             if (string.IsNullOrEmpty(eventName)) return;
-            GameAnalytics.NewDesignEvent(FormatEventName(eventName));
+            var safeName = CoreStringUtils.SanitizeEventName(eventName, allowUnicode: true, maxLength: 60);
+            GameAnalytics.NewDesignEvent(safeName);
         }
 
         /// <summary>
@@ -33,7 +34,8 @@ namespace Sky
             var fields = new Dictionary<string, object>();
             if (key != null && value != null)
                 fields[key] = value;
-            GameAnalytics.NewDesignEvent(FormatEventName(eventName), fields);
+            var safeName = CoreStringUtils.SanitizeEventName(eventName, allowUnicode: true, maxLength: 60);
+            GameAnalytics.NewDesignEvent(safeName, fields);
         }
 
         /// <summary>
@@ -48,9 +50,9 @@ namespace Sky
                     TrackEvent(eventName);
                 return;
             }
-
+            var safeName = CoreStringUtils.SanitizeEventName(eventName, allowUnicode: true, maxLength: 60);
             // 将 properties 作为自定义字段传入
-            GameAnalytics.NewDesignEvent(FormatEventName(eventName), properties);
+            GameAnalytics.NewDesignEvent(safeName, properties);
         }
 
         /// <summary>
@@ -109,23 +111,6 @@ namespace Sky
                 revenueProps["position_number"] = positionNumber;
 
             TrackEvent("ad_impression", revenueProps);
-        }
-
-        /// <summary>
-        /// 事件名清洗：只保留字母、数字、中文，其余变下划线，合并连续下划线，去首尾，截断49字符。
-        /// 完全复用 ThinkingData 的逻辑。
-        /// </summary>
-        public static string FormatEventName(string eventName)
-        {
-            if (string.IsNullOrEmpty(eventName))
-                return eventName;
-
-            string formatted = Regex.Replace(eventName, @"[^a-zA-Z0-9\u4e00-\u9fa5]", "_");
-            formatted = Regex.Replace(formatted, @"_+", "_");
-            formatted = formatted.Trim('_');
-            if (formatted.Length > 49)
-                formatted = formatted.Substring(0, 49);
-            return formatted;
         }
     }
 }

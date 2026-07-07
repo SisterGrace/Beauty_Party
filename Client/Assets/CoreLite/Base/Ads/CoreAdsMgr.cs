@@ -9,6 +9,8 @@ namespace CoreLite
 {
     public class CoreAdsMgr : CoreSingleton<CoreAdsMgr>
     {
+        // 在 CoreAdsMgr 类顶部添加
+        private bool _enableRemoteAdConfig = false; // V1.0.0 默认关闭，V1.0.1 时改为 true
         public bool _adActive = false;
         public string _rvPos = "";
         public string _ivPos = "";
@@ -40,8 +42,12 @@ namespace CoreLite
             // 检查 Firebase 是否已激活（远程配置已拉取）
             if (CoreFirebaseMgr.Instance != null && CoreFirebaseMgr.Instance.TrackingEnable())
             {
-                // 已激活，直接应用配置
-                ApplyRemoteConfig(CoreFirebaseMgr.Instance.GetConfigStr("AdUnits", ""));
+                // 只有开关打开时才应用远程配置
+                if (_enableRemoteAdConfig)
+                {
+                    // 已激活，直接应用配置
+                    ApplyRemoteConfig(CoreFirebaseMgr.Instance.GetConfigStr("AdUnits", ""));
+                }
                 // 加载开屏（如果启用）
                 ShowSplashWithCallback(_action);
             }
@@ -83,6 +89,7 @@ namespace CoreLite
         /// <param name="adUnitsJson">JSON 字符串</param>
         public void ApplyRemoteConfig(string adUnitsJson)
         {
+            if (!_enableRemoteAdConfig) return; // V1.0.0 直接跳过
             if (_remoteConfigApplied) return; // 避免重复应用
             _remoteConfigApplied = true;
 
