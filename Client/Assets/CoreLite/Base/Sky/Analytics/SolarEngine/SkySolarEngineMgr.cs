@@ -1,3 +1,4 @@
+using CoreLite;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -14,12 +15,16 @@ namespace Sky
         private float _appStartTime;
         private Coroutine _attributionCoroutine;
 
+        //public static event Action<bool> OnAttributionCompleted; // 参数为是否买量用户
+
         public bool TrackingEnable() => IsInitialized;
 
         void Awake()
         {
             _appStartTime = Time.realtimeSinceStartup;
         }
+
+
 
         private static string GetAppKey()
         {
@@ -139,7 +144,7 @@ namespace Sky
                 StopCoroutine(_attributionCoroutine);
                 _attributionCoroutine = null;
             }
-
+            CoreSdkMgr.Instance.OnUserAttributionReceived?.Invoke(true, SkySolarEnginePrefs.Network, SkySolarEnginePrefs.ClickLabel);
             Sky.SkyAnalyticsMgr.DesignEvent("SE", "Attribution", "Success", true, finalNetwork);
 
             float passTime = Time.realtimeSinceStartup - _appStartTime;
@@ -176,7 +181,7 @@ namespace Sky
                 StopCoroutine(_attributionCoroutine);
                 _attributionCoroutine = null;
             }
-
+            CoreSdkMgr.Instance.OnUserAttributionReceived?.Invoke(false, SkySolarEnginePrefs.Network, SkySolarEnginePrefs.ClickLabel);
             Sky.SkyAnalyticsMgr.DesignEvent("SE", "Attribution", "Organic", true, "Organic");
 
             float passTime = Time.realtimeSinceStartup - _appStartTime;

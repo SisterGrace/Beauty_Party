@@ -41,7 +41,7 @@ namespace CoreLite
         public static void GameConfig(Action<AppStatus, string> _callback) => CoreGameConfig.GameConfig(_callback);
 
         /// <summary>
-        /// adjust 回调：bool 是否为买量用户；string adjust 返回的 network 字段；string adjust 返回的 clickLabel 字段。
+        /// 回调：bool 是否为买量用户；string  返回的 network 字段；string  返回的 clickLabel 字段。
         /// </summary>
         public Action<bool, string, string> OnUserAttributionReceived;
         public void RegisterUserAttributionHandler(Action<bool, string, string> _callback) => OnUserAttributionReceived = _callback;
