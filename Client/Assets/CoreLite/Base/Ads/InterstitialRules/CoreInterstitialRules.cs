@@ -1,4 +1,3 @@
-using Sky;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -25,12 +24,12 @@ namespace CoreLite
             // 到达N次后，第N+1次直接展示插屏
             if (string.IsNullOrEmpty(IfFirstCheckPlayerPrefs(_type)))
             {
-                LogTool.DebugLog(" [ads] 到达第N+1次且时间满足",LogTool.Color.green);
+                CoreLogUtils.Debug(" [ads] 到达第N+1次且时间满足");
                 return null;
             }
             else if (IfFirstCheckPlayerPrefs(_type).Equals(1))
             {
-                LogTool.DebugLog(" [ads] 到达第N+1次但是时间未到", LogTool.Color.green);
+                CoreLogUtils.Debug(" [ads] 到达第N+1次但是时间未到");
                 return "到达N次,但是时间未到";
             }
 
@@ -52,7 +51,7 @@ namespace CoreLite
                 _ivsCount.Add(innerIvType, currTimes);
             }
 
-            LogTool.DebugLog(" [ads] 当前间隔次数：" + currTimes + "远端次数：" + needTimes + "IV Type:" + _type, LogTool.Color.green);
+            CoreLogUtils.Debug(" [ads] 当前间隔次数：" + currTimes + "远端次数：" + needTimes + "IV Type:" + _type);
             if (currTimes <= needTimes)
             {
                 // 没到频次控制时间
@@ -66,7 +65,7 @@ namespace CoreLite
             bool canShowFlag = adInterTime >= timeInterVal;
             var msg = "插屏时间间隔：当前时间：" + adInterTime + "远端时间：" + timeInterVal + "IV Type:" + _type + " canShowFlag:" +
                     canShowFlag;
-            LogTool.DebugLog(" [ads]" + msg, LogTool.Color.green);
+            CoreLogUtils.Debug(" [ads]" + msg);
 
             if (canShowFlag)
             {
@@ -76,7 +75,6 @@ namespace CoreLite
 
             if (!canShowFlag)
             {
-                LogTool.DebugLog($"!!! IV RULE BLOCKED !!! Reason: {msg}", LogTool.Color.green);
                 return msg;
             }
 
