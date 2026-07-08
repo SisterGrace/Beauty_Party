@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using Config.common;
+using CoreLite;
 using TK_Engine;
 using UnityEngine;
 using EventType = GameLogic.EventType;
@@ -285,5 +286,24 @@ public partial class SROptions
     public void SetUserASN()
     {
         GameEvent.Send(EventType.SetUserASN, IsASN);
+    }
+
+    [Category("插屏广告")]
+    [DisplayName("插屏1")]
+    [Sort(001)]
+    public void ShowInter1()
+    {
+        CoreSdkMgr.ShowInterstitial("IV_Back", IvType.IV1, () =>
+        {
+        });
+    }
+    [Category("插屏广告")]
+    [DisplayName("插屏2")]
+    [Sort(002)]
+    public void ShowInter2()
+    {
+        CoreSdkMgr.ShowInterstitial("IV_Fail", IvType.IV2, () =>
+        {
+        });
     }
 }
