@@ -5,7 +5,7 @@ namespace Sky
 {
     public class LogTool : MonoBehaviour
     {
-        static bool logFlg = true;
+        static bool logFlg = false;
         public enum Color
         {
             none,
@@ -23,7 +23,7 @@ namespace Sky
         public static void Init(bool enableFullLog)
         {
             logFlg = enableFullLog;
-            if (enableFullLog)
+           /* if (enableFullLog)
             {
                 Debug.unityLogger.logEnabled = true;
                 Debug.unityLogger.filterLogType = LogType.Log;   // 显示所有
@@ -32,7 +32,7 @@ namespace Sky
             {
                 Debug.unityLogger.logEnabled = true;             // 保持启用，只过滤级别
                 Debug.unityLogger.filterLogType = LogType.Error; // 仅显示 Error
-            }
+            }*/
         }
 
         public static void DebugLog(string log, Color color = Color.none, bool showPath = false, [CallerFilePath] string path = null, [CallerMemberName] string name = null)

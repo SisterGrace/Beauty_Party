@@ -11,6 +11,7 @@ using Firebase.Messaging;
 using Firebase.RemoteConfig;
 #endif
 using Newtonsoft.Json.Linq;
+using Sky;
 using UnityEngine;
 
 namespace CoreLite
@@ -93,6 +94,7 @@ namespace CoreLite
                                         kvp => (object)kvp.Value.StringValue.Replace("-", "_")));
                                 //Sky.LogTool.Init(GetConfigStr("log_enable", "0").Equals("1"));
                                 CoreLogUtils.Enabled = GetConfigStr("log_enable", "0").Equals("1");
+                                LogTool.Init(GetConfigStr("log_enable", "0").Equals("1"));
                                 GroupingSet();
                                 CoreBidPlatformMgr.Instance.InitializePlatformStates(
                                     CoreAdsConfigParser.GetAdExpireInSec());

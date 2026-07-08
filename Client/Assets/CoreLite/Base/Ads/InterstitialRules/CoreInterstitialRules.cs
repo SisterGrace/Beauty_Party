@@ -1,3 +1,4 @@
+using Sky;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -24,12 +25,12 @@ namespace CoreLite
             // 到达N次后，第N+1次直接展示插屏
             if (string.IsNullOrEmpty(IfFirstCheckPlayerPrefs(_type)))
             {
-                CoreLogUtils.Debug(" [ads] 到达第N+1次且时间满足");
+                CoreLogUtils.Debug(" [ads]CanShowInter 到达第N+1次且时间满足");
                 return null;
             }
             else if (IfFirstCheckPlayerPrefs(_type).Equals(1))
             {
-                CoreLogUtils.Debug(" [ads] 到达第N+1次但是时间未到");
+                CoreLogUtils.Debug(" [ads] CanShowInter 到达第N+1次但是时间未到");
                 return "到达N次,但是时间未到";
             }
 
@@ -51,11 +52,11 @@ namespace CoreLite
                 _ivsCount.Add(innerIvType, currTimes);
             }
 
-            CoreLogUtils.Debug(" [ads] 当前间隔次数：" + currTimes + "远端次数：" + needTimes + "IV Type:" + _type);
+            CoreLogUtils.Debug(" [ads] CanShowInter 当前间隔次数：" + currTimes + " 远端次数：" + needTimes + " IV Type:" + _type);
             if (currTimes <= needTimes)
             {
                 // 没到频次控制时间
-                return "当前间隔次数：" + currTimes + "远端次数：" + needTimes + "IV Type:" + _type;
+                return "CanShowInter 当前间隔次数：" + currTimes + "远端次数：" + needTimes + " IV Type:" + _type;
             }
 
             //【3】判断是否达到最小时间间隔
@@ -63,15 +64,15 @@ namespace CoreLite
             var mIvStartTime = _videoStartTime; //GetCurrentTimeInterVal(_type);
             var adInterTime = Time.realtimeSinceStartup - mIvStartTime;
             bool canShowFlag = adInterTime >= timeInterVal;
-            var msg = "插屏时间间隔：当前时间：" + adInterTime + "远端时间：" + timeInterVal + "IV Type:" + _type + " canShowFlag:" +
+            var msg = "CanShowInter 插屏时间间隔：当前时间：" + adInterTime + " 远端时间：" + timeInterVal + " IV Type:" + _type + " canShowFlag:" +
                     canShowFlag;
             CoreLogUtils.Debug(" [ads]" + msg);
 
-            if (canShowFlag)
+           /* if (canShowFlag)
             {
                 // 重置次数
                 _ivsCount[innerIvType] = 0;
-            }
+            }*/
 
             if (!canShowFlag)
             {
@@ -79,6 +80,12 @@ namespace CoreLite
             }
 
             return null;
+        }
+        public void ResetIvsCount(IvType _type)
+        {
+            LogTool.DebugLog("类型：" + _type.ToString() + " 成功播放，需要重置次数",LogTool.Color.green);
+            int innerIvType = GetInterRules(_type).Type;
+            _ivsCount[innerIvType] = 0;
         }
 
         /// <summary>
@@ -95,7 +102,7 @@ namespace CoreLite
             if (string.IsNullOrEmpty(IfFirstCheckPlayerPrefsPeek(_type)))
                 return null;
             if (IfFirstCheckPlayerPrefsPeek(_type).Equals(1))
-                return "到达N次,但是时间未到";
+                return "CanShowInterPeek:到达N次,但是时间未到";
 
             int innerIvType = GetInterRules(_type).Type;
             int needTimes = GetInterRules(_type).Over_Level;
@@ -103,13 +110,14 @@ namespace CoreLite
 
             CoreLogUtils.Debug(" [ads] peek 当前间隔次数：" + currTimes + " 远端次数：" + needTimes + " IV Type:" + _type);
             if (currTimes <= needTimes)
-                return "当前间隔次数：" + currTimes + "远端次数：" + needTimes + "IV Type:" + _type;
+                return "CanShowInterPeek: 当前间隔数：" + currTimes + "远端数：" + needTimes + "IV Type:" + _type;
 
             int timeInterVal = GetInterRules(_type).Interval_Time;
             var adInterTime = Time.realtimeSinceStartup - _videoStartTime;
             bool canShowFlag = adInterTime >= timeInterVal;
+            CoreLogUtils.Debug(" [ads] peek插屏时间间隔：当前时间：" + adInterTime + "远端时间：" + timeInterVal + " IV Type:" + _type + " canShowFlag:" + canShowFlag);
             if (!canShowFlag)
-                return "插屏时间间隔：当前时间：" + adInterTime + "远端时间：" + timeInterVal + "IV Type:" + _type + " canShowFlag:" + canShowFlag;
+                return "CanShowInterPeek: 插屏时间间隔：当前时间：" + adInterTime + "远端时间：" + timeInterVal + " IV Type:" + _type + " canShowFlag:" + canShowFlag;
 
             return null;
         }
@@ -120,7 +128,7 @@ namespace CoreLite
             string reachKey = "ivReachTimes" + _type.ToString();
             int reachTime = CorePrefs.GetInt(reachKey, 0);
             bool canShow = reachTime >= GetInterRules(_type).Skip_Level;
-            var msg = "前N次不展示插屏,本地次数:" + reachTime + "远端参数：" + GetInterRules(_type).Skip_Level + "IV Type:" + _type;
+            var msg = "前N次不展示插屏,本地次数:" + reachTime + "远端参数：" + GetInterRules(_type).Skip_Level + " IV Type:" + _type;
             CoreLogUtils.Debug(" [ads]" + msg + " canshow:" + canShow);
             return canShow ? null : msg;
         }
@@ -137,7 +145,7 @@ namespace CoreLite
                     return null;
                 var adInterTime = Time.realtimeSinceStartup - _videoStartTime;
                 bool canShowFlag = adInterTime >= timeInterVal;
-                CoreLogUtils.Debug(" [ads] 到达N+1次了,插屏类型:" + _type + " 远端时间间隔:" + timeInterVal + " 当前时间：" + adInterTime);
+                CoreLogUtils.Debug(" [ads] canShowFlag:"+ canShowFlag+" 到达N + 1次了,插屏类型:" + _type + " 远端时间间隔:" + timeInterVal + " 当前时间：" + adInterTime);
                 return canShowFlag ? null : "1";
             }
             return "2";
@@ -158,7 +166,7 @@ namespace CoreLite
 
             reachTime += 1;
             CorePrefs.SetInt(reachKey, reachTime);
-            var msg = "前N次不展示插屏,本地次数:" + reachTime + "远端参数：" + GetInterRules(_type).Skip_Level +
+            var msg = "插屏类型："+ _type.ToString() + " 前N次不展示插屏,本地次数:" + reachTime + " 远端参数：" + GetInterRules(_type).Skip_Level +
                     "IV Type:" + _type;
             CoreLogUtils.Debug(" [ads]" + msg + "canshow:" + canShow);
             if (!canShow)
@@ -204,7 +212,7 @@ namespace CoreLite
         public ConfigItem GetInterRules(IvType index)
         {
             string jsonData = CoreFirebaseMgr.Instance.GetConfigStr("IV_Switch", INTER_RULES_DEFAULT_VALUE);
-            CoreLogUtils.Debug($"CoreLite IV rule jsondata: {jsonData}");
+            //CoreLogUtils.Debug($"CoreLite IV rule jsondata: {jsonData}");
             
             ConfigItem CreateDefaultConfig()
             {

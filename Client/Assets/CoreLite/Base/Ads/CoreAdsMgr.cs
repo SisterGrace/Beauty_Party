@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using AnyThinkAds.Api;
+using Sky;
 
 namespace CoreLite
 {
@@ -159,12 +160,20 @@ namespace CoreLite
         
         private bool IsInterstitialReady(IvType _ivType, string _adPos)
         {
-            if(CorePrefs.IsRemoveAds) return false;
-           
-            // 使用 CanShowInterPeek 仅做只读检查,避免与 ShowInterstitial 内已调用的 CanShowInter 重复计次
-            if (CoreInterstitialRules.Instance.CanShowInterPeek(_ivType) != null)
+#if UNITY_EDITOR
+            return true;
+#endif
+            if (CorePrefs.IsRemoveAds)
             {
-                CoreLogUtils.Debug(" [ads] skip iv by condition");
+                LogTool.DebugLog("CorePrefs.IsRemoveAds==true???" , LogTool.Color.green);
+                return false;
+            }
+
+         /*   string error = CoreInterstitialRules.Instance.CanShowInterPeek(_ivType);
+            // 使用 CanShowInterPeek 仅做只读检查,避免与 ShowInterstitial 内已调用的 CanShowInter 重复计次
+            if (error != null)
+            {
+                LogTool.DebugLog(" [ads] skip iv by condition:"+ error,LogTool.Color.green);
                 
                 // 规则限制时，广告可能已经准备好了，实时获取广告信息
                 var adInfo = GetInterstitialAdInfo();
@@ -202,7 +211,7 @@ namespace CoreLite
                     });
                 }
                 return false;
-            }
+            }*/
 
             if (!IsInterstitialAvailable())
             {
@@ -229,7 +238,6 @@ namespace CoreLite
         public void ShowInterstitial(string _adPos, IvType _IvType = IvType.IV1, Action _closeCallback = null, Action<HandCallbackInfo, Action> _action = null)
         {
             _ivPos = _adPos;
-
             var ivDidEnterFullscreen = false;
             _ivShowCallback = (eventValue) =>
             {
@@ -251,9 +259,9 @@ namespace CoreLite
             if(CorePrefs.IsRemoveAds)
             {
                 _closeCallback?.Invoke();
+
                 return;
             }
-
             // IV_Position 打点：触发插屏展示时机
             var ivPosInfo = GetInterstitialAdInfo();
             CoreAnalyticsMgr.TrackEvent("IV_Position",new Dictionary<string, object>() 
@@ -270,16 +278,18 @@ namespace CoreLite
             // 随后 CanShowInterPeek 会读到已写入的更大值，易误判为可通过频次，从而错误展示。
             if (!ruleAllowsShow)
             {
+                IV_RuleEvent(_adPos);
+                LogTool.DebugLog(_IvType+ " 插屏规则未通过！" + ivRuleMsg, LogTool.Color.red);
                 _action?.Invoke(MakeHandCallbackInfo(false, ivRuleMsg ?? "Interstitial blocked by rules.", false), null);
                 return;
             }
 
             if (!IsInterstitialReady(_IvType, _adPos))
             {
+                LogTool.DebugLog("IsInterstitialReady == false ", LogTool.Color.red);
                 _action?.Invoke(MakeHandCallbackInfo(false, "Interstitial ad can not show yet.", ruleAllowsShow), null);
                 return;
             }
-
             if (_action != null)
             {
                 _action(MakeHandCallbackInfo(true, "success", true), () =>
@@ -305,6 +315,7 @@ namespace CoreLite
                         {"ad_id", matchInfo.adId},
                         {"ad_ecpm", matchInfo.adEcpm}
                     });
+                        CoreInterstitialRules.Instance.ResetIvsCount(_IvType);
                         winner.Client.ShowInterstitial();
                         CheckAndRefreshExpiredBids(CoreLiteAdsType.Interstitial);
                     }
@@ -334,12 +345,50 @@ namespace CoreLite
                     {"ad_id", matchInfo.adId},
                     {"ad_ecpm", matchInfo.adEcpm}
                 });
+                    CoreInterstitialRules.Instance.ResetIvsCount(_IvType);
                     winner.Client.ShowInterstitial();
                     CheckAndRefreshExpiredBids(CoreLiteAdsType.Interstitial);
                 }
             }
         }
+        void IV_RuleEvent(string _adPos)
+        {
+            // 规则限制时，广告可能已经准备好了，实时获取广告信息
+            var adInfo = GetInterstitialAdInfo();
 
+            if (!string.IsNullOrEmpty(adInfo.adSource))
+            {
+                // 有广告信息，上报完整参数
+                CoreAnalyticsMgr.TrackEvent("IV_ShowFail_Rule_Limit", new Dictionary<string, object>()
+                    {
+                        { "Position", _adPos },
+                        { "ad_platform", "TPN" },
+                        { "ad_source", adInfo.adSource },
+                        { "ad_id", adInfo.adId },
+                        { "ad_ecpm", adInfo.adEcpm }
+                    });
+                CoreAnalyticsMgr.TrackEvent("IV_ShowFail", new Dictionary<string, object>()
+                    {
+                        { "Position", _adPos },
+                        { "ad_platform", "TPN" },
+                        { "ad_source", adInfo.adSource },
+                        { "ad_id", adInfo.adId },
+                        { "ad_ecpm", adInfo.adEcpm }
+                    });
+            }
+            else
+            {
+                // 广告未准备好
+                CoreAnalyticsMgr.TrackEvent("IV_ShowFail_Rule_Limit", new Dictionary<string, object>()
+                    {
+                        { "Position", _adPos }
+                    });
+                CoreAnalyticsMgr.TrackEvent("IV_ShowFail", new Dictionary<string, object>()
+                    {
+                        { "Position", _adPos }
+                    });
+            }
+        }
         /// <summary>
         /// 展示插屏广告，不受频次规则控制；仅当有可用插屏时展示，无可用时直接回调。
         /// </summary>
