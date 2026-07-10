@@ -5,7 +5,6 @@ using System.Linq;
 using UnityEngine;
 using AnyThinkAds.Api;
 using Sky;
-
 namespace CoreLite
 {
     public class CoreAdsMgr : CoreSingleton<CoreAdsMgr>
@@ -288,9 +287,11 @@ namespace CoreLite
             {
                 LogTool.DebugLog("IsInterstitialReady == false ", LogTool.Color.red);
                 _action?.Invoke(MakeHandCallbackInfo(false, "Interstitial ad can not show yet.", ruleAllowsShow), null);
+                foreach (var network in _adNetworks)
+                    network.LoadInterstitial();
                 return;
             }
-            if (_action != null)
+            if (_action != null)//调用的时候action等于null 相当于没用这层
             {
                 _action(MakeHandCallbackInfo(true, "success", true), () =>
                 {
