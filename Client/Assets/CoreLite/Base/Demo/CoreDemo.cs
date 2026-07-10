@@ -175,7 +175,7 @@ public class CoreDemo : MonoBehaviour
         {
             if (callbackInfo.isReady)
             {
-                CoreLogUtils.Debug("CoreLite 插屏广告准备好了,展示去广告");
+                CoreLogUtils.Debug("CoreLite 插屏广告准备好了,展示去广告");//为什么要插屏广告准备好了再展示去广告？没准备好不能展示吗
                 action?.Invoke();
             }else
             {
