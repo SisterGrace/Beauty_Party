@@ -405,6 +405,7 @@ namespace GameLogic
 			//如果是B类用户，需要提前加载视频
 			if (_selectPhotoInfo.ABType == 1 || _selectPhotoInfo.IsVideo)
 			{
+				Debug.Log($"[Panel_Game] 视频加载地址: {_selectPhotoInfo.VideoUrl}");
 				mMediaPlayer.OpenMedia(MediaPathType.AbsolutePathOrURL, _selectPhotoInfo.VideoUrl, false);
 			}
 		}

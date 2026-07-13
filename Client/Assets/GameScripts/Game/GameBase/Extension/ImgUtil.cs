@@ -131,6 +131,7 @@ namespace Y_Base
             var cachedTexture = TryGetFromMemoryCache(cacheKey);
             if (cachedTexture != null)
             {
+                //Debug.Log($"[ImgUtil] 图片命中内存缓存: {url}");
                 return cachedTexture;
             }
 
@@ -138,10 +139,12 @@ namespace Y_Base
             var diskTexture = await TryLoadFromDiskCacheAsync(cacheKey, filePath, cancellationToken);
             if (diskTexture != null)
             {
+                //Debug.Log($"[ImgUtil] 图片命中磁盘缓存: {url} | 缓存路径: {filePath}");
                 return diskTexture;
             }
 
             // 3. 从网络下载（使用原子操作防止重复下载）
+            //Debug.Log($"[ImgUtil] 图片从网络下载: {url} | 将缓存到: {filePath}");
             return await DownloadWithDeduplicationAsync(url, cacheKey, filePath, cancellationToken);
         }
 

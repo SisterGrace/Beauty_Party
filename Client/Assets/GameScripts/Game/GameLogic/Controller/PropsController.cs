@@ -1025,28 +1025,31 @@ namespace GameLogic
         public static string GetImgUrl(string imgName, string imgType, int AbType)
         {
             //获取现在的展示逻辑，在线参数获取到指定的图片首地址
+            string url;
             if (AbType == 1)//B面,测试期间默认使用B面
             {
 
 #if UNITY_ANDROID
-                return $"{ConfigLoader.Constant.ImgBUrl}{imgName}.{imgType}";
+                url = $"{ConfigLoader.Constant.ImgBUrl}{imgName}.{imgType}";
 #elif UNITY_IOS
-                return $"{ConfigLoader.Constant.IOSImgBUrl}{imgName}.{imgType}";
+                url = $"{ConfigLoader.Constant.IOSImgBUrl}{imgName}.{imgType}";
 #else
-                return $"{ConfigLoader.Constant.ImgBUrl}{imgName}.{imgType}";
+                url = $"{ConfigLoader.Constant.ImgBUrl}{imgName}.{imgType}";
 #endif
             }
             else
             {
 #if UNITY_ANDROID
 
-                return $"{ConfigLoader.Constant.ImgAUrl}{imgName}.{imgType}";
+                url = $"{ConfigLoader.Constant.ImgAUrl}{imgName}.{imgType}";
 #elif UNITY_IOS
-                return $"{ConfigLoader.Constant.IOSImgAUrl}{imgName}.{imgType}";
+                url = $"{ConfigLoader.Constant.IOSImgAUrl}{imgName}.{imgType}";
 #else
-                return $"{ConfigLoader.Constant.ImgAUrl}{imgName}.{imgType}";
+                url = $"{ConfigLoader.Constant.ImgAUrl}{imgName}.{imgType}";
 #endif
             }
+            Log.Info($"[PropsController] GetImgUrl: AB={AbType}, ImageID={imgName}, 最终URL={url}");
+            return url;
         }
 
         public static string GetImgUrl(int PhotoId)
@@ -1064,6 +1067,7 @@ namespace GameLogic
         {
             //只有B面才有视频，A面直接返回一个默认视频地址
             //获取现在的展示逻辑，在线参数获取到指定的视频首地址
+            string url;
             if (isVideo)//B面,测试期间默认使用B面
             {
 #if UNITY_ANDROID
@@ -1073,12 +1077,14 @@ namespace GameLogic
 #else
                 string firstUrl = AbType == 1 ? $"{ConfigLoader.Constant.VideoBUrl}" : $"{ConfigLoader.Constant.VideoAUrl}";
 #endif
-                return $"{firstUrl}{Uri.EscapeDataString(videoName)}.mp4";
+                url = $"{firstUrl}{Uri.EscapeDataString(videoName)}.mp4";
             }
             else//A面返回一个默认视频地址
             {
-                return $"{ConfigLoader.Constant.VideoAUrl}Test1.mp4";
+                url = $"{ConfigLoader.Constant.VideoAUrl}Test1.mp4";
             }
+            Log.Info($"[PropsController] GetVideoUrl: AB={AbType}, VideoName={videoName}, IsVideo={isVideo}, 最终URL={url}");
+            return url;
         }
 
         public static string GetVideoUrl(int PhotoId)

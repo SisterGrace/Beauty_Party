@@ -16,6 +16,7 @@ namespace GameLogic
         { 
             _photoModel = ES3.Load("PhotoModel", new PhotoModel(true));
             int curId = UserController.Instance.GetCurUserPhotoID;
+            Log.Info($"[PhotoTrace] InitPhoto: 预加载用户当前默认照片, curPhotoID={curId} (来源: UserController.GetCurUserPhotoID, 即用户上次使用/获得的照片)");
             
             //预加载初始默认图
             await PhotoPreloading(curId);
@@ -39,12 +40,14 @@ namespace GameLogic
             var levelInfo = LevelController.GetCurrentLevelInfo(); 
             int Ab = UserController.Instance.GetCurUserType;
             int needCount = levelInfo.Difficulty > 0 ? 1 : 3;
+            Log.Info($"[PhotoTrace] SetLevelUsePhotoId: 用户类型Ab={Ab}, Difficulty={levelInfo.Difficulty}, needCount={needCount}, isRefresh={isRefresh}, refreshIndex={refreshIndex}");
             //当此时所需的不同类型的图数量与当前所拥有的不同类型的图数量不一致时，需要刷新
             bool Correct = needCount!= GetCurLevelPhotoIds.Count;
             
             // 独立刷新单张图的逻辑（Boss关卡不支持单独刷新）
             if (isRefresh && refreshIndex >= 0 && needCount != 1 && !Correct && GetCurLevelPhotoIds != null && GetCurLevelPhotoIds.Count > refreshIndex)
             {
+                Log.Info($"[PhotoTrace] 走单张刷新逻辑, refreshIndex={refreshIndex}");
                 RefreshSinglePhotoId(refreshIndex, Ab);
                 return;
             }
@@ -54,7 +57,11 @@ namespace GameLogic
                 //清空
                SetCurLevelPhotoIds(null);
             }
-            if(GetCurLevelPhotoIds!=null&& GetCurLevelPhotoIds.Count>0) return;
+            if(GetCurLevelPhotoIds!=null&& GetCurLevelPhotoIds.Count>0)
+            {
+                Log.Info($"[PhotoTrace] 已有缓存的PhotoIds=[{string.Join(", ", GetCurLevelPhotoIds)}], 跳过随机");
+                return;
+            }
             
             List<int> Curphotoids = new List<int>();
             if (needCount == 1)//Boos关卡生成3号位的图
@@ -65,11 +72,13 @@ namespace GameLogic
                 if (saclelist1 != null && saclelist1.Count > 0)
                 {
                     cfg = saclelist1.RandomFromAllList(false);
+                    Log.Info($"[PhotoTrace] Boss关卡随机: 从未获得列表({saclelist1.Count}张)中随机取得 PhotoID={cfg.ID}, ImageID={cfg.ImageID}");
                 }
                 else
                 {
                     //没有符合要求的图，就大列表随机取一个
                     cfg = saclelist.RandomFromAllList(false);
+                    Log.Info($"[PhotoTrace] Boss关卡随机: 未获得列表为空, 从全量列表({saclelist.Count}张)中随机取得 PhotoID={cfg.ID}, ImageID={cfg.ImageID}");
                 }
                 Curphotoids.Add(cfg.ID);
             }
@@ -83,17 +92,20 @@ namespace GameLogic
                     if (saclelist1 != null && saclelist1.Count > 0)
                     {
                         cfg = saclelist1.RandomFromAllList(false);
+                        Log.Info($"[PhotoTrace] 普通关卡随机第{i+1}张: 类型={i+1}, 从未获得列表({saclelist1.Count}张)中随机取得 PhotoID={cfg.ID}, ImageID={cfg.ImageID}");
                     }
                     else
                     {
                         //没有符合要求的图，就大列表随机取一个
                         cfg = saclelist.RandomFromAllList(false);
+                        Log.Info($"[PhotoTrace] 普通关卡随机第{i+1}张: 类型={i+1}, 未获得列表为空, 从全量列表({saclelist.Count}张)中随机取得 PhotoID={cfg.ID}, ImageID={cfg.ImageID}");
                     }
                     Curphotoids.Add(cfg.ID);
                 }
                
             }
             SetCurLevelPhotoIds(Curphotoids);
+            Log.Info($"[PhotoTrace] 随机结果最终PhotoIds=[{string.Join(", ", Curphotoids)}]");
         }
         
         /// <summary>
@@ -154,8 +166,10 @@ namespace GameLogic
             int Ab = UserController.Instance.GetCurUserType;
             int needCount = levelInfo.Difficulty > 0 ? 1 : 3;
             int curLevelRefresh = UserController.Instance.CurAdLevelRefreshState;
+            Log.Info($"[PhotoTrace] SetLevelCfgToPhotoId: 用户类型Ab={Ab}, Difficulty={levelInfo.Difficulty}, needCount={needCount}, curLevelRefresh={curLevelRefresh}");
             if (curLevelRefresh>0)//表示当前配置关卡已经刷新过了，就不用读取配置，直接使用当前的存储的ID
             {
+                Log.Info($"[PhotoTrace] 配置关卡已被用户刷新过(curLevelRefresh={curLevelRefresh}), 使用存储的ID=[{string.Join(", ", GetCurLevelPhotoIds ?? new List<int>())}]");
                 return;
             }
             else
@@ -166,6 +180,7 @@ namespace GameLogic
             if (needCount == 1) //Boos关卡生成3号位的图
             {
                 var IdList = Ab == 0 ? levelInfo.LevelPhotosA : levelInfo.LevelPhotosB;
+                Log.Info($"[PhotoTrace] 配置Boss关卡: 来源=CfgLevelInfo表 LevelPhotos{(Ab == 0 ? "A" : "B")}, 配置列表=[{string.Join(", ", IdList)}]");
                 if (IdList.Count > 0)
                 {
                     Curphotoids.Add(IdList[0]);
@@ -173,9 +188,10 @@ namespace GameLogic
             }
             else
             {
+                var IdList = Ab == 0 ? levelInfo.LevelPhotosA : levelInfo.LevelPhotosB;
+                Log.Info($"[PhotoTrace] 配置普通关卡: 来源=CfgLevelInfo表 LevelPhotos{(Ab == 0 ? "A" : "B")}, 配置列表=[{string.Join(", ", IdList)}]");
                 for (int i = 0; i < needCount; i++)
                 {
-                    var IdList = Ab == 0 ? levelInfo.LevelPhotosA : levelInfo.LevelPhotosB;
                     if (IdList.Count > i)
                     {
                         Curphotoids.Add(IdList[i]);
@@ -183,31 +199,38 @@ namespace GameLogic
                 }
             }
             SetCurLevelPhotoIds(Curphotoids);
+            Log.Info($"[PhotoTrace] 配置关卡最终PhotoIds=[{string.Join(", ", Curphotoids)}]");
         }
         //预加载图到内存中，没有的就网络下载
         public async UniTask  PhotoPreloading(bool isRefresh,bool isPreload)
         {
             if(_photoModel == null) return;
             var levelInfo = LevelController.GetCurrentLevelInfo(); 
+            int curLevel = UserController.Instance.Level;
             //判断是否随机关卡图
             bool isRandom = levelInfo.LevelPhotosA.Count==0&&levelInfo.LevelPhotosB.Count==0;
             if (isRandom)
             {
+                Log.Info($"[PhotoTrace] 当前关卡LevelId={curLevel}, 图片来源=【随机】(LevelPhotosA和LevelPhotosB都为空，走SetLevelUsePhotoId随机逻辑)");
                 SetLevelUsePhotoId(isRefresh);
             }
             else
             {
                 //虽然是固定图，但是还是要判断是否需要刷新，如果用户刷新过，则使用用户刷新的ID，否则使用配置的ID
+                Log.Info($"[PhotoTrace] 当前关卡LevelId={curLevel}, 图片来源=【配置表固定】(LevelPhotosA={string.Join(";", levelInfo.LevelPhotosA)}, LevelPhotosB={string.Join(";", levelInfo.LevelPhotosB)})");
                 SetLevelCfgToPhotoId();
             }
             if (isPreload)
             {
                 var dataInfo = GetCurLevelPhotoIds;
                 if (dataInfo == null || dataInfo.Count == 0) return;
+                Log.Info($"[PhotoTrace] 最终确定的PhotoIds=[{string.Join(", ", dataInfo)}], 开始预加载...");
                 for (int i = 0; i < dataInfo.Count; i++)
                 {
                     var cfg = ConfigLoader.Instance.Tables.TbCfgPhotos.Get(dataInfo[i]);
                     string imgurl = PropsController.GetImgUrl(cfg.ImageID, cfg.ImageType, cfg.ABGroup);
+                    string videourl = PropsController.GetVideoUrl(cfg.ImageID, cfg.ABGroup, cfg.IsVideo);
+                    Log.Info($"[PhotoTrace] 预加载第{i+1}张: PhotoID={cfg.ID}, ImageID={cfg.ImageID}, ABGroup={cfg.ABGroup}, IsVideo={cfg.IsVideo}\n  → 图片URL: {imgurl}\n  → 视频URL: {videourl}");
                     await ImgUtil.GetTextureAsync(imgurl);
                 }
             }
@@ -232,8 +255,8 @@ namespace GameLogic
         public async UniTask PhotoPreloading(int id)
         {
             var cfg = ConfigLoader.Instance.Tables.TbCfgPhotos.Get(id); 
+            Log.Info($"[PhotoTrace] 预加载用户当前照片: 来源=UserController.GetCurUserPhotoID, PhotoID={id}, ImageID={cfg.ImageID}, ABGroup={cfg.ABGroup}, IsVideo={cfg.IsVideo}");
             string imgurl = PropsController.GetImgUrl(cfg.ImageID, cfg.ImageType, cfg.ABGroup);
-            Log.Info($"预加载图片: {imgurl}");
             await ImgUtil.GetTextureAsync(imgurl);
         } 
         #endregion
