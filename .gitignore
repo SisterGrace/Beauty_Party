@@ -56,8 +56,6 @@ Thumbs.db
 /[Ll]ogs/
 /[Uu]ser[Ss]ettings/
 /AssetsBundles/
-/Assets/StreamingAssets/
-/Assets/StreamingAssets.meta
 
 # MemoryCaptures can get excessive in size.
 # They also could contain extremely sensitive data
@@ -116,9 +114,6 @@ crashlytics-build.properties
 # Packed Addressables
 /[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.bin*
 
-# Temporary auto-generated Android Assets
-/[Aa]ssets/[Ss]treamingAssets/aa.meta
-/[Aa]ssets/[Ss]treamingAssets/aa/*
 
 /Assets/MaxSdk/
 /Assets/MaxSdk.meta
@@ -135,7 +130,6 @@ Config/Tool/.cache.meta
 Client/UserSettings/
 Client/HybridCLRData/
 Client/Bundles/
-Client/Assets/StreamingAssets/
 Client/Assets/AATmp/
 Client/Assets/AATmp.meta
 Client/Build/
@@ -152,3 +146,9 @@ Client/Assets/Plugins/Android/FirebaseCrashlytics.androidlib.meta
 Client/Assets/GUPS/Obfuscator/Log/Android.txt
 Client/Assets/GUPS/Obfuscator/Log/Android.txt.meta
 Configs/Tool/Tools/Luban.ClientServer/Luban.ClientServer.exe
+Client/Assets/StreamingAssets/package/
+Client/Assets/StreamingAssets/build_info
+Client/Assets/StreamingAssets/build_info.meta
+Client/Assets/StreamingAssets/google-services-desktop.json
+Client/Assets/StreamingAssets/google-services-desktop.json.meta
+Client/Assets/StreamingAssets/package.meta
