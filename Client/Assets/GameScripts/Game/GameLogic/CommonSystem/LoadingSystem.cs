@@ -31,6 +31,12 @@ namespace GameLogic
         
         //不同模块加载时间
         private Stopwatch _timeSp;
+
+        // 新增：下载相关状态
+        private bool _isDownloading = false;
+        private bool _downloadExecuted = false; // 是否执行过下载流程
+        private bool _configLoaded = false;
+
         public void SetUpdateCb(Action<LoadType> cb)
         {
             _updateCb = null;
@@ -54,7 +60,7 @@ namespace GameLogic
         }
         public void StartLoading()
         {
-            loadType = LoadType.Config;
+            loadType = LoadType.DownloadConfig; // 从下载配置开始
             //播放背景音效
             AudioManager.Play(AudioType.Music,AudioDef.BGM1,false,true);
             Utility.Unity.AddUpdateListener(LoadingUpdate); //注册帧事件
@@ -66,11 +72,12 @@ namespace GameLogic
             if(loadType == LoadType.None) return;
             switch (loadType)
             {
+                case LoadType.DownloadConfig:
+                    GameModule.UI.ShowUI<Panel_Loading>();
+                    DownloadConfig();
+                    break;
                 case LoadType.Config:
                     LoadConfig();
-                    Log.Warning("加载配置文件");
-                    GameModule.UI.ShowUI<Panel_Loading>();
-                    CheckNet();
                     break;
                 case LoadType.InitSDK:
                     InitSDK();
@@ -99,10 +106,70 @@ namespace GameLogic
             }
         }
 
+        #region 下载配置表
+
+        private void DownloadConfig()
+        {
+            if (_isDownloading) return;
+
+            // 无网络时跳过下载，直接使用包内配置
+            if (Application.internetReachability == NetworkReachability.NotReachable)
+            {
+                Log.Warning("无网络，跳过配置下载，使用包内配置");
+                _downloadExecuted = false;
+                loadType = LoadType.Config;
+                return;
+            }
+
+            _isDownloading = true;
+            DownloadConfigAsync().Forget();
+        }
+
+        private async UniTaskVoid DownloadConfigAsync()
+        {
+            _timeSp.Start();
+            try
+            {
+                // 初始化下载器（异步加载CDN URL）
+                await ConfigDownloader.Instance.InitializeAsync();
+                // 执行全量下载
+                await ConfigDownloader.Instance.DownloadAllAsync();
+                _downloadExecuted = true; // 只要跑过下载流程就标记，LoadByteBuf内部会自动fallback
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[LoadingSystem] 下载配置异常: {e.Message}");
+                _downloadExecuted = false;
+            }
+            finally
+            {
+                _timeSp.Stop();
+                Log.Info($"下载配置耗时：{_timeSp.ElapsedMilliseconds}ms");
+                _isDownloading = false;
+                loadType = LoadType.Config;
+            }
+        }
+
+        #endregion
+
         private void LoadConfig()
         {
+            if (_configLoaded) return;
+            _configLoaded = true;
+
+            Log.Warning("加载配置文件");
+
+            // 根据下载结果设置开关：只要执行过下载流程就启用线上表
+            // LoadByteBuf内部有fallback机制，文件不存在时自动回退包内
+            ConfigLoader.Instance.UseOnlineTable = _downloadExecuted;
+
             //加载配置
             ConfigLoader.Instance.Load();
+
+            _updateCb?.Invoke(loadType);
+
+            // 检测网络状态决定下一步
+            CheckNet();
         }
         private void InitSDK()
         {
@@ -110,7 +177,6 @@ namespace GameLogic
             {
                 _isSDKInited = true;
                 _timeSp.Start();
-                //这里不去依赖SDK初始化，直接等三秒，模拟SDK初始化耗时
                 //初始化SDK
                 SDKManager.Instance.Init(() =>
                 {
@@ -228,6 +294,9 @@ namespace GameLogic
             _loadUserDataIn = false;
             _loadGameDataIn = false;
             _isSDKInited = false;
+            _isDownloading = false;
+            _downloadExecuted = false;
+            _configLoaded = false;
         }
         /// <summary>
         /// 检测网络状态
@@ -252,6 +321,7 @@ namespace GameLogic
     public enum LoadType
     {
         None=0,
+        DownloadConfig, // 新增：下载配置表
         Config,
         Login,
         UserData,

@@ -13,6 +13,12 @@ public class ConfigLoader : Singleton<ConfigLoader>
 {
     private bool _init = false;
 
+    /// <summary>
+    /// 是否优先使用线上下载的配置表
+    /// 当下载流程执行过后设为true，LoadByteBuf会优先从persistentDataPath读取
+    /// </summary>
+    public bool UseOnlineTable { get; set; } = false;
+
     private Tables _tables;
 
     public Tables Tables
@@ -67,12 +73,33 @@ public class ConfigLoader : Singleton<ConfigLoader>
     
     /// <summary>
     /// 加载二进制配置。
+    /// 优先从 persistentDataPath 读取下载的线上文件，失败则回退包内
     /// </summary>
     /// <param name="file">FileName</param>
     /// <returns>ByteBuf</returns>
     private ByteBuf LoadByteBuf(string file)
     {
         byte[] ret = null;
+
+        // 优先使用持久化目录中下载的文件
+        if (UseOnlineTable)
+        {
+            string persistentPath = Path.Combine(Application.persistentDataPath, "Configs", file + ".bytes");
+            if (File.Exists(persistentPath))
+            {
+                try
+                {
+                    ret = File.ReadAllBytes(persistentPath);
+                    return new ByteBuf(ret);
+                }
+                catch (Exception e)
+                {
+                    Log.Warning($"读取线上配置 {file} 失败: {e.Message}，回退包内文件");
+                }
+            }
+        }
+
+        // 回退：包内或编辑器下读取
 #if UNITY_EDITOR
         ret = File.ReadAllBytes($"{Application.dataPath}/AssetRaw/Configs/bytes/{file}.bytes");
 #else
