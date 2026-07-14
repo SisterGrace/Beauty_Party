@@ -38,7 +38,7 @@ namespace GameMain
 
         private async UniTaskVoid OnInitResourcesComplete()
         {
-            await UniTask.Delay(TimeSpan.FromSeconds(1f));
+            await UniTask.Yield();
             m_InitResourcesComplete = true;
             Log.Info("Init resources complete.");
         }
