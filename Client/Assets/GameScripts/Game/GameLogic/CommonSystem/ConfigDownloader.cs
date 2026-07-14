@@ -157,6 +157,7 @@ public class ConfigDownloader : MonoBehaviour
 
         using (UnityWebRequest req = UnityWebRequest.Get(remotePath))
         {
+            req.timeout = 8; // 单个文件最多等8秒
             req.downloadHandler = new DownloadHandlerBuffer();
 
             try
