@@ -65,6 +65,8 @@ namespace GameLogic
             AudioManager.Play(AudioType.Music,AudioDef.BGM1,false,true);
             Utility.Unity.AddUpdateListener(LoadingUpdate); //注册帧事件
             _timeSp = new Stopwatch();
+            // 显示Loading界面（只调用一次，不放在帧循环里）
+            GameModule.UI.ShowUI<Panel_Loading>();
         }
 
         private void LoadingUpdate()
@@ -73,7 +75,6 @@ namespace GameLogic
             switch (loadType)
             {
                 case LoadType.DownloadConfig:
-                    GameModule.UI.ShowUI<Panel_Loading>();
                     DownloadConfig();
                     break;
                 case LoadType.Config:
