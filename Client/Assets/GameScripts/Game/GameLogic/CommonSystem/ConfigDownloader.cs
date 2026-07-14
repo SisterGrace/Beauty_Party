@@ -72,6 +72,13 @@ public class ConfigDownloader : MonoBehaviour
     {
         if (!_urlReady) await LoadBaseUrlAsync();
 
+        // URL无效时直接跳过下载
+        if (!IsUrlValid)
+        {
+            Debug.LogWarning("[ConfigDownloader] URL无效，跳过下载，使用本地配置");
+            return false;
+        }
+
         if (!Directory.Exists(LocalConfigPath))
             Directory.CreateDirectory(LocalConfigPath);
 
@@ -96,6 +103,11 @@ public class ConfigDownloader : MonoBehaviour
     }
 
     #region 内部方法
+
+    /// <summary>
+    /// URL是否有效（读取失败时为false，跳过网络下载）
+    /// </summary>
+    public bool IsUrlValid => _urlReady && !string.IsNullOrEmpty(_cachedBaseUrl);
 
     private async UniTask LoadBaseUrlAsync()
     {
@@ -137,11 +149,13 @@ public class ConfigDownloader : MonoBehaviour
             }
         }
 
-        // 兜底：防止文件丢失或解密失败导致游戏崩溃
+        // URL读取失败时不再兜底，标记为无效，后续跳过下载直接用本地配置
         if (string.IsNullOrEmpty(url))
         {
-            Debug.LogError("[ConfigDownloader] URL配置读取失败，使用硬编码默认地址（仅开发调试用）");
-            url = "https://game.20260602.icu/BeautyParty/Byte/";
+            Debug.LogWarning("[ConfigDownloader] URL配置读取失败，将跳过网络下载，使用本地配置");
+            _cachedBaseUrl = null;
+            _urlReady = true;
+            return;
         }
 
         _cachedBaseUrl = url;
@@ -157,6 +171,7 @@ public class ConfigDownloader : MonoBehaviour
 
         using (UnityWebRequest req = UnityWebRequest.Get(remotePath))
         {
+            req.timeout = 6; // 单个文件最多等6秒
             req.downloadHandler = new DownloadHandlerBuffer();
 
             try
