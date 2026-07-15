@@ -54,7 +54,8 @@ namespace GameLogic
         RV_Daily,//看视频签到奖励翻倍
         RV_IAPToIAA,//IAP转IAA看视频
         RV_LevelSelect_2,//看视频挑战第三个精选关卡
-
+        RV_PhotoSpecial,//看视频获取梦想通行证的高级图片
+        RV_PhotoNormal//看视频获取梦想通行证的普通图片
 
     }
 }

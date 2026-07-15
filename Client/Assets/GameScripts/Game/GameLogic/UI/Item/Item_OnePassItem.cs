@@ -33,6 +33,9 @@ namespace GameLogic
         public UIButton SpeBtn;
         public Image speBgImg;
         public Item_PhotoLoad spePhotoNode;
+        public GameObject videoIcon; // 高级视频图标，在Inspector中拖拽赋值
+        public GameObject norVideoIcon; // 普通视频图标，在Inspector中拖拽赋值
+        public IReadOnlyList<Transform> GetBtnTransforms() => btns;
         #endregion
 
         public Image getBarObj;
@@ -76,15 +79,25 @@ namespace GameLogic
             LevelBgMask.SetActive(isNorGotten);
             SetupReward(data.RewardList[0], norRewardImg, norRewardTxt, norPhotoNode);
 
-            // 特殊奖励
+            // 特殊奖励（高级）
             bool isSpeLocked = !dreamPassData.IsOpenDreamPass;
-            bool isSpeGotten = UserController.Instance.CheckGetDreamPassReward(data.Id, false);
+            bool isSpeGotten = UserController.Instance.CheckGetDreamPassReward(data.Id, false); // 只定义一次
             speBgImg.sprite = GameModule.Resource.LoadAsset<Sprite>(isWaitGet && !isSpeGotten && !isSpeLocked ? "bg_txz_03" : "bg_txz_06");
             speLockObj.gameObject.SetActive(isSpeLocked);
             speGetObj.SetActive(isSpeGotten);
             SetupReward(data.RewardList[1], speRewardImg, speRewardTxt, spePhotoNode);
 
             itemLeveltxt.text = $"{data.UnlockLevel}";
+
+            // 高级视频图标：高级是图片、未领、可领、通行证已开
+            bool isSpePhoto = data.RewardList[1].Type == ERewardType.Photo;
+            bool showSpeVideo = isSpePhoto && !isSpeGotten && isWaitGet && dreamPassData.IsOpenDreamPass;
+            videoIcon.SetActive(showSpeVideo);
+
+            // 普通视频图标：普通是图片、未领、可领
+            bool isNorPhoto = data.RewardList[0].Type == ERewardType.Photo;
+            bool showNorVideo = isNorPhoto && !isNorGotten && isWaitGet;
+            if (norVideoIcon != null) norVideoIcon.SetActive(showNorVideo);
         }
 
         private void SetupReward(TBRewardData reward, Image rewardImg, TextMeshProUGUI rewardTxt, Item_PhotoLoad photoNode)
@@ -126,46 +139,111 @@ namespace GameLogic
         }
         private void ClickNorRew(GameObject obj)
         {
-            //领取过的和待解锁的两种
-
             if (Mdata.NorType == PassItemType.Getted)
             {
-                //奖励已经领取
                 GameEvent.Send(EventType.ShowTips, "uitips_dream_get", true);
+                return;
             }
-            else if (Mdata.NorType == PassItemType.Curr || Mdata.NorType == PassItemType.Lock)
+            if (Mdata.NorType == PassItemType.Curr || Mdata.NorType == PassItemType.Lock)
             {
-                //收集钥匙解锁更多
                 GameEvent.Send(EventType.ShowTips, "uitips_dream_free", true);
+                return;
             }
-            else if (Mdata.NorType == PassItemType.WaitGet)
+            if (Mdata.NorType == PassItemType.WaitGet)
             {
-                GameEvent.Send(EventType.GetDreamReward, btns, this);
+                // 普通已领则提示
+                bool isNorGotten = UserController.Instance.CheckGetDreamPassReward(Mdata.Id, true);
+                if (isNorGotten)
+                {
+                    GameEvent.Send(EventType.ShowTips, "uitips_dream_get", true);
+                    return;
+                }
+
+                bool isNorPhoto = Mdata.RewardList[0].Type == ERewardType.Photo;
+                if (isNorPhoto)
+                {
+                    // 普通是图片 → 看视频后领取普通
+                    SDKManager.Instance.Button_ShowRV(HCRVPositionName.RV_PhotoNormal, (success) =>
+                    {
+                        if (success)
+                        {
+                            GameEvent.Send(EventType.GetNormalRewardPhoto, this);
+                        }
+                        else
+                        {
+                            GameEvent.Send(EventType.ShowTips, "uitips_video_fail", true);
+                        }
+                    });
+                }
+                else
+                {
+                    // 普通非图片
+                    bool isOpen = UserController.Instance.GetOneActivityData(ActivityType.DreamPass).IsOpenDreamPass;
+                    bool isSpePhoto = Mdata.RewardList[1].Type == ERewardType.Photo;
+                    bool isSpeGotten = UserController.Instance.CheckGetDreamPassReward(Mdata.Id, false);
+
+                    if (isOpen && !isSpePhoto && !isSpeGotten)
+                    {
+                        // 通行证已开 + 高级非图片 + 高级未领 → 一键全领
+                        GameEvent.Send(EventType.GetDreamReward, btns, this);
+                    }
+                    else
+                    {
+                        // 其他情况只领普通
+                        GameEvent.Send(EventType.GetDreamPassNormalOnly, this);
+                    }
+                }
             }
         }
 
         private void ClickSpeRew(GameObject obj)
         {
-            //领取过的、待解锁和未开通通行证的
-            if (!UserController.Instance.GetOneActivityData(ActivityType.DreamPass).IsOpenDreamPass)
+            bool isOpen = UserController.Instance.GetOneActivityData(ActivityType.DreamPass).IsOpenDreamPass;
+            if (!isOpen)
             {
-                //激活通行证领取更多奖励
                 GameEvent.Send(EventType.ShowTips, "uitips_dream_active", true);
                 return;
             }
+
             if (Mdata.NorType == PassItemType.Getted)
             {
-                //奖励已经领取
                 GameEvent.Send(EventType.ShowTips, "uitips_dream_get", true);
+                return;
             }
-            else if (Mdata.NorType == PassItemType.Curr || Mdata.NorType == PassItemType.Lock)
+            if (Mdata.NorType == PassItemType.Curr || Mdata.NorType == PassItemType.Lock)
             {
-                //收集钥匙解锁更多
                 GameEvent.Send(EventType.ShowTips, "uitips_dream_free", true);
+                return;
             }
-            else if (Mdata.NorType == PassItemType.WaitGet)
+            if (Mdata.NorType == PassItemType.WaitGet)
             {
-                GameEvent.Send(EventType.GetDreamReward, btns, this);
+                // 高级已领则提示
+                bool isSpeGotten = UserController.Instance.CheckGetDreamPassReward(Mdata.Id, false);
+                if (isSpeGotten)
+                {
+                    GameEvent.Send(EventType.ShowTips, "uitips_dream_get", true);
+                    return;
+                }
+                bool isPhoto = Mdata.RewardList[1].Type == ERewardType.Photo;
+                if (isPhoto)
+                {
+                    SDKManager.Instance.Button_ShowRV(HCRVPositionName.RV_PhotoSpecial, (success) =>
+                    {
+                        if (success)
+                        {
+                            GameEvent.Send(EventType.GetSpecialRewardPhoto, this);
+                        }
+                        else
+                        {
+                            GameEvent.Send(EventType.ShowTips, "uitips_video_fail", true);
+                        }
+                    });
+                }
+                else
+                {
+                    // 非图片直接领取高级
+                    GameEvent.Send(EventType.GetSpecialRewardPhoto, this);
+                }
             }
         }
 

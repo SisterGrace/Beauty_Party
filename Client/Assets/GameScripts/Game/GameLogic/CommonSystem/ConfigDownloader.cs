@@ -28,27 +28,27 @@ public class ConfigDownloader : MonoBehaviour
     // 所有表名列表（与 Tables 构造函数中的 loader 调用完全一致）
     private static readonly string[] KnownTableNames = new string[]
     {
-        "config_tblanguagecfg",
+        //"config_tblanguagecfg",
         "config_tbcfglevelinfo",
-        "config_tbcfglevelchest",
-        "config_tbconstant",
-        "config_tbcfgnormalcardinfo",
-        "config_tbcfglockcardinfo",
-        "config_tbcfgfunctioncardinfo",
-        "config_tbcfggamepropinfo",
+        //"config_tbcfglevelchest",
+        //"config_tbconstant",
+        //"config_tbcfgnormalcardinfo",
+        //"config_tbcfglockcardinfo",
+       // "config_tbcfgfunctioncardinfo",
+       // "config_tbcfggamepropinfo",
         "config_tbcfgreward",
         "config_tbcfgphotogrouprew",
-        "config_tbcfgguide",
+        //"config_tbcfgguide",
         "config_tbcfgshop",
         "config_tbcfgrecharge",
-        "config_tbcfgactivity",
-        "config_tbcfgdreampass",
-        "config_tbcfgendlesstreasure",
-        "config_tbcfglevelprogress",
+        //"config_tbcfgactivity",
+        //"config_tbcfgdreampass",
+        //"config_tbcfgendlesstreasure",
+        //"config_tbcfglevelprogress",
         "config_tbcfgphotos",
         "config_tbcfggacha",
-        "config_tbcfgdaycheck",
-        "config_tbcfggamevip"
+        //"config_tbcfgdaycheck",
+        //"config_tbcfggamevip"
     };
 
     private string LocalConfigPath => Path.Combine(Application.persistentDataPath, "Configs");

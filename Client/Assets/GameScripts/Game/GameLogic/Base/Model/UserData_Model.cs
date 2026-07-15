@@ -98,7 +98,10 @@ namespace GameLogic
         #region 梦想通行证数据
         public bool IsOpenDreamPass => UserController.Instance.GetOpenDreamPass;//是否开启梦想通行证
         public int CurrDreamPassLevel;//当前梦想通行证等级
-        public Dictionary<int, bool> GetPassReward;
+        // 普通奖励领取记录：key存在即表示普通已领
+        public Dictionary<int, bool> NormalGotten;
+        // 高级奖励领取记录：key存在且value==true表示高级已领
+        public Dictionary<int, bool> SpecialGotten;
         #endregion
 
         #region 七日签到数据
@@ -142,7 +145,8 @@ namespace GameLogic
             {
                 case ActivityType.DreamPass:
                     CurrDreamPassLevel = 1;
-                    GetPassReward = new Dictionary<int, bool>();
+                    NormalGotten = new Dictionary<int, bool>();
+                    SpecialGotten = new Dictionary<int, bool>();
                     break;
                 case ActivityType.UntoldTreasure:
                     RewGetList = new List<int>();
@@ -184,17 +188,22 @@ namespace GameLogic
                 switch (Id)
                 {
                     case ActivityType.DreamPass:
-                        bool isAllGet = true;
-                        //开通了梦想通行证，且领取了所有奖励，则关闭
-                        foreach (var getInfo in GetPassReward)
+                        // 防御旧存档：字典可能为null
+                        if (NormalGotten == null) NormalGotten = new Dictionary<int, bool>();
+                        if (SpecialGotten == null) SpecialGotten = new Dictionary<int, bool>();
+                        var allCfgs = ConfigLoader.Instance.Tables.TbCfgDreamPass.DataList;
+                        bool allGotten = true;
+                        foreach (var cfg in allCfgs)
                         {
-                            if (!getInfo.Value)
+                            bool normalGotten = NormalGotten.ContainsKey(cfg.Id);
+                            bool specialGotten = SpecialGotten.ContainsKey(cfg.Id) && SpecialGotten[cfg.Id];
+                            if (!normalGotten || (IsOpenDreamPass && !specialGotten))
                             {
-                                isAllGet = false;
+                                allGotten = false;
                                 break;
                             }
                         }
-                        return GetPassReward.Count == ConfigLoader.Instance.Tables.TbCfgDreamPass.DataList.Count && IsOpenDreamPass && isAllGet;
+                        return allGotten && NormalGotten.Count == allCfgs.Count && IsOpenDreamPass;
                     case ActivityType.Adfree:
                         return UserController.Instance.AdFree;
                     case ActivityType.UntoldTreasure:
@@ -252,12 +261,17 @@ namespace GameLogic
         public bool CheckDreamPassGetRew(bool DoEvent,out int Count)
         {
             Count = 0;
+            // 防御旧存档：字典可能为null
+            if (NormalGotten == null) NormalGotten = new Dictionary<int, bool>();
+            if (SpecialGotten == null) SpecialGotten = new Dictionary<int, bool>();
             var _allPassList = ConfigLoader.Instance.Tables.TbCfgDreamPass.DataList;
-            //再检测未领取的奖励数量
+            //检测未领取的奖励数量
             for (int i = 0; i < _allPassList.Count; i++)
             {
                 var cfg = _allPassList[i];
-                if ((BuyCount.Contains(cfg.Id) && !GetPassReward.ContainsKey(cfg.Id))||(GetPassReward.ContainsKey(cfg.Id) && GetPassReward[cfg.Id] == false && IsOpenDreamPass))
+                bool normalCanGet = BuyCount.Contains(cfg.Id) && !NormalGotten.ContainsKey(cfg.Id);
+                bool specialCanGet = IsOpenDreamPass && (!SpecialGotten.ContainsKey(cfg.Id) || !SpecialGotten[cfg.Id]);
+                if (normalCanGet || specialCanGet)
                 {
                     Count++;
                 }

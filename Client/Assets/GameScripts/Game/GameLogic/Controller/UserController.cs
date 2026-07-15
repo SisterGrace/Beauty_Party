@@ -464,6 +464,7 @@ namespace GameLogic
         /// 检测通行证某一等级奖励领取情况
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="isNormal">true检查普通，false检查高级</param>
         /// <returns></returns>
         public bool CheckGetDreamPassReward(int id, bool isNormal)
         {
@@ -471,15 +472,13 @@ namespace GameLogic
             if (data == null) return false;
             if (isNormal)
             {
-                return data.GetPassReward.ContainsKey(id);
+                if (data.NormalGotten == null) return false;
+                return data.NormalGotten.ContainsKey(id);
             }
             else
             {
-                if (data.GetPassReward.ContainsKey(id))
-                {
-                    return data.GetPassReward[id];
-                }
-                return false;
+                if (data.SpecialGotten == null) return false;
+                return data.SpecialGotten.ContainsKey(id) && data.SpecialGotten[id];
             }
 
         }
@@ -559,24 +558,53 @@ namespace GameLogic
             }
         }
         /// <summary>
-        /// 添加通行证领取的奖励
+        /// 启动时刷新梦想通行证：如果活动已存在，根据当前关卡补齐可解锁等级
         /// </summary>
-        public void AddDreamPassReward(int id)
+        private void RefreshDreamPassOnInit()
         {
-            if (CurActivityData.ContainsKey(ActivityType.DreamPass))
+            var actCfg = ConfigLoader.Instance.Tables.TbCfgActivity.GetByActType(ActivityType.DreamPass);
+            if (actCfg == null || !actCfg.IsOpen) return;
+            // 如果活动未创建但关卡已过解锁线，补创建
+            if (!CurActivityData.ContainsKey(ActivityType.DreamPass))
             {
-                var recDic = CurActivityData[ActivityType.DreamPass].GetPassReward;
-                if (recDic.ContainsKey(id))
+                if (Level >= actCfg.UnLockLevel)
                 {
-                    recDic[id] = true;
+                    var data = new ActityData(actCfg);
+                    AddActivityData(ActivityType.DreamPass, data);
                 }
                 else
                 {
-                    recDic.Add(id, CurActivityData[ActivityType.DreamPass].IsOpenDreamPass);
+                    return; // 关卡不够，无需处理
                 }
-                CurActivityData[ActivityType.DreamPass].CheckDreamPassGetRew(true, out int count);
-                Save();
             }
+            // 根据当前关卡刷新解锁进度
+            CurActivityData[ActivityType.DreamPass]?.AddAccruePassLevel(Level);
+            Save();
+        }
+        /// <summary>
+        /// 标记通行证奖励已领取
+        /// </summary>
+        /// <param name="id">等级ID</param>
+        /// <param name="normalGotten">普通是否已领</param>
+        /// <param name="specialGotten">高级是否已领</param>
+        public void AddDreamPassReward(int id, bool normalGotten = false, bool specialGotten = false)
+        {
+            var data = GetOneActivityData(ActivityType.DreamPass);
+            if (data == null) return;
+            // 防御旧存档
+            if (data.NormalGotten == null) data.NormalGotten = new Dictionary<int, bool>();
+            if (data.SpecialGotten == null) data.SpecialGotten = new Dictionary<int, bool>();
+            if (normalGotten && !data.NormalGotten.ContainsKey(id))
+                data.NormalGotten.Add(id, true);
+            if (specialGotten)
+            {
+                if (data.SpecialGotten.ContainsKey(id))
+                    data.SpecialGotten[id] = true;
+                else
+                    data.SpecialGotten.Add(id, true);
+            }
+            data.CheckDreamPassGetRew(true, out int _);
+            Save();
         }
         /// <summary>
         /// 激活通行证
@@ -1592,6 +1620,8 @@ namespace GameLogic
             ActivityController.Instance.CheckActivityOpen(ActivityType.Shop);
             //默认开启H5功能验证
             ActivityController.Instance.CheckActivityOpen(ActivityType.H5Check);
+            // 启动时刷新梦想通行证进度：活动已开启则根据当前关卡补齐可解锁等级
+            RefreshDreamPassOnInit();
             var list = GetAllActivityData();
             foreach (var item in list)
             {

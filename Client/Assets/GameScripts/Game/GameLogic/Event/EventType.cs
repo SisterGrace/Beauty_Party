@@ -62,6 +62,9 @@ namespace GameLogic
         public const string OpenDreamPass = "OpenDreamPass"; //激活梦想通行证
         public const string RefreshDreamPassAdCount = "RefreshDreamPassAdCount"; //刷新梦想通行证广告进度
         public const string GetDreamReward = "GetDreamReward";//获得梦想奖励
+        public const string GetDreamPassNormalOnly = "GetDreamPassNormalOnly";//梦想通行证只领普通事件
+        public const string GetSpecialRewardPhoto = "GetSpecialRewardPhoto";//梦想通行证领取高级图片
+        public const string GetNormalRewardPhoto = "GetNormalRewardPhoto";//梦想通行证领取普通图片(视频后)
         public const string SetAdEnter = "SetAdEnter"; //设置广告入口状态
         public const string SetCloseBanner = "SetCloseBanner"; //设置关闭banner状态
         public const string SetLoadNetTips = "SetLoadNetTips"; //设置加载提示
