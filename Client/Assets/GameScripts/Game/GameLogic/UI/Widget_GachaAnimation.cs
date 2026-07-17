@@ -22,14 +22,27 @@ namespace GameLogic
 		public void Open(GachaResult result)
 		{
 			_timeId = 0;
-			mSkip.gameObject.Show();
+			_result = result;
 			_animStopwatch.Restart();
 			AudioManager.Stop(TK_Engine.AudioType.Music, false);
-			_result = result;
-			gameObject.SetActive(true);
-			//重置播放起点
-			mAvMediaPlayer.Rewind(false);
-			mAvMediaPlayer.Play();
+
+			// 检查视频是否可用
+			if (mAvMediaPlayer != null && mAvMediaPlayer.MediaPath != null && !string.IsNullOrEmpty(mAvMediaPlayer.MediaPath.Path))
+			{
+				// 有视频，播放动画
+				mSkip.gameObject.Show();
+				gameObject.SetActive(true);
+				mAvMediaPlayer.Rewind(false);
+				mAvMediaPlayer.Play();
+			}
+			else
+			{
+				// 没有视频，直接展示结果
+				gameObject.SetActive(false);
+				_animStopwatch.Stop();
+				AudioManager.Play(TK_Engine.AudioType.Music, AudioDef.BGM1, false, true);
+				OpenRewShow();
+			}
 		}
 		private void OpenRewShow()
 		{
