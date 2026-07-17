@@ -1,11 +1,12 @@
-using System.Collections;
-using System.Collections.Generic;
 using Config.common;
 using Config.config;
-using UnityEngine;
-using Y_Base;
-using TK_Engine;
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using TK_Engine;
+using UnityEngine;
+using UnityEngine.UIElements;
+using Y_Base;
 
 namespace GameLogic
 {
@@ -309,6 +310,151 @@ namespace GameLogic
         }
 
         #endregion
+
+        #region 商城照片动态刷新
+
+        /// <summary>
+        /// 获取当前动态展示的照片ID列表
+        /// </summary>
+        public List<int> GetShopDynamicPhotoIds
+        {
+            get
+            {
+                if (_userModel.ShopDynamicPhotoIds == null)
+                {
+                    _userModel.ShopDynamicPhotoIds = new List<int>();
+                }
+                return _userModel.ShopDynamicPhotoIds;
+            }
+        }
+
+
+        /// <summary>
+        /// 检查配表的照片商品是否全部已购买
+        /// </summary>
+        public bool IsAllConfigPhotosPurchased()
+        {
+            var allConfigs = GetAllPhotoProductConfigs();
+            foreach (var kvp in allConfigs)
+            {
+                if (!GetShopPhotoConfigDic.ContainsKey(kvp.Key))
+                {
+                    return false;
+                }
+            }
+            return allConfigs.Count > 0;
+        }
+
+       
+
+        /// <summary>
+        /// 获取当前AB类型下所有未获得的动态照片（排除已获得和不进入随机队列的照片）
+        /// </summary>
+        private List<CfgPhotos> GetUnobtainedDynamicPhotos()
+        {
+            var saclelist = ConfigLoader.GetRandomPhotoList(UserController.Instance.GetCurUserType);
+            var saclelist1 = saclelist.FindAll(a => !UserController.Instance.IsGetPhoto(a.ID));
+            return saclelist1;
+        }
+
+        /// <summary>
+        /// 检查当前动态展示的照片是否全部已获得，如果是则刷新下一批。
+        /// 返回当前应展示的动态照片ID列表（最多10个），空表示全部获得完毕。
+        /// </summary>
+        public List<int> RefreshDynamicShopPhotos()
+        {
+            var currentIds = GetShopDynamicPhotoIds;
+
+            // 检查当前批次是否全部已获得
+            bool allObtained = true;
+            if (currentIds.Count > 0)
+            {
+                foreach (var id in currentIds)
+                {
+                    if (!IsGetPhoto(id))
+                    {
+                        allObtained = false;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                // 第一次进入动态模式，需要生成
+                allObtained = true;
+            }
+
+            // 如果当前批次未全部获得，直接返回当前批次
+            if (!allObtained)
+            {
+                return currentIds;
+            }
+
+            // 全部获得，尝试刷新下一批
+            var unobtained = GetUnobtainedDynamicPhotos();
+            if (unobtained.Count == 0)
+            {
+                // 该AB类型下所有照片已获得，清空并返回空
+                currentIds.Clear();
+                Save();
+                return currentIds;
+            }
+
+            // 取最多10个未获得的照片作为新批次
+            currentIds.Clear();
+            int count = System.Math.Min(10, unobtained.Count);
+            for (int i = 0; i < count; i++)
+            {
+                currentIds.Add(unobtained[i].ID);
+            }
+            Save();
+            return currentIds;
+        }
+
+        /// <summary>
+        /// 动态模式下标记一张照片已获得（购买成功后调用）
+        /// </summary>
+        public void AddDynamicPhotoObtained(int photoId)
+        {
+            // 添加到相册（IsGetPhoto检查的就是UserPhotosData）
+            AddUserPhotoData(photoId);
+            Save();
+        }
+        /// <summary>
+        /// 得到商城动态图片解锁次数
+        /// </summary>
+        /// <param name="id"></param>//cfg photos id
+        /// <returns></returns>
+        public int GetPhotoUnLockTime(int id)
+        {
+            if (_userModel.ShopDynamicPhotoUnlockDic == null)
+            {
+                _userModel.ShopDynamicPhotoUnlockDic = new Dictionary<int, int>();
+            }
+            if (_userModel.ShopDynamicPhotoUnlockDic.ContainsKey(id))
+            {
+                return _userModel.ShopDynamicPhotoUnlockDic[id];
+            }
+            return 0;
+        }
+
+        /// <summary>
+        /// 设置商城动态图片解锁次数
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="count"></param>
+        public void SetPhotoUnLockTime(int id, int count)
+        {
+            if (_userModel.ShopDynamicPhotoUnlockDic == null)
+            {
+                _userModel.ShopDynamicPhotoUnlockDic = new Dictionary<int, int>();
+            }
+            _userModel.ShopDynamicPhotoUnlockDic[id] = count;
+            Save();
+        }
+
+        #endregion
+
         public long GetFreeGetGoldTime
         {
             get => _userModel.FreeGetGoldTime;

@@ -1,13 +1,14 @@
-using System;
-using System.Collections.Generic;
 using Bright.Serialization;
-using System.IO;
 using Config;
 using Config.config;
-using Y_Base;
 using SimpleJSON;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
 using TK_Engine;
 using UnityEngine;
+using Y_Base;
 
 public class ConfigLoader : Singleton<ConfigLoader>
 {
@@ -155,6 +156,23 @@ public class ConfigLoader : Singleton<ConfigLoader>
                 {
                     tempList.Add(item);
                 }
+            }
+        }
+        return tempList;
+    }
+    /// <summary>
+    /// 获取照片列表，获取参与随机的
+    /// </summary>
+    /// <param name="Abtype">AB类型，0-A，1-B</param>
+    /// <returns></returns>
+    public static List<CfgPhotos> GetRandomPhotoList(int Abtype)
+    {
+        var tempList = new List<CfgPhotos>();
+        foreach (var item in Instance.Tables.TbCfgPhotos.DataList)
+        {
+            if (item.IsRandomEnabled)
+            {
+                tempList.Add(item);
             }
         }
         return tempList;

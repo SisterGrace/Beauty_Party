@@ -103,26 +103,52 @@ namespace GameLogic
 
 			List<OneExcItemInfo> photoInfos = new List<OneExcItemInfo>();
 			Dictionary<int, List<int>> allCurrentConfigs = new Dictionary<int, List<int>>();
-			for (int i = 0; i < photoCfgs.Count; i++)
-			{
-				var rechargeInfo = RechargeController.GetRechargeInfoByShop(photoCfgs[i].Id);
-				var rewardList = ConfigLoader.Instance.Tables.TbCfgReward.Get(rechargeInfo.RewardId).Reward;
-				List<int> currentPhotoIds = UserController.GetPhotoIdsFromRewardList(rewardList);
 
-				bool isPurchased = UserController.Instance.CheckShopPhotoConfig(rechargeInfo.Giftid, currentPhotoIds);
-				bool isUpdated = UserController.Instance.IsPhotoProductUpdated(rechargeInfo.Giftid, currentPhotoIds);
-				photoInfos.Add(new OneExcItemInfo(photoCfgs[i].Id, rechargeInfo.Giftid, isPurchased, isUpdated, currentPhotoIds));
-				allCurrentConfigs[rechargeInfo.Giftid] = currentPhotoIds;
+			// 先检查配表的照片商品是否全部已购买
+			bool allConfigPurchased = UserController.Instance.IsAllConfigPhotosPurchased();
+
+			if (!allConfigPurchased)
+			{
+				// 配表模式：前10个走原有逻辑
+				for (int i = 0; i < photoCfgs.Count; i++)
+				{
+					var rechargeInfo = RechargeController.GetRechargeInfoByShop(photoCfgs[i].Id);
+					var rewardList = ConfigLoader.Instance.Tables.TbCfgReward.Get(rechargeInfo.RewardId).Reward;
+					List<int> currentPhotoIds = UserController.GetPhotoIdsFromRewardList(rewardList);
+
+					bool isPurchased = UserController.Instance.CheckShopPhotoConfig(rechargeInfo.Giftid, currentPhotoIds);
+					bool isUpdated = UserController.Instance.IsPhotoProductUpdated(rechargeInfo.Giftid, currentPhotoIds);
+					photoInfos.Add(new OneExcItemInfo(photoCfgs[i].Id, rechargeInfo.Giftid, isPurchased, isUpdated, currentPhotoIds));
+					allCurrentConfigs[rechargeInfo.Giftid] = currentPhotoIds;
+				}
+			}
+			else
+			{
+				// 动态模式：从照片池中抽取未获得的照片展示
+				var dynamicIds = UserController.Instance.RefreshDynamicShopPhotos();
+				for (int i = 0; i < dynamicIds.Count; i++)
+				{
+					bool obtained = UserController.Instance.IsGetPhoto(dynamicIds[i]);
+					photoInfos.Add(new OneExcItemInfo(dynamicIds[i], obtained));
+				}
 			}
 
-			if (photoInfos.Count == 0) return;
+			if (photoInfos.Count == 0)
+			{
+				mExcNode.Hide();
+				return;
+			}
+			mExcNode.Show();
 			if (_allExcList == null)
 			{
 				_allExcList = CreateWidget<UIListWidget<Widget_OneExcItem, OneExcItemInfo>>(mAllExc.gameObject);
 			}
 			_allExcList.SetDatas(photoInfos);
 
-			UserController.Instance.MarkPhotoProductsSeen(allCurrentConfigs);
+			if (!allConfigPurchased)
+			{
+				UserController.Instance.MarkPhotoProductsSeen(allCurrentConfigs);
+			}
 		}
 		private void CreatDiaList()
 		{

@@ -50,6 +50,9 @@ namespace GameLogic
         public Dictionary<int, List<int>> ShopPhotoConfigDic;//商城照片购买配置字典，key=Giftid，value=对应奖励的ID和OtherID列表
         [ES3Serializable]
         public Dictionary<int, List<int>> ShopPhotoSeenConfigDic;//已见的照片商品配置，key=GiftId，value=photoIds
+        [ES3Serializable]
+        public List<int> ShopDynamicPhotoIds;//当前动态展示的照片ID列表（当前批次）
+        [ES3Serializable] public Dictionary<int, int> ShopDynamicPhotoUnlockDic;//商城动态展示的照片解锁次数存档
         #endregion
         #region 活动礼包
         [ES3Serializable]
@@ -133,9 +136,11 @@ namespace GameLogic
                 CurShopPackId = new List<int>();
                 ShopPhotoConfigDic = new Dictionary<int, List<int>>();
                 ShopPhotoSeenConfigDic = new Dictionary<int, List<int>>();
+                ShopDynamicPhotoIds = new List<int>();
                 CurDateTime = TimeUtil.GetTimeStampToZero();
                 ISOpenDreampass = false;
                 ActivtyItemUnlockDic = new Dictionary<int, int>();
+                ShopDynamicPhotoUnlockDic = new Dictionary<int, int>();
                 UserPhotosData = new List<UserPhotoData>();
                 VIPLevel = 0;
                 CurUserType = 0;
