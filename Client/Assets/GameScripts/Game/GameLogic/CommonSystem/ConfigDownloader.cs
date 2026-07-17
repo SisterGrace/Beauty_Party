@@ -39,14 +39,14 @@ public class ConfigDownloader : MonoBehaviour
         "config_tbcfgreward",
         "config_tbcfgphotogrouprew",
         //"config_tbcfgguide",
-        "config_tbcfgshop",
-        "config_tbcfgrecharge",
+        //"config_tbcfgshop",
+        //"config_tbcfgrecharge",
         //"config_tbcfgactivity",
         //"config_tbcfgdreampass",
         //"config_tbcfgendlesstreasure",
         //"config_tbcfglevelprogress",
         "config_tbcfgphotos",
-        "config_tbcfggacha",
+        //"config_tbcfggacha",
         //"config_tbcfgdaycheck",
         //"config_tbcfggamevip"
     };
