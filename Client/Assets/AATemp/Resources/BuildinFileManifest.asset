@@ -71,8 +71,8 @@ MonoBehaviour:
     FileName: assets_assetraw_configs_7dcfaba308beb3bfb280cd5291ef1d10.bundle
     FileCRC32: 36a8e3ae
   - PackageName: DefaultPackage
-    FileName: assets_assetraw_configs_bytes_bf25c2934536b3d36f15d5ef8d72c273.bundle
-    FileCRC32: 7169319e
+    FileName: assets_assetraw_configs_bytes_5e5ec1e3ff0b4133c50cb4e12085d395.bundle
+    FileCRC32: 426b4973
   - PackageName: DefaultPackage
     FileName: assets_assetraw_effects_cardvfx_bomb_90fb178bfdfd72175b521a732bb7b71d.bundle
     FileCRC32: 92a1b97d
@@ -188,8 +188,8 @@ MonoBehaviour:
     FileName: assets_assetraw_ui_panel_downloadtip_5b3aa1693fb6fdb7f19c26db68139ffe.bundle
     FileCRC32: 46aaec44
   - PackageName: DefaultPackage
-    FileName: assets_assetraw_ui_panel_dreampass_ec5d70a92b1ea0f5ee700fa6bfc4c192.bundle
-    FileCRC32: 07267143
+    FileName: assets_assetraw_ui_panel_dreampass_c9b35f2abc08f21ddc7bd93c78be06d7.bundle
+    FileCRC32: 338ed76d
   - PackageName: DefaultPackage
     FileName: assets_assetraw_ui_panel_editorhome_2df65eebfa2673340ffc2d698b80b0dd.bundle
     FileCRC32: 5c12f096
@@ -539,8 +539,8 @@ MonoBehaviour:
     FileName: share_assets_plugins_textmesh pro_fonts_daca5fd4b228c17a1b1b23f79056d0f7.bundle
     FileCRC32: 65513a8f
   - PackageName: DefaultPackage
-    FileName: share_assets_plugins_textmesh pro_resources_fonts & materials_b95a82e39c0eb2c107da1151f46b8846.bundle
-    FileCRC32: 475971b1
+    FileName: share_assets_plugins_textmesh pro_resources_fonts & materials_3fcb7510fac7b8c8b2fbd54eb73f36d5.bundle
+    FileCRC32: 7cf8dcb9
   - PackageName: DefaultPackage
     FileName: share_assets_plugins_textmesh pro_resources_sprite assets_55f167513337e99109e01997387a7a1f.bundle
     FileCRC32: 6e36513f
