@@ -46,7 +46,7 @@ public class ConfigDownloader : MonoBehaviour
         //"config_tbcfgendlesstreasure",
         //"config_tbcfglevelprogress",
         "config_tbcfgphotos",
-        //"config_tbcfggacha",
+        "config_tbcfggacha",
         //"config_tbcfgdaycheck",
         //"config_tbcfggamevip"
     };
