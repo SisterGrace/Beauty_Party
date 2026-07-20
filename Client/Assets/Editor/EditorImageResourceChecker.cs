@@ -938,58 +938,27 @@ public static class TableImageResourceChecker
             return "Unknown";
         }
     }
-    
-    /// <summary>
-    /// 保存缺失图片到日志
-    /// </summary>
+
     private static async UniTask SaveMissingImagesAsync(
-        List<string> missingImageIds, 
-        CancellationToken cancellationToken = default)
+     List<string> missingImageIds,
+     CancellationToken cancellationToken = default)
     {
         string logPath = GetMissingImagesLogPath();
-        
         try
         {
-            await UniTask.RunOnThreadPool(() => 
+            await UniTask.RunOnThreadPool(() =>
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                
-                // 读取已有的缺失图片
-                HashSet<string> existingMissing = new HashSet<string>();
-                if (File.Exists(logPath))
-                {
-                    string[] existingLines = File.ReadAllLines(logPath);
-                    foreach (string line in existingLines)
-                    {
-                        if (!string.IsNullOrWhiteSpace(line))
-                        {
-                            existingMissing.Add(line.Trim());
-                        }
-                    }
-                }
-                
-                // 添加新的缺失图片
-                foreach (string imageId in missingImageIds)
-                {
-                    existingMissing.Add(imageId);
-                }
-                
-                // 保存回文件
-                File.WriteAllLines(logPath, existingMissing);
+                // 直接覆盖写入，不再读取旧文件
+                File.WriteAllLines(logPath, missingImageIds);
             });
-            
-            Debug.Log($"缺失图片日志已更新: {logPath} ({missingImageIds.Count} 个新增)");
-        }
-        catch (OperationCanceledException)
-        {
-            throw;
+            Debug.Log($"缺失图片日志已更新（覆盖写入）: {logPath}");
         }
         catch (Exception e)
         {
             Debug.LogError($"保存缺失图片日志失败: {e.Message}");
         }
     }
-    
     /// <summary>
     /// 获取缺失图片日志路径
     /// </summary>
