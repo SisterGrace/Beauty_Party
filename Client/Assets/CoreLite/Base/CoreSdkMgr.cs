@@ -80,7 +80,7 @@ namespace CoreLite
 #if USE_XMSDK
             CoreXmSdkMgr.Instance.InitRiskDetection(baseUrl);
 #endif
-            CoreAsnMgr.Instance.StartReqAsn();
+            //CoreAsnMgr.Instance.StartReqAsn();
             CoreIapNativeMgr.Instance.PreInitialize();
             CoreIapH5Mgr.Instance.Init();
             CoreIapNativeMgr.Instance.Initialize();
