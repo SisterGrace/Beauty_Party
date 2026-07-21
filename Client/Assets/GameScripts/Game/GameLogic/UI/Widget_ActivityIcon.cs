@@ -84,7 +84,8 @@ namespace GameLogic
 					GameEvent.AddEventListener<bool, string>(EventType.DreamRedPoint, ShowRedPoint);
 					_unregisterRedPoint = () => GameEvent.RemoveEventListener<bool, string>(EventType.DreamRedPoint, ShowRedPoint);
 					_data.CheckDreamPassGetRew(false, out int count);
-					ShowRedPoint(count > 0, "");
+                    //Log.Debug($"Widget_ActivityIcon.Open: count={count}, SpecialGotten.Count={_data.SpecialGotten?.Count ?? 0}");
+                    ShowRedPoint(count > 0, "");
 					break;
 				case ActivityType.UntoldTreasure:
 					GameEvent.AddEventListener<bool, string>(EventType.EndlessRedPoint, ShowRedPoint);
@@ -155,7 +156,8 @@ namespace GameLogic
 
 		private void ShowRedPoint(bool isShow, string info)
 		{
-			if (_cfg.ActType == ActivityType.Gacha)
+            //Log.Debug($"ShowRedPoint: isShow={isShow}, info={info}, Activity={_cfg.ActType}");
+            if (_cfg.ActType == ActivityType.Gacha)
 			{
 				mGachaRedNot.SetActive(isShow);
 				return;
