@@ -1226,7 +1226,17 @@ namespace GameLogic
         /// </summary>
         public int GetCurUserType
         {
-            get => _userModel.CurUserType;
+            get
+            {
+                // 如果字段值非法，直接返回 1（不修改存档）
+                if (_userModel.CurUserType != 0 && _userModel.CurUserType != 1)
+                {
+                    Log.Warning($"[UserController] 检测到非法 CurUserType={_userModel.CurUserType}，强制返回 0！");
+                    return 0;
+                }
+                    
+                return _userModel.CurUserType;
+            }
             set
             {
                 if (value != 0 && value != 1)
