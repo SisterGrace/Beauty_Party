@@ -159,8 +159,13 @@ namespace GameLogic
 			LoadImageAsync();
 			if (_selectPhotoInfo.IsVideo)
 			{
-				mPhotoAVPro.OpenMedia(MediaPathType.AbsolutePathOrURL, _selectPhotoInfo.VideoUrl);
+				mPhotoAVPro.gameObject.SetActive(true);
+                mPhotoAVPro.OpenMedia(MediaPathType.AbsolutePathOrURL, _selectPhotoInfo.VideoUrl);
 			}
+			else
+			{
+                mPhotoAVPro.gameObject.SetActive(false);
+            }
 		}
 		private void LoadImageAsync()
 		{

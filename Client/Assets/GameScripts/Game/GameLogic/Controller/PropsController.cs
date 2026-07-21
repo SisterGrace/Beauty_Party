@@ -1067,7 +1067,7 @@ namespace GameLogic
         {
             //只有B面才有视频，A面直接返回一个默认视频地址
             //获取现在的展示逻辑，在线参数获取到指定的视频首地址
-            string url;
+            string url=null;
             if (isVideo)//B面,测试期间默认使用B面
             {
 #if UNITY_ANDROID
@@ -1081,7 +1081,7 @@ namespace GameLogic
             }
             else//A面返回一个默认视频地址
             {
-                url = $"{ConfigLoader.Constant.VideoAUrl}Test1.mp4";
+                //url = $"{ConfigLoader.Constant.VideoAUrl}Test1.mp4";
             }
             Log.Info($"[PropsController] GetVideoUrl: AB={AbType}, VideoName={videoName}, IsVideo={isVideo}, 最终URL={url}");
             return url;
