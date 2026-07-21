@@ -267,10 +267,11 @@ namespace GameLogic
                 {
                     bool normalGotten = _activityData.NormalGotten.ContainsKey(cfg.Id);
                     bool specialGotten = _activityData.SpecialGotten.ContainsKey(cfg.Id) && _activityData.SpecialGotten[cfg.Id];
-                    if (normalGotten && specialGotten)
-                        type1 = PassItemType.Getted; // 全部已领
+                    // 关键修改：高级未开通时，只要普通已领就算全部已领
+                    if (normalGotten && (!_activityData.IsOpenDreamPass || specialGotten))
+                        type1 = PassItemType.Getted;
                     else
-                        type1 = PassItemType.WaitGet; // 至少一种未领，仍可领
+                        type1 = PassItemType.WaitGet;
                 }
                 var rewards = ConfigLoader.Instance.Tables.TbCfgReward.Get(cfg.RewardId).Reward;
                 OnePassItemInfo itemInfo = new OnePassItemInfo(cfg.Id, cfg.NeedKeyCount, type1, rewards);
