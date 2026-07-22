@@ -30,6 +30,8 @@ namespace GameLogic
 	private GameObject _freezeEff;
 	private bool _countdownWarning;
 	private bool _isBanner;
+	private bool _isWaitingForAudio = false; // 是否正在等待音频检测
+	private CancellationTokenSource _audioCheckCts; // 音频检测取消令牌
 	#region 倒计时相关
 		private bool _isStartTime2CountDown;//关卡总倒计时
 		private bool _isStartTime1CountDown;//关卡暂停倒计时
@@ -496,19 +498,13 @@ namespace GameLogic
 		switch (et)
 		{
 			case MediaPlayerEvent.EventType.Started:
-				// 检查视频是否有音轨
-				if (HasAudioTrack(mp))
-				{
-					// 有声音，暂停背景音乐
-					AudioManager.Stop(TK_Engine.AudioType.Music, true);
-				}
-				else
-				{
-					// 没有声音，播放背景音乐
-					AudioManager.Play(TK_Engine.AudioType.Music, AudioDef.BGM1, false, true);
-				}
+				// 延迟1秒检测音频，避免无声视频时BGM闪烁
+				_isWaitingForAudio = true;
+				CheckAudioAfterDelay(mp).Forget();
 				break;
 			case MediaPlayerEvent.EventType.FinishedPlaying://播放结束，弹出下一个视频
+				_isWaitingForAudio = false;
+				CancelAudioCheck();
 				CancelVideoTimeout();
 				// 恢复背景音乐
 				AudioManager.Play(TK_Engine.AudioType.Music, AudioDef.BGM1, false, true);
@@ -517,12 +513,64 @@ namespace GameLogic
 				break;
 			case MediaPlayerEvent.EventType.Error://播放出错，直接触发完成回调
 				Log.Warning($"视频播放出错：{errorCode}，自动触发完成回调");
+				_isWaitingForAudio = false;
+				CancelAudioCheck();
 				CancelVideoTimeout();
 				// 恢复背景音乐
 				AudioManager.Play(TK_Engine.AudioType.Music, AudioDef.BGM1, false, true);
 				_finishAvShow?.Invoke();
 				_finishAvShow = null;
 				break;
+		}
+	}
+	
+	/// <summary>
+	/// 延迟检测视频音频（1秒内检测3次）
+	/// </summary>
+	private async UniTaskVoid CheckAudioAfterDelay(MediaPlayer mp)
+	{
+		// 取消之前的检测
+		CancelAudioCheck();
+		_audioCheckCts = new CancellationTokenSource();
+		
+		try
+		{
+			// 1秒内检测3次，每次间隔约333ms
+			for (int i = 0; i < 3; i++)
+			{
+				await UniTask.Delay(333, cancellationToken: _audioCheckCts.Token);
+				
+				if (!_isWaitingForAudio) return;
+				
+				// 检测音频是否可用
+				if (HasAudioTrack(mp))
+				{
+					// 检测到有声音，停止背景音乐
+					AudioManager.Stop(TK_Engine.AudioType.Music, true);
+					_isWaitingForAudio = false;
+					return;
+				}
+			}
+			
+			// 3次检测都没有声音，不做任何操作（保持当前BGM状态）
+			_isWaitingForAudio = false;
+		}
+		catch (OperationCanceledException)
+		{
+			// 取消了，不做任何操作
+		}
+	}
+	
+	/// <summary>
+	/// 取消音频检测
+	/// </summary>
+	private void CancelAudioCheck()
+	{
+		if (_audioCheckCts != null)
+		{
+			_audioCheckCts.Cancel();
+			_audioCheckCts.Dispose();
+			_audioCheckCts = null;
 		}
 	}
 	
@@ -553,12 +601,16 @@ namespace GameLogic
 	protected override void Close()
 	{
 		// 恢复主页视频声音
+		_isWaitingForAudio = false;
+		CancelAudioCheck();
 		GameEvent.Send(EventType.UnmuteHomeVideo);
 		base.Close();
 	}
 
 	protected override void OnDestroy()
 	{
+		_isWaitingForAudio = false;
+		CancelAudioCheck();
 		if (_isBanner)
 			{
 				SDKManager.Instance.Button_HideBanner();

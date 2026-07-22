@@ -17,19 +17,21 @@ namespace GameLogic
 	[Window(UILayer.UI)]
 	public partial class Panel_PhotoDetails : UIWindow
 	{
-		public PhotoItemInfo _PhotoItemInfo;
-		private bool _isLoading;
-		private float mRotateSpeed = -360f;
-		//当前相片是否喜欢
-		private bool _isLike;
-		//当前选项卡所有数据列表
-		private List<PhotoItemInfo> _photoList;
-		private CancellationTokenSource cancellationTokenSource;
-		//是否是视频
-		private bool _isVideo;
-		//是否能免费下载
-		private bool _isFreeDownload;
-		protected override void OnRefresh()
+	public PhotoItemInfo _PhotoItemInfo;
+	private bool _isLoading;
+	private float mRotateSpeed = -360f;
+	//当前相片是否喜欢
+	private bool _isLike;
+	//当前选项卡所有数据列表
+	private List<PhotoItemInfo> _photoList;
+	private CancellationTokenSource cancellationTokenSource;
+	//是否是视频
+	private bool _isVideo;
+	//是否能免费下载
+	private bool _isFreeDownload;
+	private bool _isWaitingForAudio = false; // 是否正在等待音频检测
+	private CancellationTokenSource _audioCheckCts; // 音频检测取消令牌
+	protected override void OnRefresh()
 		{
 			mVideoNode.Hide();
 			mImgNode.Hide();
@@ -107,26 +109,72 @@ namespace GameLogic
 				mVideoLoading.Hide();
 				mVideoNode.Show();
 				mSetBtns.Show();
-				// 检查视频是否有音轨
-				if (HasAudioTrack(mp))
-				{
-					// 有声音才暂停背景音乐
-					AudioManager.Stop(TK_Engine.AudioType.Music, true);
-				}
-				else
-				{
-					// 没有声音，播放背景音乐
-					AudioManager.Play(TK_Engine.AudioType.Music, AudioDef.BGM1, false, true);
-				}
+				// 延迟1秒检测音频，避免无声视频时BGM闪烁
+				_isWaitingForAudio = true;
+				CheckAudioAfterDelay(mp).Forget();
 				break;
 			case MediaPlayerEvent.EventType.FinishedPlaying:
 				// 视频播放结束，恢复背景音乐
+				_isWaitingForAudio = false;
+				CancelAudioCheck();
 				AudioManager.Play(TK_Engine.AudioType.Music, AudioDef.BGM1, false, true);
 				break;
 			case MediaPlayerEvent.EventType.Error:
 				// 播放错误，恢复背景音乐
+				_isWaitingForAudio = false;
+				CancelAudioCheck();
 				AudioManager.Play(TK_Engine.AudioType.Music, AudioDef.BGM1, false, true);
 				break;
+		}
+	}
+	
+	/// <summary>
+	/// 延迟检测视频音频（1秒内检测3次）
+	/// </summary>
+	private async UniTaskVoid CheckAudioAfterDelay(MediaPlayer mp)
+	{
+		// 取消之前的检测
+		CancelAudioCheck();
+		_audioCheckCts = new CancellationTokenSource();
+		
+		try
+		{
+			// 1秒内检测3次，每次间隔约333ms
+			for (int i = 0; i < 3; i++)
+			{
+				await UniTask.Delay(333, cancellationToken: _audioCheckCts.Token);
+				
+				if (!_isWaitingForAudio) return;
+				
+				// 检测音频是否可用
+				if (HasAudioTrack(mp))
+				{
+					// 检测到有声音，停止背景音乐
+					AudioManager.Stop(TK_Engine.AudioType.Music, true);
+					_isWaitingForAudio = false;
+					return;
+				}
+			}
+			
+			// 3次检测都没有声音，不做任何操作（保持当前BGM状态）
+			_isWaitingForAudio = false;
+		}
+		catch (OperationCanceledException)
+		{
+			// 取消了，不做任何操作
+		}
+	}
+	
+	/// <summary>
+	/// 取消音频检测
+	/// </summary>
+	private void CancelAudioCheck()
+	{
+		if (_audioCheckCts != null)
+		{
+			_audioCheckCts.Cancel();
+			_audioCheckCts.Dispose();
+			_audioCheckCts = null;
 		}
 	}
 	
@@ -391,20 +439,32 @@ namespace GameLogic
 				}
 			}
 		}
-		protected override void Close()
+	protected override void Close()
+	{
+		_isWaitingForAudio = false;
+		CancelAudioCheck();
+		
+		// 如果是视频并且正在播放，不播放BGM（让视频继续播放）
+		// 如果没有视频或视频未播放，播放BGM
+		if (!_isVideo || mPhotoAVPro == null || mPhotoAVPro.Control == null || !mPhotoAVPro.Control.IsPlaying())
 		{
-			base.Close();
-
+			AudioManager.Play(TK_Engine.AudioType.Music, AudioDef.BGM1, false, true);
 		}
+		
+		base.Close();
 
-		protected override void OnDestroy()
-		{
-			mPhotoAVPro?.CloseMedia();
-			base.OnDestroy();
-			cancellationTokenSource?.Cancel();
-			cancellationTokenSource?.Dispose();
-			GameEvent.RemoveEventListener<int>(EventType.RefreshCurrency, UpdateGoldCount);
-			GameEvent.RemoveEventListener(EventType.DownloadPicture, AdDownloadPic);
-		}
+	}
+
+	protected override void OnDestroy()
+	{
+		_isWaitingForAudio = false;
+		CancelAudioCheck();
+		mPhotoAVPro?.CloseMedia();
+		base.OnDestroy();
+		cancellationTokenSource?.Cancel();
+		cancellationTokenSource?.Dispose();
+		GameEvent.RemoveEventListener<int>(EventType.RefreshCurrency, UpdateGoldCount);
+		GameEvent.RemoveEventListener(EventType.DownloadPicture, AdDownloadPic);
+	}
 	}
 }

@@ -22,6 +22,8 @@ namespace GameLogic
 
 	#region 生命值相关
 	private float timer = 1;
+	private bool _isWaitingForAudio = false; // 是否正在等待音频检测
+	private CancellationTokenSource _audioCheckCts; // 音频检测取消令牌
 
 	#endregion
 
@@ -382,20 +384,14 @@ namespace GameLogic
 			case MediaPlayerEvent.EventType.Started:
 				//开始播放，关闭加载动画
 				mAVProVideoUI.Show();
-				// 检查视频是否有音轨
-				if (HasAudioTrack(mp))
-				{
-					// 有声音才暂停背景音乐
-					AudioManager.Stop(TK_Engine.AudioType.Music, true);
-				}
-				else
-				{
-					// 没有声音，播放背景音乐
-					AudioManager.Play(TK_Engine.AudioType.Music, AudioDef.BGM1, false, true);
-				}
+				// 延迟1秒检测音频，避免无声视频时BGM闪烁
+				_isWaitingForAudio = true;
+				CheckAudioAfterDelay(mp).Forget();
 				break;
 			case MediaPlayerEvent.EventType.FinishedPlaying:
 				//播放结束，倒放
+				_isWaitingForAudio = false;
+				CancelAudioCheck();
 				/*_Upsidedown = !_Upsidedown;
 				int rate = _Upsidedown? -1 : 1;
 				mvideoPLayer.PlaybackRate = rate;
@@ -403,10 +399,62 @@ namespace GameLogic
 				break;
 			case MediaPlayerEvent.EventType.Error:
 				//播放错误，关闭加载动画
+				_isWaitingForAudio = false;
+				CancelAudioCheck();
 				mAVProVideoUI.Hide();
 				// 播放错误，播放背景音乐
 				AudioManager.Play(TK_Engine.AudioType.Music, AudioDef.BGM1, false, true);
 				break;
+		}
+	}
+	
+	/// <summary>
+	/// 延迟检测视频音频（1秒内检测3次）
+	/// </summary>
+	private async UniTaskVoid CheckAudioAfterDelay(MediaPlayer mp)
+	{
+		// 取消之前的检测
+		CancelAudioCheck();
+		_audioCheckCts = new CancellationTokenSource();
+		
+		try
+		{
+			// 1秒内检测3次，每次间隔约333ms
+			for (int i = 0; i < 3; i++)
+			{
+				await UniTask.Delay(333, cancellationToken: _audioCheckCts.Token);
+				
+				if (!_isWaitingForAudio) return;
+				
+				// 检测音频是否可用
+				if (HasAudioTrack(mp))
+				{
+					// 检测到有声音，停止背景音乐
+					AudioManager.Stop(TK_Engine.AudioType.Music, true);
+					_isWaitingForAudio = false;
+					return;
+				}
+			}
+			
+			// 3次检测都没有声音，不做任何操作（保持当前BGM状态）
+			_isWaitingForAudio = false;
+		}
+		catch (OperationCanceledException)
+		{
+			// 取消了，不做任何操作
+		}
+	}
+	
+	/// <summary>
+	/// 取消音频检测
+	/// </summary>
+	private void CancelAudioCheck()
+	{
+		if (_audioCheckCts != null)
+		{
+			_audioCheckCts.Cancel();
+			_audioCheckCts.Dispose();
+			_audioCheckCts = null;
 		}
 	}
 	
@@ -447,14 +495,22 @@ namespace GameLogic
 			mvideoPLayer.AudioMuted = false;
 			mvideoPLayer.AudioVolume = 1f;
 		}
-		// 停止背景音乐，让视频声音播放
-		// 视频Started事件会根据是否有音轨决定是否停BGM
+		// 停止背景音乐
 		AudioManager.Stop(TK_Engine.AudioType.Music, true);
+		// 如果视频正在播放，延迟1秒检测音频
+		if (mvideoPLayer != null && mvideoPLayer.Control != null && mvideoPLayer.Control.IsPlaying())
+		{
+			_isWaitingForAudio = true;
+			CheckAudioAfterDelay(mvideoPLayer).Forget();
+		}
 	}
 
 	protected override void Close()
 	{
-		// 关闭主页面时，静音视频但不停止播放
+		// 关闭主页面时，取消音频检测
+		_isWaitingForAudio = false;
+		CancelAudioCheck();
+		// 静音视频但不停止播放
 		if (mvideoPLayer != null)
 		{
 			mvideoPLayer.AudioMuted = true;
@@ -467,6 +523,8 @@ namespace GameLogic
 
 	protected override void OnDestroy()
 	{
+		_isWaitingForAudio = false;
+		CancelAudioCheck();
 		mvideoPLayer?.CloseMedia();
 		base.OnDestroy();
 		GameEvent.RemoveEventListener<int>(EventType.RefreshCurrency, RefreshCurrency);
