@@ -204,6 +204,7 @@ namespace GameLogic
             {
                 AspectRatioFitter.aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
                 AspectRatioFitter.aspectRatio = (float)tex.width / (float)tex.height;
+                //Debug.LogError(AspectRatioFitter.aspectRatio+" width:"+ tex.width+" height:"+ tex.height);
             }
             if (PhotoImg != null) PhotoImg.sprite = sprite;
         }

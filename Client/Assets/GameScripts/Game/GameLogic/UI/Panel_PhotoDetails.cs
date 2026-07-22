@@ -1,16 +1,16 @@
+using Config.common;
+using Cysharp.Threading.Tasks;
+using RenderHeads.Media.AVProVideo;
 using System;
-using TK_Engine;
-using UnityEngine;
-
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
-using Config.common;
-using Cysharp.Threading.Tasks;
+using TK_Engine;
+using UnityEngine;
+using UnityEngine.UI;
 using Y_Base;
-using RenderHeads.Media.AVProVideo;
-using Rect = UnityEngine.Rect;
 using AudioType = TK_Engine.AudioType;
+using Rect = UnityEngine.Rect;
 
 namespace GameLogic
 {
@@ -137,7 +137,13 @@ namespace GameLogic
 			sprite.name = $"{_PhotoItemInfo.Imgurl}";
 			//if(mPhotoIcon.sprite!= null) return;
 			mPhotoIcon.sprite = sprite;
-		}
+            if (aspectRatioFitter != null)
+            {
+                aspectRatioFitter.aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
+                aspectRatioFitter.aspectRatio = (float)tex.width / (float)tex.height;
+                //Debug.LogError(aspectRatioFitter.aspectRatio + " width:" + tex.width + " height:" + tex.height);
+            }
+        }
 		protected override void OnUpdate()
 		{
 			if (_isLoading)
