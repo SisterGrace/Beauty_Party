@@ -22,18 +22,21 @@ namespace GameLogic
 		private int _maxPassLevel;
 		private CfgRecharge _rechargeItem;
 		private bool _isShowAd = false;
-		protected override void OnRefresh()
+	protected override void OnRefresh()
+	{
+		if (userDatas.Length > 0)
 		{
-			if (userDatas.Length > 0)
-			{
-				_activityData = (ActityData)userDatas[0];
-			}
-			_allPassList = ConfigLoader.Instance.Tables.TbCfgDreamPass.DataList;
-			_isOpenCountDown = _activityData.EndTime > 0;
-			CreatPassItemList();
-			UpdataInfo();
-			SDKManager.Instance.LogEvent("Pass_Show"); 
+			_activityData = (ActityData)userDatas[0];
 		}
+		_allPassList = ConfigLoader.Instance.Tables.TbCfgDreamPass.DataList;
+		_isOpenCountDown = _activityData.EndTime > 0;
+		CreatPassItemList();
+		UpdataInfo();
+		SDKManager.Instance.LogEvent("Pass_Show");
+		// 静音主页视频，播放背景音乐
+		GameEvent.Send(EventType.MuteHomeVideo);
+		AudioManager.Play(TK_Engine.AudioType.Music, AudioDef.BGM1, false, true);
+	}
 
 		protected override void RegisterEvent()
 		{
@@ -299,10 +302,12 @@ namespace GameLogic
 				_passList.SetDatas(passListData);
 			}, 1.3f);
 		}
-		protected override void Close()
-		{
-			base.Close();
-		}
+	protected override void Close()
+	{
+		// 恢复主页视频声音
+		GameEvent.Send(EventType.UnmuteHomeVideo);
+		base.Close();
+	}
 
 		protected override void OnDestroy()
 		{

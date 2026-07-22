@@ -11,23 +11,25 @@ namespace GameLogic
 	public partial class Panel_Photo  : UIWindow
 	{
 		private SwitchPageMgr _switchPage;
-		protected override void OnRefresh()
+	protected override void OnRefresh()
+	{
+		var switchPageInfo = ConfigLoader.Constant.PhotoTab;
+		_switchPage = new SwitchPageMgr(mTopsUI, mChildPageNode, this);
+		foreach (var item in switchPageInfo)
 		{
-			var switchPageInfo = ConfigLoader.Constant.PhotoTab;
-			_switchPage = new SwitchPageMgr(mTopsUI, mChildPageNode, this);
-			foreach (var item in switchPageInfo)
-			{
-				int id = item.Id;
-				string tabKey = item.PhotoItemKey;
-				_switchPage.BindChildPage<Widget_AllPhotoItems>(id, tabKey);
-				_switchPage.SetShareParam(id,tabKey);
-			}
-
-			_switchPage.CreatTab<Widget_SwitchPhoto>(0,false);
-			//更新页签红点
-			SetSwitchRedPoint();
-			
+			int id = item.Id;
+			string tabKey = item.PhotoItemKey;
+			_switchPage.BindChildPage<Widget_AllPhotoItems>(id, tabKey);
+			_switchPage.SetShareParam(id,tabKey);
 		}
+
+		_switchPage.CreatTab<Widget_SwitchPhoto>(0,false);
+		//更新页签红点
+		SetSwitchRedPoint();
+		// 静音主页视频，播放背景音乐
+		GameEvent.Send(EventType.MuteHomeVideo);
+		AudioManager.Play(TK_Engine.AudioType.Music, AudioDef.BGM1, false, true);
+	}
 
 		protected override void RegisterEvent()
 		{
@@ -54,10 +56,12 @@ namespace GameLogic
 				}
 			}
 		}
-		protected override void Close()
-		{
-			base.Close();
-		}
+	protected override void Close()
+	{
+		// 恢复主页视频声音
+		GameEvent.Send(EventType.UnmuteHomeVideo);
+		base.Close();
+	}
 
 		protected override void OnDestroy()
 		{

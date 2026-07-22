@@ -83,31 +83,61 @@ namespace GameLogic
 				//mFreeCount.SetLanguage("uitips_photo_free", freeCount);
 			}
 		}
-		private void SetABShow()
+	private void SetABShow()
+	{
+		_isVideo = _PhotoItemInfo.ABType == 1;
+		cancellationTokenSource = new CancellationTokenSource();
+		LoadImageAsync();
+		if (_PhotoItemInfo.IsVideo)
 		{
-			_isVideo = _PhotoItemInfo.ABType == 1;
-			cancellationTokenSource = new CancellationTokenSource();
-			LoadImageAsync();
-			if (_PhotoItemInfo.IsVideo)
-			{
-				mPhotoAVPro.AutoOpen = true;
-				mPhotoAVPro.OpenMedia(MediaPathType.AbsolutePathOrURL, _PhotoItemInfo.VideoUrl);
-			}
+			mPhotoAVPro.AudioVolume = 1f;
+			mPhotoAVPro.AudioMuted = false;
+			mPhotoAVPro.AutoOpen = true;
+			mPhotoAVPro.OpenMedia(MediaPathType.AbsolutePathOrURL, _PhotoItemInfo.VideoUrl);
 		}
-		private void OnMediaPlayerEvent(MediaPlayer mp, MediaPlayerEvent.EventType et, ErrorCode errorCode)
+	}
+	private void OnMediaPlayerEvent(MediaPlayer mp, MediaPlayerEvent.EventType et, ErrorCode errorCode)
+	{
+		Log.Info($"此时的AVpro状态：{et}，错误码：{errorCode}");
+		switch (et)
 		{
-			Log.Info($"此时的AVpro状态：{et}，错误码：{errorCode}");
-			switch (et)
-			{
-				case MediaPlayerEvent.EventType.Started:
-					//开始播放，关闭加载动画
-					_isLoading = false;
-					mVideoLoading.Hide();
-					mVideoNode.Show();
-					mSetBtns.Show();
-					break;
-			}
+			case MediaPlayerEvent.EventType.Started:
+				//开始播放，关闭加载动画
+				_isLoading = false;
+				mVideoLoading.Hide();
+				mVideoNode.Show();
+				mSetBtns.Show();
+				// 检查视频是否有音轨
+				if (HasAudioTrack(mp))
+				{
+					// 有声音才暂停背景音乐
+					AudioManager.Stop(TK_Engine.AudioType.Music, true);
+				}
+				else
+				{
+					// 没有声音，播放背景音乐
+					AudioManager.Play(TK_Engine.AudioType.Music, AudioDef.BGM1, false, true);
+				}
+				break;
+			case MediaPlayerEvent.EventType.FinishedPlaying:
+				// 视频播放结束，恢复背景音乐
+				AudioManager.Play(TK_Engine.AudioType.Music, AudioDef.BGM1, false, true);
+				break;
+			case MediaPlayerEvent.EventType.Error:
+				// 播放错误，恢复背景音乐
+				AudioManager.Play(TK_Engine.AudioType.Music, AudioDef.BGM1, false, true);
+				break;
 		}
+	}
+	
+	/// <summary>
+	/// 检查视频是否有音轨
+	/// </summary>
+	private bool HasAudioTrack(MediaPlayer mp)
+	{
+		if (mp == null || mp.Info == null) return false;
+		return mp.Info.HasAudio();
+	}
 		private async UniTask LoadImageAsync()
 		{
 			try

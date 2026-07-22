@@ -49,6 +49,9 @@ namespace GameLogic
             _itemPos.Swap(2, 3);
             GameEvent.Send(TKEventType.MainHomeAnim,false);
             SDKManager.Instance.LogEvent("Endless_Show");
+            // 静音主页视频，播放背景音乐
+            GameEvent.Send(EventType.MuteHomeVideo);
+            AudioManager.Play(TK_Engine.AudioType.Music, AudioDef.BGM1, false, true);
         }
 
         protected override void RegisterEvent()
@@ -193,6 +196,8 @@ namespace GameLogic
         }
         protected override void Close()
         {
+            // 恢复主页视频声音
+            GameEvent.Send(EventType.UnmuteHomeVideo);
             base.Close();
         }
 

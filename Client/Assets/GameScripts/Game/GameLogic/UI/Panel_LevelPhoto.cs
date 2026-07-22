@@ -22,19 +22,22 @@ namespace GameLogic
 		//当前选择的照片索引
 		private int _currentSelectIndex = 0;
 
-		protected override void OnRefresh()
+	protected override void OnRefresh()
+	{
+		_IsAdRefresh = UserController.Instance.CurAdLevelRefreshState;
+		_currentSelectIndex = 0;
+		//首先判断是boss关卡还是普通关卡
+		UpdateLevelPhoto();
+		CheckGuide();
+		if (!SDKManager.Instance.GetLevelChooseReported)
 		{
-			_IsAdRefresh = UserController.Instance.CurAdLevelRefreshState;
-			_currentSelectIndex = 0;
-			//首先判断是boss关卡还是普通关卡
-			UpdateLevelPhoto();
-			CheckGuide();
-			if (!SDKManager.Instance.GetLevelChooseReported)
-			{
-				SDKManager.Instance.GetLevelChooseReported = true;
-				SDKManager.Instance.LogEvent("Level_Choose", CommonEvent.ComLevelEvent);
-			}
+			SDKManager.Instance.GetLevelChooseReported = true;
+			SDKManager.Instance.LogEvent("Level_Choose", CommonEvent.ComLevelEvent);
 		}
+		// 静音主页视频，播放背景音乐
+		GameEvent.Send(EventType.MuteHomeVideo);
+		AudioManager.Play(TK_Engine.AudioType.Music, AudioDef.BGM1, false, true);
+	}
 
 		protected override void RegisterEvent()
 		{
@@ -304,11 +307,13 @@ namespace GameLogic
 				SDKManager.Instance.LogEvent("RV_Button_Show", "Position", HCRVPositionName.RV_LevelSelect_2.ToString());
 			}
 		}
-		protected override void Close()
-		{
-			base.Close();
-			GameModule.UI.RemoveOrderPanel<Panel_LevelPhoto>();
-		}
+	protected override void Close()
+	{
+		// 恢复主页视频声音
+		GameEvent.Send(EventType.UnmuteHomeVideo);
+		base.Close();
+		GameModule.UI.RemoveOrderPanel<Panel_LevelPhoto>();
+	}
 
 		protected override void OnDestroy()
 		{

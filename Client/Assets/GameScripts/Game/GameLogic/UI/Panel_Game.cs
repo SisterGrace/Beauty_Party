@@ -25,12 +25,12 @@ namespace GameLogic
 		private Widget_StoreSlot _storeSlot;
 		private Dictionary<PropType, PropBtnInfo> _propBtns = new Dictionary<PropType, PropBtnInfo>();
 
-		private bool _isPropAnim;
-		private GameObject _propAnimObj;
-		private GameObject _freezeEff;
-		private bool _countdownWarning;
-		private bool _isBanner;
-		#region 倒计时相关
+	private bool _isPropAnim;
+	private GameObject _propAnimObj;
+	private GameObject _freezeEff;
+	private bool _countdownWarning;
+	private bool _isBanner;
+	#region 倒计时相关
 		private bool _isStartTime2CountDown;//关卡总倒计时
 		private bool _isStartTime1CountDown;//关卡暂停倒计时
 		private float _allTimer2;
@@ -53,27 +53,30 @@ namespace GameLogic
 		private CancellationTokenSource _videoTimeoutCts;
 		private const float VIDEO_TIMEOUT_SECONDS = 10f; // 视频超时时间（秒）
 		#endregion
-		protected override void OnRefresh()
+	protected override void OnRefresh()
+	{
+		if (userDatas.Length > 0)
 		{
-			if (userDatas.Length > 0)
-			{
-				_selectPhotoInfo = (OneSelectPhotoInfo)userDatas[0];
-			}
-			ABShow();
-			_cardBoard = CreateWidgetByType<Widget_CardBoard>(mCardBoardNode);
-			_eliminateSlot = CreateWidgetByType<Widget_EliminateSlot>(mSlotNode);
-			_storeSlot = CreateWidgetByType<Widget_StoreSlot>(mStoreSlotNode);
-			_cardBoard.Open(_eliminateSlot, _storeSlot, mCardMoving);
-			_soltUseCount = 0;
-			_tipUseCount = 0;
-			_finishAvShow = null;
-			UpdatePropBtns();
-			mLevelName.SetLanguage("uitips_level", $"{UserController.Instance.Level}");
-			//mLevelName.gameObject.Hide();
-			_isPropAnim = false;
-			GamePanelShow();
-			SDKManager.Instance.LogEvent("Level_Enter",CommonEvent.ComLevelEvent);
+			_selectPhotoInfo = (OneSelectPhotoInfo)userDatas[0];
 		}
+		ABShow();
+		_cardBoard = CreateWidgetByType<Widget_CardBoard>(mCardBoardNode);
+		_eliminateSlot = CreateWidgetByType<Widget_EliminateSlot>(mSlotNode);
+		_storeSlot = CreateWidgetByType<Widget_StoreSlot>(mStoreSlotNode);
+		_cardBoard.Open(_eliminateSlot, _storeSlot, mCardMoving);
+		_soltUseCount = 0;
+		_tipUseCount = 0;
+		_finishAvShow = null;
+		UpdatePropBtns();
+		mLevelName.SetLanguage("uitips_level", $"{UserController.Instance.Level}");
+		//mLevelName.gameObject.Hide();
+		_isPropAnim = false;
+		GamePanelShow();
+		SDKManager.Instance.LogEvent("Level_Enter",CommonEvent.ComLevelEvent);
+		// 静音主页视频，播放背景音乐
+		GameEvent.Send(EventType.MuteHomeVideo);
+		AudioManager.Play(TK_Engine.AudioType.Music, AudioDef.BGM1, false, true);
+	}
 
 		protected override void RegisterEvent()
 		{
@@ -409,17 +412,22 @@ namespace GameLogic
 				mMediaPlayer.OpenMedia(MediaPathType.AbsolutePathOrURL, _selectPhotoInfo.VideoUrl, false);
 			}
 		}
-		private void ShowAVBg(Action callback)
-		{
-			_finishAvShow = callback;
-			mAVProVideoUI.Show();
-			//UI界面隐藏
-			ShowPanel(null, false);
-			mMediaPlayer.Play();
+	private void ShowAVBg(Action callback)
+	{
+		_finishAvShow = callback;
+		mAVProVideoUI.Show();
+		//UI界面隐藏
+		ShowPanel(null, false);
+		
+		// 启用视频声音
+		mMediaPlayer.Control.SetVolume(1f);
+		mMediaPlayer.Control.MuteAudio(false);
+		
+		mMediaPlayer.Play();
 
-			// 开启视频超时检测
-			StartVideoTimeoutCheck().Forget();
-		}
+		// 开启视频超时检测
+		StartVideoTimeoutCheck().Forget();
+	}
 		/// <summary>
 		/// 视频播放超时检测
 		/// </summary>
@@ -460,15 +468,17 @@ namespace GameLogic
 			}
 		}
 
-		/// <summary>
-		/// 视频超时处理
-		/// </summary>
-		private void OnVideoTimeout()
-		{
-			_videoTimeoutCts = null;
-			_finishAvShow?.Invoke();
-			_finishAvShow = null;
-		}
+	/// <summary>
+	/// 视频超时处理
+	/// </summary>
+	private void OnVideoTimeout()
+	{
+		_videoTimeoutCts = null;
+		// 恢复背景音乐
+		AudioManager.Play(TK_Engine.AudioType.Music, AudioDef.BGM1, false, true);
+		_finishAvShow?.Invoke();
+		_finishAvShow = null;
+	}
 
 		private void ShowClosePanel()
 		{
@@ -480,24 +490,50 @@ namespace GameLogic
 			_photoLoad.LoadUIImg(_selectPhotoInfo.Imgurl);
 		}
 
-		private void OnMediaPlayerEvent(MediaPlayer mp, MediaPlayerEvent.EventType et, ErrorCode errorCode)
+	private void OnMediaPlayerEvent(MediaPlayer mp, MediaPlayerEvent.EventType et, ErrorCode errorCode)
+	{
+		Log.Info($"此时关卡界面的视频播放器状态：{et}");
+		switch (et)
 		{
-			Log.Info($"此时关卡界面的视频播放器状态：{et}");
-			switch (et)
-			{
-				case MediaPlayerEvent.EventType.FinishedPlaying://播放结束，弹出下一个视频
-					CancelVideoTimeout();
-					_finishAvShow?.Invoke();
-					_finishAvShow = null;
-					break;
-				case MediaPlayerEvent.EventType.Error://播放出错，直接触发完成回调
-					Log.Warning($"视频播放出错：{errorCode}，自动触发完成回调");
-					CancelVideoTimeout();
-					_finishAvShow?.Invoke();
-					_finishAvShow = null;
-					break;
-			}
+			case MediaPlayerEvent.EventType.Started:
+				// 检查视频是否有音轨
+				if (HasAudioTrack(mp))
+				{
+					// 有声音，暂停背景音乐
+					AudioManager.Stop(TK_Engine.AudioType.Music, true);
+				}
+				else
+				{
+					// 没有声音，播放背景音乐
+					AudioManager.Play(TK_Engine.AudioType.Music, AudioDef.BGM1, false, true);
+				}
+				break;
+			case MediaPlayerEvent.EventType.FinishedPlaying://播放结束，弹出下一个视频
+				CancelVideoTimeout();
+				// 恢复背景音乐
+				AudioManager.Play(TK_Engine.AudioType.Music, AudioDef.BGM1, false, true);
+				_finishAvShow?.Invoke();
+				_finishAvShow = null;
+				break;
+			case MediaPlayerEvent.EventType.Error://播放出错，直接触发完成回调
+				Log.Warning($"视频播放出错：{errorCode}，自动触发完成回调");
+				CancelVideoTimeout();
+				// 恢复背景音乐
+				AudioManager.Play(TK_Engine.AudioType.Music, AudioDef.BGM1, false, true);
+				_finishAvShow?.Invoke();
+				_finishAvShow = null;
+				break;
 		}
+	}
+	
+	/// <summary>
+	/// 检查视频是否有音轨
+	/// </summary>
+	private bool HasAudioTrack(MediaPlayer mp)
+	{
+		if (mp == null || mp.Info == null) return false;
+		return mp.Info.HasAudio();
+	}
 		#endregion
 		private void ExitLevel()
 		{
@@ -514,14 +550,16 @@ namespace GameLogic
 			GameModule.UI.ShowUI<Panel_Home>();
 			LevelController.Instance.ExitLevel(false);
 		}
-		protected override void Close()
-		{
-			base.Close();
-		}
+	protected override void Close()
+	{
+		// 恢复主页视频声音
+		GameEvent.Send(EventType.UnmuteHomeVideo);
+		base.Close();
+	}
 
-		protected override void OnDestroy()
-		{
-			if (_isBanner)
+	protected override void OnDestroy()
+	{
+		if (_isBanner)
 			{
 				SDKManager.Instance.Button_HideBanner();
 			}
