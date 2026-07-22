@@ -18,18 +18,20 @@ namespace GameLogic
 	{
 		private List<Transform> _allAnimNodes = new List<Transform>();
 		private List<TBRewardData> _rewardDatas;
-		private bool _isAnim;
-		//关卡所选照片信息
-		private OneSelectPhotoInfo _selectPhotoInfo;
-		//是否正在加载视频
-		private bool _isLoading;
-		private float mRotateSpeed = -360f;
-		//是否能免费下载
-		private bool _isFreeDownload;
-		//关卡钻石奖励数量
-		private int _diamondCount;
-		//是否喜欢
-		private bool _isLike;
+	private bool _isAnim;
+	//关卡所选照片信息
+	private OneSelectPhotoInfo _selectPhotoInfo;
+	//是否正在加载视频
+	private bool _isLoading;
+	private float mRotateSpeed = -360f;
+	//是否能免费下载
+	private bool _isFreeDownload;
+	//关卡钻石奖励数量
+	private int _diamondCount;
+	//是否喜欢
+	private bool _isLike;
+	private bool _isWaitingForAudio = false; // 是否正在等待音频检测
+	private CancellationTokenSource _audioCheckCts; // 音频检测取消令牌
 		
 		//动画相关参数（可通过GameScene配置）
 		private static SucceedAnimConfig _animConfig = SucceedAnimConfig.Default;
@@ -171,17 +173,91 @@ namespace GameLogic
 		{
 			_photoLoad.LoadUIImg(_selectPhotoInfo.Imgurl);
 		}
-		private void OnMediaPlayerEvent(MediaPlayer mp, MediaPlayerEvent.EventType et, ErrorCode errorCode)
+	private void OnMediaPlayerEvent(MediaPlayer mp, MediaPlayerEvent.EventType et, ErrorCode errorCode)
+	{
+		switch (et)
 		{
-			switch (et)
-			{
-				case MediaPlayerEvent.EventType.Started:
-					//开始播放，关闭加载动画
-					_isLoading = false;
-					mAVProVideoUI.Show();
-					break;
-			}
+			case MediaPlayerEvent.EventType.Started:
+				//开始播放，关闭加载动画
+				_isLoading = false;
+				mAVProVideoUI.Show();
+				// 延迟检测音频（1秒内检测3次）
+				_isWaitingForAudio = true;
+				CheckAudioAfterDelay(mp).Forget();
+				break;
+			case MediaPlayerEvent.EventType.FinishedPlaying:
+				// 视频播放结束，恢复背景音乐
+				_isWaitingForAudio = false;
+				CancelAudioCheck();
+				AudioManager.Play(TK_Engine.AudioType.Music, AudioDef.BGM1, false, true);
+				break;
+			case MediaPlayerEvent.EventType.Error:
+				// 播放错误，恢复背景音乐
+				_isWaitingForAudio = false;
+				CancelAudioCheck();
+				AudioManager.Play(TK_Engine.AudioType.Music, AudioDef.BGM1, false, true);
+				break;
 		}
+	}
+	
+	/// <summary>
+	/// 延迟检测视频音频（1秒内检测3次）
+	/// </summary>
+	private async UniTaskVoid CheckAudioAfterDelay(MediaPlayer mp)
+	{
+		// 取消之前的检测
+		CancelAudioCheck();
+		_audioCheckCts = new CancellationTokenSource();
+		
+		try
+		{
+			// 1秒内检测3次，每次间隔约333ms
+			for (int i = 0; i < 3; i++)
+			{
+				await UniTask.Delay(333, cancellationToken: _audioCheckCts.Token);
+				
+				if (!_isWaitingForAudio) return;
+				
+				// 检测音频是否可用
+				if (HasAudioTrack(mp))
+				{
+					// 检测到有声音，停止背景音乐
+					AudioManager.Stop(TK_Engine.AudioType.Music, true);
+					_isWaitingForAudio = false;
+					return;
+				}
+			}
+			
+			// 3次检测都没有声音，不做任何操作（保持当前BGM状态）
+			_isWaitingForAudio = false;
+		}
+		catch (OperationCanceledException)
+		{
+			// 取消了，不做任何操作
+		}
+	}
+	
+	/// <summary>
+	/// 取消音频检测
+	/// </summary>
+	private void CancelAudioCheck()
+	{
+		if (_audioCheckCts != null)
+		{
+			_audioCheckCts.Cancel();
+			_audioCheckCts.Dispose();
+			_audioCheckCts = null;
+		}
+	}
+	
+	/// <summary>
+	/// 检查视频是否有音轨
+	/// </summary>
+	private bool HasAudioTrack(MediaPlayer mp)
+	{
+		if (mp == null || mp.Info == null) return false;
+		return mp.Info.HasAudio();
+	}
 		private void SetLikeIcon()
 		{
 			_isLike = !_isLike;
@@ -598,17 +674,29 @@ namespace GameLogic
 
 		#endregion
 
-		protected override void Close()
+	protected override void Close()
+	{
+		_isWaitingForAudio = false;
+		CancelAudioCheck();
+		
+		// 如果视频正在播放，不播放BGM
+		// 如果没有视频或视频未播放，播放BGM
+		if (mPhotoAVPro == null || mPhotoAVPro.Control == null || !mPhotoAVPro.Control.IsPlaying())
 		{
-			base.Close();
-
+			AudioManager.Play(TK_Engine.AudioType.Music, AudioDef.BGM1, false, true);
 		}
+		
+		base.Close();
 
-		protected override void OnDestroy()
-		{
-			base.OnDestroy();
-			mPhotoAVPro?.CloseMedia();
-		}
+	}
+
+	protected override void OnDestroy()
+	{
+		_isWaitingForAudio = false;
+		CancelAudioCheck();
+		base.OnDestroy();
+		mPhotoAVPro?.CloseMedia();
+	}
 	}
 	
 	/// <summary>
