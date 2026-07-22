@@ -17,15 +17,13 @@ namespace GameLogic
 	[Window(UILayer.UI)]
 	public partial class Panel_Home : UIWindow
 	{
-	private static readonly Vector2 PhotoAnchoredPosA = new(-50f, 225f);
-	private static readonly Vector2 PhotoAnchoredPosB = new(-50f, 30f);
+		private static readonly Vector2 PhotoAnchoredPosA = new(-50f, 225f);
+		private static readonly Vector2 PhotoAnchoredPosB = new(-50f, 30f);
 
-	#region 生命值相关
-	private float timer = 1;
-	private bool _isWaitingForAudio = false; // 是否正在等待音频检测
-	private CancellationTokenSource _audioCheckCts; // 音频检测取消令牌
+		#region 生命值相关
+		private float timer = 1;
 
-	#endregion
+		#endregion
 
 		#region UI动画
 		//是否UI进入动画
@@ -47,18 +45,18 @@ namespace GameLogic
 		private bool _isShowBanner = false;
 		//主页视频动画正向播放
 		private bool _Upsidedown = false;
-	protected override void OnRefresh()
-	{
-		_activityList = new List<Widget_ActivityIcon>();
-		_isShowBanner = true;
-		_isAtOnceGuide = true;
-		RefreshCurrency(-1);
-		UpdateLevelInfo();
-		SetActivity();
-		SetRedNot();
-		SetPhotoRedNot(-1);
-		PlayHomeVideo(UserController.Instance.GetCurUserPhotoID);
-		if (userDatas.Length > 0)
+		protected override void OnRefresh()
+		{
+			_activityList = new List<Widget_ActivityIcon>();
+			_isShowBanner = true;
+			_isAtOnceGuide = true;
+			RefreshCurrency(-1);
+			UpdateLevelInfo();
+			SetActivity();
+			SetRedNot();
+			SetPhotoRedNot(-1);
+			PlayHomeVideo(UserController.Instance.GetCurUserPhotoID);
+			if (userDatas.Length > 0)
 			{
 				_isEnterAnim = (bool)userDatas[0];
 				_endAnimCallback = (Action)userDatas[1];
@@ -92,26 +90,26 @@ namespace GameLogic
 			GameScene.Instance.LogEventHomeShow();
 		}
 
-	protected override void RegisterEvent()
-	{
-		GameEvent.AddEventListener<int>(EventType.RefreshCurrency, RefreshCurrency);
-		GameEvent.AddEventListener(EventType.RefreshLevel, UpdateLevelInfo);
-		GameEvent.AddEventListener<bool>(EventType.SetAnimMask, SetAnimMask);
-		GameEvent.AddEventListener<bool>(EventType.StartGuide1, StartGuide1);
-		GameEvent.AddEventListener(EventType.RefreshActivity, SetActivity);
-		GameEvent.AddEventListener(EventType.ShopRedPoint, SetRedNot);
-		GameEvent.AddEventListener<int>(EventType.PhotoRedPoint, SetPhotoRedNot);
-		GameEvent.AddEventListener(EventType.OpenLevelInfo, OpenLevelInfo);
-		GameEvent.AddEventListener<bool>(TKEventType.MainHomeAnim, SetMainHomeAnim);
-		GameEvent.AddEventListener(EventType.CloseAllActivityBtns, CloseAllActivityBtns);
-		GameEvent.AddEventListener<int>(EventType.RefreshHomeVideo, PlayHomeVideo);
-		GameEvent.AddEventListener(EventType.MuteHomeVideo, MuteHomeVideo);
-		GameEvent.AddEventListener(EventType.UnmuteHomeVideo, UnmuteHomeVideo);
-		//飞行奖励目标位置注册
-		FlySystem.Instance.RegisterPos(FlyReType.prop, mLevel.transform);
-		//FlySystem.Instance.RegisterPos(FlyReType.CashOut,mBtnMMO);
+		protected override void RegisterEvent()
+		{
+			GameEvent.AddEventListener<int>(EventType.RefreshCurrency, RefreshCurrency);
+			GameEvent.AddEventListener(EventType.RefreshLevel, UpdateLevelInfo);
+			GameEvent.AddEventListener<bool>(EventType.SetAnimMask, SetAnimMask);
+			GameEvent.AddEventListener<bool>(EventType.StartGuide1, StartGuide1);
+			GameEvent.AddEventListener(EventType.RefreshActivity, SetActivity);
+			GameEvent.AddEventListener(EventType.ShopRedPoint, SetRedNot);
+			GameEvent.AddEventListener<int>(EventType.PhotoRedPoint, SetPhotoRedNot);
+			GameEvent.AddEventListener(EventType.OpenLevelInfo, OpenLevelInfo);
+			GameEvent.AddEventListener<bool>(TKEventType.MainHomeAnim, SetMainHomeAnim);
+			GameEvent.AddEventListener(EventType.CloseAllActivityBtns, CloseAllActivityBtns);
+			GameEvent.AddEventListener<int>(EventType.RefreshHomeVideo, PlayHomeVideo);
+			GameEvent.AddEventListener(EventType.MuteHomeVideo, MuteHomeVideo);
+			GameEvent.AddEventListener(EventType.UnmuteHomeVideo, UnmuteHomeVideo);
+			//飞行奖励目标位置注册
+			FlySystem.Instance.RegisterPos(FlyReType.prop, mLevel.transform);
+			//FlySystem.Instance.RegisterPos(FlyReType.CashOut,mBtnMMO);
 
-	}
+		}
 
 		protected override void OnUpdate()
 		{
@@ -233,8 +231,8 @@ namespace GameLogic
 		private void SetActivity()
 		{
 			var list = UserController.Instance.GetAllActivityData();
-            list.RemoveAll(data => data.Id == ActivityType.Discard);
-            var count = list.Count;
+			list.RemoveAll(data => data.Id == ActivityType.Discard);
+			var count = list.Count;
 			if (list.Count < _activityList.Count && _activityList.Count > 0)
 			{
 				var tempList = new List<Widget_ActivityIcon>();
@@ -350,197 +348,131 @@ namespace GameLogic
 
 		#region 主页视频播放或者展示动画
 
-	private void PlayHomeVideo(int photoId)
-	{
-		var phtcfg = ConfigLoader.Instance.Tables.TbCfgPhotos.Get(photoId);
-		mAVProVideoUI.Hide();
-		if (phtcfg == null)//没有找到视频配置，播放默认视频
+		private void PlayHomeVideo(int photoId)
 		{
-
-		}
-		else
-		{
-			string iUrl = PropsController.GetImgUrl(phtcfg.ImageID, phtcfg.ImageType, phtcfg.ABGroup);
-			LoadImageAsync(iUrl);
-			if (phtcfg.IsVideo)
+			var phtcfg = ConfigLoader.Instance.Tables.TbCfgPhotos.Get(photoId);
+			mAVProVideoUI.Hide();
+			if (phtcfg == null)//没有找到视频配置，播放默认视频
 			{
-				string vUrl = PropsController.GetVideoUrl(phtcfg.ImageID, phtcfg.ABGroup, phtcfg.IsVideo);
-				mvideoPLayer.AudioVolume = 1f;
-				mvideoPLayer.AudioMuted = false;
-				mvideoPLayer.AutoOpen = true;
-				mvideoPLayer.OpenMedia(MediaPathType.AbsolutePathOrURL, vUrl);
+
 			}
-		}
-		_Upsidedown = false;
-
-		/*mvideoPLayer.PlaybackRate = -1;
-		mvideoPLayer.Play();*/
-	}
-	private void OnMediaPlayerEvent(MediaPlayer mp, MediaPlayerEvent.EventType et, ErrorCode errorCode)
-	{
-		//Log.Info("当前主界面Av状态：" + et, "错误：" + errorCode.ToString());
-		switch (et)
-		{
-			case MediaPlayerEvent.EventType.Started:
-				//开始播放，关闭加载动画
-				mAVProVideoUI.Show();
-				// 延迟1秒检测音频，避免无声视频时BGM闪烁
-				_isWaitingForAudio = true;
-				CheckAudioAfterDelay(mp).Forget();
-				break;
-			case MediaPlayerEvent.EventType.FinishedPlaying:
-				//播放结束，倒放
-				_isWaitingForAudio = false;
-				CancelAudioCheck();
-				/*_Upsidedown = !_Upsidedown;
-				int rate = _Upsidedown? -1 : 1;
-				mvideoPLayer.PlaybackRate = rate;
-				mvideoPLayer.Play();*/
-				break;
-			case MediaPlayerEvent.EventType.Error:
-				//播放错误，关闭加载动画
-				_isWaitingForAudio = false;
-				CancelAudioCheck();
-				mAVProVideoUI.Hide();
-				// 播放错误，播放背景音乐
-				AudioManager.Play(TK_Engine.AudioType.Music, AudioDef.BGM1, false, true);
-				break;
-		}
-	}
-	
-	/// <summary>
-	/// 延迟检测视频音频（1秒内检测3次）
-	/// </summary>
-	private async UniTaskVoid CheckAudioAfterDelay(MediaPlayer mp)
-	{
-		// 取消之前的检测
-		CancelAudioCheck();
-		_audioCheckCts = new CancellationTokenSource();
-		
-		try
-		{
-			// 1秒内检测3次，每次间隔约333ms
-			for (int i = 0; i < 3; i++)
+			else
 			{
-				await UniTask.Delay(333, cancellationToken: _audioCheckCts.Token);
-				
-				if (!_isWaitingForAudio) return;
-				
-				// 检测音频是否可用
-				if (HasAudioTrack(mp))
+				string iUrl = PropsController.GetImgUrl(phtcfg.ImageID, phtcfg.ImageType, phtcfg.ABGroup);
+				LoadImageAsync(iUrl);
+				if (phtcfg.IsVideo)
 				{
-					// 检测到有声音，停止背景音乐
-					AudioManager.Stop(TK_Engine.AudioType.Music, true);
-					_isWaitingForAudio = false;
-					return;
+					string vUrl = PropsController.GetVideoUrl(phtcfg.ImageID, phtcfg.ABGroup, phtcfg.IsVideo);
+					mvideoPLayer.AudioVolume = 1f;
+					mvideoPLayer.AudioMuted = false;
+					mvideoPLayer.AutoOpen = true;
+					mvideoPLayer.OpenMedia(MediaPathType.AbsolutePathOrURL, vUrl);
 				}
 			}
-			
-			// 3次检测都没有声音，不做任何操作（保持当前BGM状态）
-			_isWaitingForAudio = false;
-		}
-		catch (OperationCanceledException)
-		{
-			// 取消了，不做任何操作
-		}
-	}
-	
-	/// <summary>
-	/// 取消音频检测
-	/// </summary>
-	private void CancelAudioCheck()
-	{
-		if (_audioCheckCts != null)
-		{
-			_audioCheckCts.Cancel();
-			_audioCheckCts.Dispose();
-			_audioCheckCts = null;
-		}
-	}
-	
-	/// <summary>
-	/// 检查视频是否有音轨
-	/// </summary>
-	private bool HasAudioTrack(MediaPlayer mp)
-	{
-		if (mp == null || mp.Info == null) return false;
-		return mp.Info.HasAudio();
-	}
-		private void LoadImageAsync(string url)
-		{
-			_photoLoad.LoadUIImg(url);
-		}
+			_Upsidedown = false;
 
-		#endregion
+			/*mvideoPLayer.PlaybackRate = -1;
+			mvideoPLayer.Play();*/
+		}
+		private void OnMediaPlayerEvent(MediaPlayer mp, MediaPlayerEvent.EventType et, ErrorCode errorCode)
+		{
+			//Log.Info("当前主界面Av状态：" + et, "错误：" + errorCode.ToString());
+			switch (et)
+			{
+				case MediaPlayerEvent.EventType.Started:
+					//开始播放，关闭加载动画
+					mAVProVideoUI.Show();
+					// 开始视频音频检测
+					VideoAudioHelper.StartVideoAudioCheck(mp);
+					break;
+				case MediaPlayerEvent.EventType.FinishedPlaying:
+					//播放结束，倒放
+					/*_Upsidedown = !_Upsidedown;
+					int rate = _Upsidedown? -1 : 1;
+					mvideoPLayer.PlaybackRate = rate;
+					mvideoPLayer.Play();*/
+					break;
+				case MediaPlayerEvent.EventType.Error:
+					//播放错误，关闭加载动画
+					mAVProVideoUI.Hide();
+					// 停止检测并恢复BGM
+					VideoAudioHelper.StopVideoAudioCheck();
+					break;
+		}
+	}
+
+	private void LoadImageAsync(string url)
+	{
+		_photoLoad.LoadUIImg(url);
+	}
 
 	/// <summary>
 	/// 静音主页视频（其他Panel打开时调用）
 	/// </summary>
-	private void MuteHomeVideo()
-	{
-		if (mvideoPLayer != null)
+		private void MuteHomeVideo()
 		{
-			mvideoPLayer.AudioMuted = true;
-			mvideoPLayer.AudioVolume = 0f;
+			if (mvideoPLayer != null)
+			{
+				mvideoPLayer.AudioMuted = true;
+				mvideoPLayer.AudioVolume = 0f;
+			}
 		}
-	}
 
-	/// <summary>
-	/// 恢复主页视频声音（回到主页时调用）
-	/// </summary>
-	private void UnmuteHomeVideo()
-	{
-		if (mvideoPLayer != null)
+		/// <summary>
+		/// 恢复主页视频声音（回到主页时调用）
+		/// </summary>
+		private void UnmuteHomeVideo()
 		{
-			mvideoPLayer.AudioMuted = false;
-			mvideoPLayer.AudioVolume = 1f;
+			if (mvideoPLayer != null)
+			{
+				mvideoPLayer.AudioMuted = false;
+				mvideoPLayer.AudioVolume = 1f;
+			}
+			// 停止背景音乐
+			AudioManager.Stop(TK_Engine.AudioType.Music, true);
+			// 如果视频正在播放，开始检测音频
+			if (mvideoPLayer != null && mvideoPLayer.Control != null && mvideoPLayer.Control.IsPlaying())
+			{
+				VideoAudioHelper.StartVideoAudioCheck(mvideoPLayer);
+			}
 		}
-		// 停止背景音乐
-		AudioManager.Stop(TK_Engine.AudioType.Music, true);
-		// 如果视频正在播放，延迟1秒检测音频
-		if (mvideoPLayer != null && mvideoPLayer.Control != null && mvideoPLayer.Control.IsPlaying())
-		{
-			_isWaitingForAudio = true;
-			CheckAudioAfterDelay(mvideoPLayer).Forget();
-		}
-	}
 
-	protected override void Close()
-	{
-		// 关闭主页面时，取消音频检测
-		_isWaitingForAudio = false;
-		CancelAudioCheck();
-		// 静音视频但不停止播放
-		if (mvideoPLayer != null)
+		protected override void Close()
 		{
-			mvideoPLayer.AudioMuted = true;
-			mvideoPLayer.AudioVolume = 0f;
+			// 关闭主页面时，取消音频检测
+			VideoAudioHelper.CancelCheck();
+			// 静音视频但不停止播放
+			if (mvideoPLayer != null)
+			{
+				mvideoPLayer.AudioMuted = true;
+				mvideoPLayer.AudioVolume = 0f;
+			}
+			// 恢复背景音乐（给其他页面使用）
+			AudioManager.Play(TK_Engine.AudioType.Music, AudioDef.BGM1, false, true);
+			base.Close();
 		}
-		// 恢复背景音乐（给其他页面使用）
-		AudioManager.Play(TK_Engine.AudioType.Music, AudioDef.BGM1, false, true);
-		base.Close();
-	}
 
-	protected override void OnDestroy()
-	{
-		_isWaitingForAudio = false;
-		CancelAudioCheck();
-		mvideoPLayer?.CloseMedia();
-		base.OnDestroy();
-		GameEvent.RemoveEventListener<int>(EventType.RefreshCurrency, RefreshCurrency);
-		GameEvent.RemoveEventListener(EventType.RefreshLevel, UpdateLevelInfo);
-		GameEvent.RemoveEventListener<bool>(EventType.SetAnimMask, SetAnimMask);
-		GameEvent.RemoveEventListener<bool>(EventType.StartGuide1, StartGuide1);
-		GameEvent.RemoveEventListener(EventType.RefreshActivity, SetActivity);
-		GameEvent.RemoveEventListener(EventType.ShopRedPoint, SetRedNot);
-		GameEvent.RemoveEventListener<int>(EventType.PhotoRedPoint, SetPhotoRedNot);
-		GameEvent.RemoveEventListener(EventType.OpenLevelInfo, OpenLevelInfo);
-		GameEvent.RemoveEventListener<bool>(TKEventType.MainHomeAnim, SetMainHomeAnim);
-		GameEvent.RemoveEventListener(EventType.CloseAllActivityBtns, CloseAllActivityBtns);
-		GameEvent.RemoveEventListener<int>(EventType.RefreshHomeVideo, PlayHomeVideo);
-		GameEvent.RemoveEventListener(EventType.MuteHomeVideo, MuteHomeVideo);
-		GameEvent.RemoveEventListener(EventType.UnmuteHomeVideo, UnmuteHomeVideo);
-		SDKManager.Instance.Button_HideBanner();
-	}
+		protected override void OnDestroy()
+		{
+			VideoAudioHelper.CancelCheck();
+			mvideoPLayer?.CloseMedia();
+			base.OnDestroy();
+			GameEvent.RemoveEventListener<int>(EventType.RefreshCurrency, RefreshCurrency);
+			GameEvent.RemoveEventListener(EventType.RefreshLevel, UpdateLevelInfo);
+			GameEvent.RemoveEventListener<bool>(EventType.SetAnimMask, SetAnimMask);
+			GameEvent.RemoveEventListener<bool>(EventType.StartGuide1, StartGuide1);
+			GameEvent.RemoveEventListener(EventType.RefreshActivity, SetActivity);
+			GameEvent.RemoveEventListener(EventType.ShopRedPoint, SetRedNot);
+			GameEvent.RemoveEventListener<int>(EventType.PhotoRedPoint, SetPhotoRedNot);
+			GameEvent.RemoveEventListener(EventType.OpenLevelInfo, OpenLevelInfo);
+			GameEvent.RemoveEventListener<bool>(TKEventType.MainHomeAnim, SetMainHomeAnim);
+			GameEvent.RemoveEventListener(EventType.CloseAllActivityBtns, CloseAllActivityBtns);
+			GameEvent.RemoveEventListener<int>(EventType.RefreshHomeVideo, PlayHomeVideo);
+			GameEvent.RemoveEventListener(EventType.MuteHomeVideo, MuteHomeVideo);
+			GameEvent.RemoveEventListener(EventType.UnmuteHomeVideo, UnmuteHomeVideo);
+			SDKManager.Instance.Button_HideBanner();
+		}
+
+		#endregion
 	}
 }
