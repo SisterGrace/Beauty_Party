@@ -179,16 +179,16 @@ namespace GameLogic
 		//开始播放，关闭加载动画
 		_isLoading = false;
 		mAVProVideoUI.Show();
-		// 开始视频音频检测（传入视频URL）
-		VideoAudioHelper.StartVideoAudioCheck(mp, _selectPhotoInfo.VideoUrl);
+		// 开始视频音频检测（传入视频URL和页面名称）
+		VideoAudioHelper.StartVideoAudioCheck(mp, _selectPhotoInfo.VideoUrl, "Panel_Succeed");
 		break;
-		case MediaPlayerEvent.EventType.FinishedPlaying:
-			// 视频播放结束，停止检测并恢复背景音乐
-			VideoAudioHelper.StopVideoAudioCheck();
-			break;
-		case MediaPlayerEvent.EventType.Error:
+	case MediaPlayerEvent.EventType.FinishedPlaying:
+		// 视频播放结束，停止检测并恢复背景音乐
+		VideoAudioHelper.StopVideoAudioCheck("Panel_Succeed");
+		break;
+	case MediaPlayerEvent.EventType.Error:
 		// 播放错误，停止检测并恢复背景音乐
-		VideoAudioHelper.StopVideoAudioCheck();
+		VideoAudioHelper.StopVideoAudioCheck("Panel_Succeed");
 		break;
 	}
 }

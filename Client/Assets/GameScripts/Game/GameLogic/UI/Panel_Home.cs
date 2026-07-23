@@ -385,8 +385,8 @@ namespace GameLogic
 		case MediaPlayerEvent.EventType.Started:
 			//开始播放，关闭加载动画
 			mAVProVideoUI.Show();
-			// 开始视频音频检测（传入视频URL）
-			VideoAudioHelper.StartVideoAudioCheck(mp, _currentVideoUrl);
+			// 开始视频音频检测（传入视频URL和页面名称）
+			VideoAudioHelper.StartVideoAudioCheck(mp, _currentVideoUrl, "Panel_Home");
 			break;
 				case MediaPlayerEvent.EventType.FinishedPlaying:
 					//播放结束，倒放
@@ -395,12 +395,12 @@ namespace GameLogic
 					mvideoPLayer.PlaybackRate = rate;
 					mvideoPLayer.Play();*/
 					break;
-				case MediaPlayerEvent.EventType.Error:
-					//播放错误，关闭加载动画
-					mAVProVideoUI.Hide();
-					// 停止检测并恢复BGM
-					VideoAudioHelper.StopVideoAudioCheck();
-					break;
+			case MediaPlayerEvent.EventType.Error:
+				//播放错误，关闭加载动画
+				mAVProVideoUI.Hide();
+				// 停止检测并恢复BGM
+				VideoAudioHelper.StopVideoAudioCheck("Panel_Home");
+				break;
 		}
 	}
 
@@ -433,10 +433,10 @@ private void UnmuteHomeVideo()
 	}
 	// 停止背景音乐
 	AudioManager.Stop(TK_Engine.AudioType.Music, true);
-	// 如果视频正在播放，开始检测音频（传入视频URL）
+	// 如果视频正在播放，开始检测音频（传入视频URL和页面名称）
 	if (mvideoPLayer != null && mvideoPLayer.Control != null && mvideoPLayer.Control.IsPlaying())
 	{
-		VideoAudioHelper.StartVideoAudioCheck(mvideoPLayer, _currentVideoUrl);
+		VideoAudioHelper.StartVideoAudioCheck(mvideoPLayer, _currentVideoUrl, "Panel_Home");
 	}
 }
 

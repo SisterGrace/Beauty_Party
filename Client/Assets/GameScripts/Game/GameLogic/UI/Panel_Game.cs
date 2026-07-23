@@ -495,25 +495,25 @@ namespace GameLogic
 		Log.Info($"此时关卡界面的视频播放器状态：{et}");
 		switch (et)
 		{
-		case MediaPlayerEvent.EventType.Started:
-			// 开始视频音频检测（传入视频URL）
-			VideoAudioHelper.StartVideoAudioCheck(mp, _selectPhotoInfo.VideoUrl);
-			break;
-		case MediaPlayerEvent.EventType.FinishedPlaying://播放结束，弹出下一个视频
-			CancelVideoTimeout();
-			// 停止检测并恢复BGM
-			VideoAudioHelper.StopVideoAudioCheck();
-			_finishAvShow?.Invoke();
-			_finishAvShow = null;
-			break;
-		case MediaPlayerEvent.EventType.Error://播放出错，直接触发完成回调
-			Log.Warning($"视频播放出错：{errorCode}，自动触发完成回调");
-			CancelVideoTimeout();
-			// 停止检测并恢复BGM
-			VideoAudioHelper.StopVideoAudioCheck();
-			_finishAvShow?.Invoke();
-			_finishAvShow = null;
-			break;
+	case MediaPlayerEvent.EventType.Started:
+		// 开始视频音频检测（传入视频URL和页面名称）
+		VideoAudioHelper.StartVideoAudioCheck(mp, _selectPhotoInfo.VideoUrl, "Panel_Game");
+		break;
+	case MediaPlayerEvent.EventType.FinishedPlaying://播放结束，弹出下一个视频
+		CancelVideoTimeout();
+		// 停止检测并恢复BGM
+		VideoAudioHelper.StopVideoAudioCheck("Panel_Game");
+		_finishAvShow?.Invoke();
+		_finishAvShow = null;
+		break;
+	case MediaPlayerEvent.EventType.Error://播放出错，直接触发完成回调
+		Log.Warning($"视频播放出错：{errorCode}，自动触发完成回调");
+		CancelVideoTimeout();
+		// 停止检测并恢复BGM
+		VideoAudioHelper.StopVideoAudioCheck("Panel_Game");
+		_finishAvShow?.Invoke();
+		_finishAvShow = null;
+		break;
 		}
 	}
 	
