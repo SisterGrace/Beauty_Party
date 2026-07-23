@@ -27,7 +27,7 @@ namespace GameLogic
 		//更新页签红点
 		SetSwitchRedPoint();
 		// 静音主页视频，播放背景音乐
-		GameEvent.Send(EventType.MuteHomeVideo);
+		VideoAudioHelper.SwitchToPage("Panel_Photo");
 		AudioManager.Play(TK_Engine.AudioType.Music, AudioDef.BGM1, false, true);
 	}
 
@@ -58,9 +58,8 @@ namespace GameLogic
 		}
 	protected override void Close()
 	{
-		// 恢复主页视频声音
-		GameEvent.Send(EventType.UnmuteHomeVideo);
-		base.Close();
+            VideoAudioHelper.StopVideoAudioCheck("Panel_Photo", true);
+            base.Close();
 	}
 
 		protected override void OnDestroy()

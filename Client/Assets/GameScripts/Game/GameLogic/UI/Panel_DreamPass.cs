@@ -34,7 +34,7 @@ namespace GameLogic
 		UpdataInfo();
 		SDKManager.Instance.LogEvent("Pass_Show");
 		// 静音主页视频，播放背景音乐
-		GameEvent.Send(EventType.MuteHomeVideo);
+		VideoAudioHelper.SwitchToPage("Panel_DreamPass");
 		AudioManager.Play(TK_Engine.AudioType.Music, AudioDef.BGM1, false, true);
 	}
 
@@ -304,9 +304,8 @@ namespace GameLogic
 		}
 	protected override void Close()
 	{
-		// 恢复主页视频声音
-		GameEvent.Send(EventType.UnmuteHomeVideo);
-		base.Close();
+            VideoAudioHelper.StopVideoAudioCheck("Panel_DreamPass", true);
+            base.Close();
 	}
 
 		protected override void OnDestroy()

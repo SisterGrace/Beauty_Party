@@ -78,7 +78,7 @@ namespace GameLogic
 			SDKManager.Instance.Button_HideBanner();
 		}
 		// 静音主页视频，播放背景音乐
-		GameEvent.Send(EventType.MuteHomeVideo);
+		VideoAudioHelper.SwitchToPage("Panel_Gacha");
 		AudioManager.Play(TK_Engine.AudioType.Music, AudioDef.BGM1, false, true);
 	}
 
@@ -463,9 +463,8 @@ namespace GameLogic
 		#endregion
 	protected override void Close()
 	{
-		// 恢复主页视频声音
-		GameEvent.Send(EventType.UnmuteHomeVideo);
-		base.Close();
+            VideoAudioHelper.StopVideoAudioCheck("Panel_Gacha", restoreBGM: true);
+            base.Close();
 	}
 
 		protected override void OnDestroy()

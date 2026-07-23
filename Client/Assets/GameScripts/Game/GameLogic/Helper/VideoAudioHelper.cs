@@ -282,5 +282,21 @@ namespace GameLogic
         {
             return mp?.Info != null && mp.Info.HasAudio();
         }
+
+        public static void SwitchToPage(string newPanelName)
+        {
+            // 如果切换到同名页面，不做任何事
+            if (_currentPanelName == newPanelName) return;
+
+            // 如果有正在运行的检测，停止它并恢复 BGM
+            if (_isChecking)
+            {
+                Log.Info($"[VideoAudioHelper] 切换页面: {_currentPanelName} → {newPanelName}，停止旧检测并恢复BGM");
+                StopCurrentCheck(restoreBGM: true);
+            }
+
+            // 更新当前页面名（即使没有检测，也更新）
+            _currentPanelName = newPanelName;
+        }
     }
 }

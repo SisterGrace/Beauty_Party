@@ -74,7 +74,7 @@ namespace GameLogic
 		GamePanelShow();
 		SDKManager.Instance.LogEvent("Level_Enter",CommonEvent.ComLevelEvent);
 		// 静音主页视频，播放背景音乐
-		GameEvent.Send(EventType.MuteHomeVideo);
+		VideoAudioHelper.SwitchToPage("Panel_Game");
 		AudioManager.Play(TK_Engine.AudioType.Music, AudioDef.BGM1, false, true);
 	}
 
@@ -545,8 +545,8 @@ protected override void Close()
 {
 	// 恢复主页视频声音
 	VideoAudioHelper.CancelCheck();
-	GameEvent.Send(EventType.UnmuteHomeVideo);
-	base.Close();
+            VideoAudioHelper.StopVideoAudioCheck("Panel_Game", restoreBGM: true);
+            base.Close();
 }
 
 protected override void OnDestroy()

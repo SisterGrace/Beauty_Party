@@ -104,8 +104,8 @@ namespace GameLogic
 			GameEvent.AddEventListener<bool>(TKEventType.MainHomeAnim, SetMainHomeAnim);
 			GameEvent.AddEventListener(EventType.CloseAllActivityBtns, CloseAllActivityBtns);
 			GameEvent.AddEventListener<int>(EventType.RefreshHomeVideo, PlayHomeVideo);
-			GameEvent.AddEventListener(EventType.MuteHomeVideo, MuteHomeVideo);
-			GameEvent.AddEventListener(EventType.UnmuteHomeVideo, UnmuteHomeVideo);
+			/*GameEvent.AddEventListener(EventType.MuteHomeVideo, MuteHomeVideo);
+			GameEvent.AddEventListener(EventType.UnmuteHomeVideo, UnmuteHomeVideo);*/
 			//飞行奖励目标位置注册
 			FlySystem.Instance.RegisterPos(FlyReType.prop, mLevel.transform);
 			//FlySystem.Instance.RegisterPos(FlyReType.CashOut,mBtnMMO);
@@ -408,7 +408,7 @@ namespace GameLogic
 	{
 		_photoLoad.LoadUIImg(url);
 	}
-
+/*
 	/// <summary>
 	/// 静音主页视频（其他Panel打开时调用）
 	/// </summary>
@@ -419,7 +419,7 @@ namespace GameLogic
 				mvideoPLayer.AudioMuted = true;
 				mvideoPLayer.AudioVolume = 0f;
 			}
-		}
+		}*/
 
 /// <summary>
 /// 恢复主页视频声音（回到主页时调用）
@@ -471,8 +471,8 @@ private void UnmuteHomeVideo()
 			GameEvent.RemoveEventListener<bool>(TKEventType.MainHomeAnim, SetMainHomeAnim);
 			GameEvent.RemoveEventListener(EventType.CloseAllActivityBtns, CloseAllActivityBtns);
 			GameEvent.RemoveEventListener<int>(EventType.RefreshHomeVideo, PlayHomeVideo);
-			GameEvent.RemoveEventListener(EventType.MuteHomeVideo, MuteHomeVideo);
-			GameEvent.RemoveEventListener(EventType.UnmuteHomeVideo, UnmuteHomeVideo);
+			/*GameEvent.RemoveEventListener(EventType.MuteHomeVideo, MuteHomeVideo);
+			GameEvent.RemoveEventListener(EventType.UnmuteHomeVideo, UnmuteHomeVideo);*/
 			SDKManager.Instance.Button_HideBanner();
 		}
 

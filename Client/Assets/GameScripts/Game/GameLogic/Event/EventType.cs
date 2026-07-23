@@ -82,8 +82,8 @@ namespace GameLogic
         public const string OnVipLevelChanged = "OnVipLevelChanged";   // VIP等级改变
         
         public const string RefreshHomeVideo = "RefreshHomeVideo"; //刷新首页视频
-        public const string MuteHomeVideo = "MuteHomeVideo"; //静音主页视频
-        public const string UnmuteHomeVideo = "UnmuteHomeVideo"; //恢复主页视频声音
+       /* public const string MuteHomeVideo = "MuteHomeVideo"; //静音主页视频
+        public const string UnmuteHomeVideo = "UnmuteHomeVideo"; //恢复主页视频声音*/
         public const string RefreshUserABType = "RefreshUserABType";//刷新AB类型
         public const string OpenGameBgAvPro = "OpenGameBgAvPro";//打开游戏背景视频播放
         
