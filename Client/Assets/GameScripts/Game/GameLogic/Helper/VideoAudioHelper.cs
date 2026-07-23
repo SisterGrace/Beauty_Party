@@ -11,9 +11,7 @@ namespace GameLogic
     public static class VideoAudioHelper
     {
         private const string BGM_AUDIO_NAME = AudioDef.BGM1;
-        private const string HOME_PANEL_NAME = "Home";
-        private const int REQUIRED_STABLE_CHECKS = 3;   // 连续稳定检测3次（每次2秒，共6秒）
-
+        private static string _homePanelName = "Home"; // 默认值，但会被覆盖
         private static CancellationTokenSource _cts;
         private static bool _isChecking = false;
 
@@ -28,12 +26,17 @@ namespace GameLogic
 
         // ==================== 公共 API ====================
 
-        public static void RegisterHome(MediaPlayer homePlayer, string homeVideoUrl)
+        public static void RegisterHome(MediaPlayer homePlayer, string homeVideoUrl, string panelName = null)
         {
             ResetAllState();
-            _homePlayer = homePlayer;          // 允许为 null
-            _homeVideoUrl = homeVideoUrl ?? ""; // 避免 null
-            Log.Info($"[VideoAudioHelper] Home已注册");
+            _homePlayer = homePlayer;
+            _homeVideoUrl = homeVideoUrl ?? "";
+
+            // 如果传入了 panelName，则更新 Home 名称
+            if (!string.IsNullOrEmpty(panelName))
+                _homePanelName = panelName;
+
+            Log.Info($"[VideoAudioHelper] Home已注册，名称: {_homePanelName}");
         }
 
         public static void SwitchToPage(string newPanelName)
@@ -41,7 +44,7 @@ namespace GameLogic
             if (string.IsNullOrEmpty(newPanelName)) return;
             if (_currentPanelName == newPanelName) return;
 
-            if (!string.IsNullOrEmpty(_currentPanelName) && _currentPanelName != HOME_PANEL_NAME)
+            if (!string.IsNullOrEmpty(_currentPanelName) && _currentPanelName != _homePanelName)
             {
                 _pageStack.Push(_currentPanelName);
                 Log.Info($"[VideoAudioHelper] 压栈: {_currentPanelName}，栈深度: {_pageStack.Count}");
@@ -53,7 +56,7 @@ namespace GameLogic
             _currentPanelName = newPanelName;
             Log.Info($"[VideoAudioHelper] 切换到页面: {newPanelName}");
 
-            if (newPanelName == HOME_PANEL_NAME && _pageStack.Count == 0)
+            if (newPanelName == _homePanelName && _pageStack.Count == 0)
                 StartHomeDetection();
         }
 
@@ -61,7 +64,7 @@ namespace GameLogic
         {
             if (mp == null) return;
 
-            // 非顶层页面静音并忽略
+            // 非顶层页面静音并忽略（但此时视频可能已有声音，需要静音）
             if (panelName != _currentPanelName)
             {
                 Log.Info($"[VideoAudioHelper] 忽略启动请求：当前顶层 {_currentPanelName}，请求来自 {panelName}，静音视频");
@@ -69,6 +72,7 @@ namespace GameLogic
                 return;
             }
 
+            // 重置状态
             _hasPlayedAudio = false;
             _isChecking = false;
 
@@ -79,8 +83,8 @@ namespace GameLogic
                 _currentVideoUrl = videoUrl;
             }
 
-            mp.Control?.MuteAudio(true);
-            Log.Info($"[VideoAudioHelper] 视频静音，开始检测");
+            // ★ 注意：这里不再主动静音视频，视频将直接播放声音
+            Log.Info($"[VideoAudioHelper] 视频开始检测（不静音）");
 
             _currentPlayer = mp;
             _isChecking = true;
@@ -97,14 +101,12 @@ namespace GameLogic
 
             StopCurrentCheck(restoreBGM);
 
-            if (panelName != HOME_PANEL_NAME)
+            if (panelName != _homePanelName)
             {
-                // 弹出栈顶
                 if (_pageStack.Count > 0 && _pageStack.Peek() == panelName)
                     _pageStack.Pop();
                 else
                 {
-                    // 保险移除
                     var temp = new Stack<string>();
                     while (_pageStack.Count > 0)
                     {
@@ -117,7 +119,7 @@ namespace GameLogic
                 if (_pageStack.Count == 0)
                 {
                     Log.Info($"[VideoAudioHelper] 所有非Home页面已关闭，自动恢复Home");
-                    _currentPanelName = HOME_PANEL_NAME;
+                    _currentPanelName = _homePanelName;
                     StartHomeDetection();
                 }
                 else
@@ -153,6 +155,7 @@ namespace GameLogic
             _hasPlayedAudio = false;
             _currentPanelName = "";
             _pageStack.Clear();
+            // 不重置 _homePlayer 和 _homeVideoUrl
         }
 
         private static void StopCurrentCheck(bool restoreBGM)
@@ -169,14 +172,14 @@ namespace GameLogic
         {
             if (_homePlayer == null || string.IsNullOrEmpty(_homeVideoUrl))
             {
-                Log.Warning($"[VideoAudioHelper] Home未注册，无法启动检测");
+                Log.Warning($"[VideoAudioHelper] Home未注册或URL为空，无法启动检测");
                 return;
             }
             Log.Info($"[VideoAudioHelper] 启动Home检测");
-            StartVideoAudioCheck(_homePlayer, _homeVideoUrl, HOME_PANEL_NAME);
+            StartVideoAudioCheck(_homePlayer, _homeVideoUrl, _homePanelName);
         }
 
-        // ==================== 异步检测 + 切换后监控 ====================
+        // ==================== 异步检测（直接播放 + 监控卡顿） ====================
 
         private static async UniTaskVoid CheckAudioAndStallAsync(MediaPlayer mp)
         {
@@ -208,83 +211,32 @@ namespace GameLogic
                     return;
                 }
 
-                // 有音轨，开始稳定检测
-                double videoDuration = mp.Info?.GetDuration() ?? 0;
-                int totalTimeoutSeconds = Math.Max(30, (int)videoDuration + 10);
-                int stableChecks = 0;
-                int elapsedSeconds = 0;
+                // ---- 有音轨，直接切换至视频音效 ----
+                Log.Info($"[VideoAudioHelper] 立即切换至视频音效");
+                AudioManager.Stop(TK_Engine.AudioType.Music, true);
+                mp.Control?.MuteAudio(false);
+                _hasPlayedAudio = true;
 
-                if (!AudioManager.IsPlaying(TK_Engine.AudioType.Music))
-                    AudioManager.Play(TK_Engine.AudioType.Music, BGM_AUDIO_NAME, false, false);
-
-                // ---- 稳定检测循环 ----
+                // ---- 监控循环（检测卡顿/缓冲/停止） ----
                 while (_isChecking)
                 {
-                    await UniTask.Delay(2000, cancellationToken: token);
+                    await UniTask.Delay(1000, cancellationToken: token);
                     if (!_isChecking) return;
 
-                    elapsedSeconds += 2;
-                    if (elapsedSeconds > totalTimeoutSeconds)
+                    // 检测缓冲或停止
+                    if (mp.Control == null || !mp.Control.IsPlaying() || mp.Control.IsBuffering())
                     {
-                        Log.Warning($"[VideoAudioHelper] 检测超时，放弃");
+                        Log.Warning($"[VideoAudioHelper] 视频播放异常（缓冲/停止），恢复BGM并静音视频");
                         mp.Control?.MuteAudio(true);
                         if (!AudioManager.IsPlaying(TK_Engine.AudioType.Music))
                             AudioManager.Play(TK_Engine.AudioType.Music, BGM_AUDIO_NAME, false, false);
                         _isChecking = false;
                         return;
                     }
-
-                    if (mp.Control != null && mp.Control.IsBuffering())
-                    {
-                        Log.Info($"[VideoAudioHelper] 缓冲中，重置稳定计数");
-                        stableChecks = 0;
-                        continue;
-                    }
-
-                    if (mp.Control == null || !mp.Control.IsPlaying())
-                    {
-                        Log.Warning($"[VideoAudioHelper] 视频停止");
-                        mp.Control?.MuteAudio(true);
-                        if (!AudioManager.IsPlaying(TK_Engine.AudioType.Music))
-                            AudioManager.Play(TK_Engine.AudioType.Music, BGM_AUDIO_NAME, false, false);
-                        _isChecking = false;
-                        return;
-                    }
-
-                    stableChecks++;
-                    Log.Info($"[VideoAudioHelper] 稳定检测 {stableChecks}/{REQUIRED_STABLE_CHECKS}");
-
-                    if (stableChecks >= REQUIRED_STABLE_CHECKS)
-                    {
-                        // ---------- 切换至视频音效 ----------
-                        Log.Info($"[VideoAudioHelper] 切换至视频音效");
-                        AudioManager.Stop(TK_Engine.AudioType.Music, true);
-                        mp.Control?.MuteAudio(false);
-                        _hasPlayedAudio = true;
-
-                        // ---------- 进入监控循环（容错） ----------
-                        while (_isChecking)
-                        {
-                            await UniTask.Delay(1000, cancellationToken: token);
-                            if (!_isChecking) return;
-
-                            // 检测缓冲或停止
-                            if (mp.Control == null || !mp.Control.IsPlaying() || mp.Control.IsBuffering())
-                            {
-                                Log.Warning($"[VideoAudioHelper] 视频播放异常（缓冲/停止），恢复BGM并静音视频");
-                                mp.Control?.MuteAudio(true);
-                                if (!AudioManager.IsPlaying(TK_Engine.AudioType.Music))
-                                    AudioManager.Play(TK_Engine.AudioType.Music, BGM_AUDIO_NAME, false, false);
-                                _isChecking = false;
-                                return;
-                            }
-                            // 若视频正常，继续监控
-                        }
-                        // 监控退出（_isChecking被外部置false）
-                        Log.Info($"[VideoAudioHelper] 监控结束");
-                        return;
-                    }
+                    // 若正常，继续监控
                 }
+                // 监控退出（外部置false）
+                Log.Info($"[VideoAudioHelper] 监控结束");
             }
             catch (OperationCanceledException)
             {

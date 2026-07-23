@@ -49,7 +49,7 @@ namespace GameLogic
 	protected override void OnRefresh()
 		{
             // ★ 总是注册 Home（即使当前没有视频，也传入播放器引用和当前URL）
-            VideoAudioHelper.RegisterHome(mvideoPLayer, _currentVideoUrl);
+            VideoAudioHelper.RegisterHome(mvideoPLayer, _currentVideoUrl,this.WindowName);
             _activityList = new List<Widget_ActivityIcon>();
 			_isShowBanner = true;
 			_isAtOnceGuide = true;
@@ -370,7 +370,7 @@ namespace GameLogic
 				mvideoPLayer.AudioMuted = false;
 				mvideoPLayer.AutoOpen = true;
 				mvideoPLayer.OpenMedia(MediaPathType.AbsolutePathOrURL, vUrl);
-                    VideoAudioHelper.RegisterHome(mvideoPLayer, vUrl);
+                    VideoAudioHelper.RegisterHome(mvideoPLayer, vUrl,this.WindowName);
                     // 记录视频URL，用于卡顿检测
                     _currentVideoUrl = vUrl;
 			}
