@@ -496,8 +496,8 @@ namespace GameLogic
 		switch (et)
 		{
 		case MediaPlayerEvent.EventType.Started:
-			// 开始视频音频检测
-			VideoAudioHelper.StartVideoAudioCheck(mp);
+			// 开始视频音频检测（传入视频URL）
+			VideoAudioHelper.StartVideoAudioCheck(mp, _selectPhotoInfo.VideoUrl);
 			break;
 		case MediaPlayerEvent.EventType.FinishedPlaying://播放结束，弹出下一个视频
 			CancelVideoTimeout();

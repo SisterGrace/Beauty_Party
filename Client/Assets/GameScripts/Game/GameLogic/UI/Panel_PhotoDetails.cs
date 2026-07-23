@@ -101,15 +101,15 @@ namespace GameLogic
 		//Log.Info($"此时的AVpro状态：{et}，错误码：{errorCode}");
 		switch (et)
 		{
-		case MediaPlayerEvent.EventType.Started:
-			//开始播放，关闭加载动画
-			_isLoading = false;
-			mVideoLoading.Hide();
-			mVideoNode.Show();
-			mSetBtns.Show();
-			// 开始视频音频检测
-			VideoAudioHelper.StartVideoAudioCheck(mp);
-			break;
+	case MediaPlayerEvent.EventType.Started:
+		//开始播放，关闭加载动画
+		_isLoading = false;
+		mVideoLoading.Hide();
+		mVideoNode.Show();
+		mSetBtns.Show();
+		// 开始视频音频检测（传入视频URL）
+		VideoAudioHelper.StartVideoAudioCheck(mp, _PhotoItemInfo.VideoUrl);
+		break;
 		case MediaPlayerEvent.EventType.FinishedPlaying:
 			// 视频播放结束，停止检测并恢复背景音乐
 			VideoAudioHelper.StopVideoAudioCheck();

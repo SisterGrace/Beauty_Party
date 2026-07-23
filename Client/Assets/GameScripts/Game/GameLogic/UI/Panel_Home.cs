@@ -42,10 +42,11 @@ namespace GameLogic
 		#endregion
 		private bool _checkReward = false;
 		//是否立即展示Banner广告
-		private bool _isShowBanner = false;
-		//主页视频动画正向播放
-		private bool _Upsidedown = false;
-		protected override void OnRefresh()
+	private bool _isShowBanner = false;
+	//主页视频动画正向播放
+	private bool _Upsidedown = false;
+	private string _currentVideoUrl = ""; // 当前播放的视频URL
+	protected override void OnRefresh()
 		{
 			_activityList = new List<Widget_ActivityIcon>();
 			_isShowBanner = true;
@@ -348,28 +349,30 @@ namespace GameLogic
 
 		#region 主页视频播放或者展示动画
 
-		private void PlayHomeVideo(int photoId)
+	private void PlayHomeVideo(int photoId)
+	{
+		var phtcfg = ConfigLoader.Instance.Tables.TbCfgPhotos.Get(photoId);
+		mAVProVideoUI.Hide();
+		if (phtcfg == null)//没有找到视频配置，播放默认视频
 		{
-			var phtcfg = ConfigLoader.Instance.Tables.TbCfgPhotos.Get(photoId);
-			mAVProVideoUI.Hide();
-			if (phtcfg == null)//没有找到视频配置，播放默认视频
-			{
 
-			}
-			else
+		}
+		else
+		{
+			string iUrl = PropsController.GetImgUrl(phtcfg.ImageID, phtcfg.ImageType, phtcfg.ABGroup);
+			LoadImageAsync(iUrl);
+			if (phtcfg.IsVideo)
 			{
-				string iUrl = PropsController.GetImgUrl(phtcfg.ImageID, phtcfg.ImageType, phtcfg.ABGroup);
-				LoadImageAsync(iUrl);
-				if (phtcfg.IsVideo)
-				{
-					string vUrl = PropsController.GetVideoUrl(phtcfg.ImageID, phtcfg.ABGroup, phtcfg.IsVideo);
-					mvideoPLayer.AudioVolume = 1f;
-					mvideoPLayer.AudioMuted = false;
-					mvideoPLayer.AutoOpen = true;
-					mvideoPLayer.OpenMedia(MediaPathType.AbsolutePathOrURL, vUrl);
-				}
+				string vUrl = PropsController.GetVideoUrl(phtcfg.ImageID, phtcfg.ABGroup, phtcfg.IsVideo);
+				mvideoPLayer.AudioVolume = 1f;
+				mvideoPLayer.AudioMuted = false;
+				mvideoPLayer.AutoOpen = true;
+				mvideoPLayer.OpenMedia(MediaPathType.AbsolutePathOrURL, vUrl);
+				// 记录视频URL，用于卡顿检测
+				_currentVideoUrl = vUrl;
 			}
-			_Upsidedown = false;
+		}
+		_Upsidedown = false;
 
 			/*mvideoPLayer.PlaybackRate = -1;
 			mvideoPLayer.Play();*/
@@ -379,12 +382,12 @@ namespace GameLogic
 			//Log.Info("当前主界面Av状态：" + et, "错误：" + errorCode.ToString());
 			switch (et)
 			{
-				case MediaPlayerEvent.EventType.Started:
-					//开始播放，关闭加载动画
-					mAVProVideoUI.Show();
-					// 开始视频音频检测
-					VideoAudioHelper.StartVideoAudioCheck(mp);
-					break;
+		case MediaPlayerEvent.EventType.Started:
+			//开始播放，关闭加载动画
+			mAVProVideoUI.Show();
+			// 开始视频音频检测（传入视频URL）
+			VideoAudioHelper.StartVideoAudioCheck(mp, _currentVideoUrl);
+			break;
 				case MediaPlayerEvent.EventType.FinishedPlaying:
 					//播放结束，倒放
 					/*_Upsidedown = !_Upsidedown;
@@ -418,24 +421,24 @@ namespace GameLogic
 			}
 		}
 
-		/// <summary>
-		/// 恢复主页视频声音（回到主页时调用）
-		/// </summary>
-		private void UnmuteHomeVideo()
-		{
-			if (mvideoPLayer != null)
-			{
-				mvideoPLayer.AudioMuted = false;
-				mvideoPLayer.AudioVolume = 1f;
-			}
-			// 停止背景音乐
-			AudioManager.Stop(TK_Engine.AudioType.Music, true);
-			// 如果视频正在播放，开始检测音频
-			if (mvideoPLayer != null && mvideoPLayer.Control != null && mvideoPLayer.Control.IsPlaying())
-			{
-				VideoAudioHelper.StartVideoAudioCheck(mvideoPLayer);
-			}
-		}
+/// <summary>
+/// 恢复主页视频声音（回到主页时调用）
+/// </summary>
+private void UnmuteHomeVideo()
+{
+	if (mvideoPLayer != null)
+	{
+		mvideoPLayer.AudioMuted = false;
+		mvideoPLayer.AudioVolume = 1f;
+	}
+	// 停止背景音乐
+	AudioManager.Stop(TK_Engine.AudioType.Music, true);
+	// 如果视频正在播放，开始检测音频（传入视频URL）
+	if (mvideoPLayer != null && mvideoPLayer.Control != null && mvideoPLayer.Control.IsPlaying())
+	{
+		VideoAudioHelper.StartVideoAudioCheck(mvideoPLayer, _currentVideoUrl);
+	}
+}
 
 		protected override void Close()
 		{
