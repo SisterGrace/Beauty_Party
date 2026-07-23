@@ -110,7 +110,7 @@ namespace GameLogic
 		mVideoNode.Show();
 		mSetBtns.Show();
 		// 开始视频音频检测（传入视频URL和页面名称）
-		VideoAudioHelper.StartVideoAudioCheck(mp, _PhotoItemInfo.VideoUrl,this.WindowName);
+		VideoAudioHelper.StartVideoAudioCheck(mp, _PhotoItemInfo.VideoUrl, this.WindowName);
 		break;
 	case MediaPlayerEvent.EventType.FinishedPlaying:
 		// 视频播放结束，停止检测并恢复背景音乐

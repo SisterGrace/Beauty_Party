@@ -35,7 +35,7 @@ namespace GameLogic
 			SDKManager.Instance.LogEvent("Level_Choose", CommonEvent.ComLevelEvent);
 		}
 		// 静音主页视频，播放背景音乐
-		VideoAudioHelper.SwitchToPage("Panel_LevelPhoto");
+		VideoAudioHelper.SwitchToPage(this.WindowName);
 		AudioManager.Play(TK_Engine.AudioType.Music, AudioDef.BGM1, false, true);
 	}
 
@@ -309,7 +309,7 @@ namespace GameLogic
 		}
 	protected override void Close()
 	{
-            VideoAudioHelper.StopVideoAudioCheck("Panel_LevelPhoto", restoreBGM: true);
+            VideoAudioHelper.StopVideoAudioCheck(this.WindowName, restoreBGM: true);
             base.Close();
 		GameModule.UI.RemoveOrderPanel<Panel_LevelPhoto>();
 	}

@@ -50,7 +50,7 @@ namespace GameLogic
             GameEvent.Send(TKEventType.MainHomeAnim,false);
             SDKManager.Instance.LogEvent("Endless_Show");
             // 静音主页视频，播放背景音乐
-            VideoAudioHelper.SwitchToPage("Panel_EndlessTreasure");
+            VideoAudioHelper.SwitchToPage(this.WindowName);
             AudioManager.Play(TK_Engine.AudioType.Music, AudioDef.BGM1, false, true);
         }
 
@@ -196,7 +196,7 @@ namespace GameLogic
         }
         protected override void Close()
         {
-            VideoAudioHelper.StopVideoAudioCheck("Panel_EndlessTreasure", restoreBGM: true);
+            VideoAudioHelper.StopVideoAudioCheck(this.WindowName, restoreBGM: true);
             base.Close();
         }
 

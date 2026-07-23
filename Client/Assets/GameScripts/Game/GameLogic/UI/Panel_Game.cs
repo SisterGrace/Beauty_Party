@@ -74,7 +74,7 @@ namespace GameLogic
 		GamePanelShow();
 		SDKManager.Instance.LogEvent("Level_Enter",CommonEvent.ComLevelEvent);
 		// 静音主页视频，播放背景音乐
-		VideoAudioHelper.SwitchToPage("Panel_Game");
+		VideoAudioHelper.SwitchToPage(this.WindowName);
 		AudioManager.Play(TK_Engine.AudioType.Music, AudioDef.BGM1, false, true);
 	}
 
@@ -497,12 +497,12 @@ namespace GameLogic
 		{
 	case MediaPlayerEvent.EventType.Started:
 		// 开始视频音频检测（传入视频URL和页面名称）
-		VideoAudioHelper.StartVideoAudioCheck(mp, _selectPhotoInfo.VideoUrl, "Panel_Game");
+		VideoAudioHelper.StartVideoAudioCheck(mp, _selectPhotoInfo.VideoUrl, this.WindowName);
 		break;
 	case MediaPlayerEvent.EventType.FinishedPlaying://播放结束，弹出下一个视频
 		CancelVideoTimeout();
 		// 停止检测并恢复BGM
-		VideoAudioHelper.StopVideoAudioCheck("Panel_Game");
+		VideoAudioHelper.StopVideoAudioCheck(this.WindowName);
 		_finishAvShow?.Invoke();
 		_finishAvShow = null;
 		break;
@@ -510,7 +510,7 @@ namespace GameLogic
 		Log.Warning($"视频播放出错：{errorCode}，自动触发完成回调");
 		CancelVideoTimeout();
 		// 停止检测并恢复BGM
-		VideoAudioHelper.StopVideoAudioCheck("Panel_Game");
+		VideoAudioHelper.StopVideoAudioCheck(this.WindowName);
 		_finishAvShow?.Invoke();
 		_finishAvShow = null;
 		break;
@@ -545,7 +545,7 @@ protected override void Close()
 {
 	// 恢复主页视频声音
 	VideoAudioHelper.CancelCheck();
-            VideoAudioHelper.StopVideoAudioCheck("Panel_Game", restoreBGM: true);
+            VideoAudioHelper.StopVideoAudioCheck(this.WindowName, restoreBGM: true);
             base.Close();
 }
 
