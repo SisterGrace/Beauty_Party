@@ -64,20 +64,23 @@ namespace GameLogic
 
 		private List<PhotoPackItemInfo> PackList => GachaController.Instance.PhotoPackList;
 
-		protected override void OnRefresh()
+	protected override void OnRefresh()
+	{
+		GameEvent.Send(EventType.SetGachaRedPoint, false, "");
+		RefreshCurrency();
+		GachaController.Instance.InitPhotoPacks();
+		CreatePhotoPackList();
+		InitCarouselEffect();
+		SDKManager.Instance.LogEvent("Draw_Show");
+		_isHomePanel = GameModule.UI.HasWindow<Panel_Home>();
+		if (_isHomePanel)
 		{
-			GameEvent.Send(EventType.SetGachaRedPoint, false, "");
-			RefreshCurrency();
-			GachaController.Instance.InitPhotoPacks();
-			CreatePhotoPackList();
-			InitCarouselEffect();
-			SDKManager.Instance.LogEvent("Draw_Show");
-			_isHomePanel = GameModule.UI.HasWindow<Panel_Home>();
-			if (_isHomePanel)
-			{
-				SDKManager.Instance.Button_HideBanner();
-			}
+			SDKManager.Instance.Button_HideBanner();
 		}
+		// 静音主页视频，播放背景音乐
+		GameEvent.Send(EventType.MuteHomeVideo);
+		AudioManager.Play(TK_Engine.AudioType.Music, AudioDef.BGM1, false, true);
+	}
 
 		protected override void RegisterEvent()
 		{
@@ -458,10 +461,12 @@ namespace GameLogic
 		}
 
 		#endregion
-		protected override void Close()
-		{
-			base.Close();
-		}
+	protected override void Close()
+	{
+		// 恢复主页视频声音
+		GameEvent.Send(EventType.UnmuteHomeVideo);
+		base.Close();
+	}
 
 		protected override void OnDestroy()
 		{

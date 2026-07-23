@@ -1,10 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using System;
 using Config.common;
 using Config.config;
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using TK_Engine;
+using UnityEngine;
 using Y_Base;
 
 namespace GameLogic
@@ -270,9 +270,12 @@ namespace GameLogic
             {
                 var cfg = _allPassList[i];
                 bool normalCanGet = BuyCount.Contains(cfg.Id) && !NormalGotten.ContainsKey(cfg.Id);
-                bool specialCanGet = IsOpenDreamPass && (!SpecialGotten.ContainsKey(cfg.Id) || !SpecialGotten[cfg.Id]);
+                bool specialCanGet = IsOpenDreamPass &&
+                      BuyCount.Contains(cfg.Id) &&
+                      (!SpecialGotten.ContainsKey(cfg.Id) || !SpecialGotten[cfg.Id]);
                 if (normalCanGet || specialCanGet)
                 {
+                    //TK_Engine.Log.Debug("count:" + Count);
                     Count++;
                 }
             }
@@ -280,6 +283,7 @@ namespace GameLogic
             {
                 GameEvent.Send(EventType.DreamRedPoint,Count > 0,$"{Count}");
             }
+            TK_Engine.Log.Debug($"CheckDreamPassGetRew: count={Count}, NormalGotten.Count={NormalGotten?.Count ?? 0}, SpecialGotten.Count={SpecialGotten?.Count ?? 0}");
             return false;
         }
 

@@ -3077,7 +3077,7 @@ MonoBehaviour:
   _loop: 1
   _audioVolume: 1
   _audioBalance: 0
-  _audioMuted: 1
+  _audioMuted: 0
   _playbackRate: 1
   _useResampler: 0
   _resampleMode: 0

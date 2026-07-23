@@ -25,7 +25,8 @@ namespace GameLogic
 		protected GameObject mVideoLoading;
 		protected GameObject mAdicn;
 		protected Image mPhotoIcon;
-		protected MediaPlayer mPhotoAVPro;
+		protected AspectRatioFitter aspectRatioFitter;
+        protected MediaPlayer mPhotoAVPro;
 		protected Transform mloadingIcon;
 		protected TextMeshProUGUI mFreeDowCount;
 		protected TextMeshProUGUI mCost;
@@ -49,7 +50,8 @@ namespace GameLogic
 			mVideoLoading = FindChild("AnimNode/PicNode/Obj_VideoLoading").gameObject;
 			mAdicn = FindChild("AnimNode/Btn_AdToGet/Obj_Adicn").gameObject;
 			mPhotoIcon = FindChildComponent<Image>("AnimNode/PicNode/mask/Obj_ImgNode/Img_PhotoIcon");
-			mPhotoAVPro = FindChildComponent<MediaPlayer>("AnimNode/PicNode/AV_PhotoAVPro");
+			aspectRatioFitter = mPhotoIcon.GetComponent<AspectRatioFitter>();
+            mPhotoAVPro = FindChildComponent<MediaPlayer>("AnimNode/PicNode/AV_PhotoAVPro");
 			mloadingIcon = FindChild("AnimNode/PicNode/Obj_VideoLoading/Trans_loadingIcon");
 			mFreeDowCount = FindChildComponent<TextMeshProUGUI>("AnimNode/Btn_AdToGet/TMP_FreeDowCount");
 			mCost = FindChildComponent<TextMeshProUGUI>("AnimNode/Btn_GoldToGet/Btntxts/TMP_Cost");

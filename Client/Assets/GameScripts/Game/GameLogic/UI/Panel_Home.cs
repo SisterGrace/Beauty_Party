@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Config.common;
 using System;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Y_Base;
@@ -102,6 +103,8 @@ namespace GameLogic
 			GameEvent.AddEventListener<bool>(TKEventType.MainHomeAnim, SetMainHomeAnim);
 			GameEvent.AddEventListener(EventType.CloseAllActivityBtns, CloseAllActivityBtns);
 			GameEvent.AddEventListener<int>(EventType.RefreshHomeVideo, PlayHomeVideo);
+			GameEvent.AddEventListener(EventType.MuteHomeVideo, MuteHomeVideo);
+			GameEvent.AddEventListener(EventType.UnmuteHomeVideo, UnmuteHomeVideo);
 			//飞行奖励目标位置注册
 			FlySystem.Instance.RegisterPos(FlyReType.prop, mLevel.transform);
 			//FlySystem.Instance.RegisterPos(FlyReType.CashOut,mBtnMMO);
@@ -228,8 +231,8 @@ namespace GameLogic
 		private void SetActivity()
 		{
 			var list = UserController.Instance.GetAllActivityData();
-            list.RemoveAll(data => data.Id == ActivityType.Discard);
-            var count = list.Count;
+			list.RemoveAll(data => data.Id == ActivityType.Discard);
+			var count = list.Count;
 			if (list.Count < _activityList.Count && _activityList.Count > 0)
 			{
 				var tempList = new List<Widget_ActivityIcon>();
@@ -360,6 +363,8 @@ namespace GameLogic
 				if (phtcfg.IsVideo)
 				{
 					string vUrl = PropsController.GetVideoUrl(phtcfg.ImageID, phtcfg.ABGroup, phtcfg.IsVideo);
+					mvideoPLayer.AudioVolume = 1f;
+					mvideoPLayer.AudioMuted = false;
 					mvideoPLayer.AutoOpen = true;
 					mvideoPLayer.OpenMedia(MediaPathType.AbsolutePathOrURL, vUrl);
 				}
@@ -377,6 +382,8 @@ namespace GameLogic
 				case MediaPlayerEvent.EventType.Started:
 					//开始播放，关闭加载动画
 					mAVProVideoUI.Show();
+					// 开始视频音频检测
+					VideoAudioHelper.StartVideoAudioCheck(mp);
 					break;
 				case MediaPlayerEvent.EventType.FinishedPlaying:
 					//播放结束，倒放
@@ -388,23 +395,66 @@ namespace GameLogic
 				case MediaPlayerEvent.EventType.Error:
 					//播放错误，关闭加载动画
 					mAVProVideoUI.Hide();
+					// 停止检测并恢复BGM
+					VideoAudioHelper.StopVideoAudioCheck();
 					break;
+		}
+	}
+
+	private void LoadImageAsync(string url)
+	{
+		_photoLoad.LoadUIImg(url);
+	}
+
+	/// <summary>
+	/// 静音主页视频（其他Panel打开时调用）
+	/// </summary>
+		private void MuteHomeVideo()
+		{
+			if (mvideoPLayer != null)
+			{
+				mvideoPLayer.AudioMuted = true;
+				mvideoPLayer.AudioVolume = 0f;
 			}
 		}
-		private void LoadImageAsync(string url)
-		{
-			_photoLoad.LoadUIImg(url);
-		}
 
-		#endregion
+		/// <summary>
+		/// 恢复主页视频声音（回到主页时调用）
+		/// </summary>
+		private void UnmuteHomeVideo()
+		{
+			if (mvideoPLayer != null)
+			{
+				mvideoPLayer.AudioMuted = false;
+				mvideoPLayer.AudioVolume = 1f;
+			}
+			// 停止背景音乐
+			AudioManager.Stop(TK_Engine.AudioType.Music, true);
+			// 如果视频正在播放，开始检测音频
+			if (mvideoPLayer != null && mvideoPLayer.Control != null && mvideoPLayer.Control.IsPlaying())
+			{
+				VideoAudioHelper.StartVideoAudioCheck(mvideoPLayer);
+			}
+		}
 
 		protected override void Close()
 		{
+			// 关闭主页面时，取消音频检测
+			VideoAudioHelper.CancelCheck();
+			// 静音视频但不停止播放
+			if (mvideoPLayer != null)
+			{
+				mvideoPLayer.AudioMuted = true;
+				mvideoPLayer.AudioVolume = 0f;
+			}
+			// 恢复背景音乐（给其他页面使用）
+			AudioManager.Play(TK_Engine.AudioType.Music, AudioDef.BGM1, false, true);
 			base.Close();
 		}
 
 		protected override void OnDestroy()
 		{
+			VideoAudioHelper.CancelCheck();
 			mvideoPLayer?.CloseMedia();
 			base.OnDestroy();
 			GameEvent.RemoveEventListener<int>(EventType.RefreshCurrency, RefreshCurrency);
@@ -418,7 +468,11 @@ namespace GameLogic
 			GameEvent.RemoveEventListener<bool>(TKEventType.MainHomeAnim, SetMainHomeAnim);
 			GameEvent.RemoveEventListener(EventType.CloseAllActivityBtns, CloseAllActivityBtns);
 			GameEvent.RemoveEventListener<int>(EventType.RefreshHomeVideo, PlayHomeVideo);
+			GameEvent.RemoveEventListener(EventType.MuteHomeVideo, MuteHomeVideo);
+			GameEvent.RemoveEventListener(EventType.UnmuteHomeVideo, UnmuteHomeVideo);
 			SDKManager.Instance.Button_HideBanner();
 		}
+
+		#endregion
 	}
 }

@@ -735,8 +735,12 @@ namespace GameLogic
         /// <param name="specialGotten">高级是否已领</param>
         public void AddDreamPassReward(int id, bool normalGotten = false, bool specialGotten = false)
         {
+
             var data = GetOneActivityData(ActivityType.DreamPass);
             if (data == null) return;
+            // 日志1：记录进入时字典状态
+           /* Log.Debug($"AddDreamPassReward 开始: id={id}, normalGotten={normalGotten}, specialGotten={specialGotten}, " +
+                      $"NormalGotten.Count={data.NormalGotten?.Count ?? 0}, SpecialGotten.Count={data.SpecialGotten?.Count ?? 0}");*/
             // 防御旧存档
             if (data.NormalGotten == null) data.NormalGotten = new Dictionary<int, bool>();
             if (data.SpecialGotten == null) data.SpecialGotten = new Dictionary<int, bool>();
@@ -749,8 +753,14 @@ namespace GameLogic
                 else
                     data.SpecialGotten.Add(id, true);
             }
-            data.CheckDreamPassGetRew(true, out int _);
+            // 日志2：记录添加后的字典状态
+            //Log.Debug($"AddDreamPassReward 添加后: NormalGotten.Count={data.NormalGotten.Count}, SpecialGotten.Count={data.SpecialGotten.Count}");
+            data.CheckDreamPassGetRew(true, out int count);
+            //Log.Debug($"CheckDreamPassGetRew 返回 count={count}");
+
+
             Save();
+            //Log.Debug($"AddDreamPassReward Save() 执行完毕");
         }
         /// <summary>
         /// 激活通行证
@@ -1362,9 +1372,24 @@ namespace GameLogic
         /// </summary>
         public int GetCurUserType
         {
-            get => _userModel.CurUserType;
+            get
+            {
+                // 如果字段值非法，直接返回 1（不修改存档）
+                if (_userModel.CurUserType != 0 && _userModel.CurUserType != 1)
+                {
+                    Log.Warning($"[UserController] 检测到非法 CurUserType={_userModel.CurUserType}，强制返回 0！");
+                    return 0;
+                }
+                    
+                return _userModel.CurUserType;
+            }
             set
             {
+                if (value != 0 && value != 1)
+                {
+                    Log.Warning($"[UserController] 检测到非法 CurUserType={_userModel.CurUserType}，强制返回！");
+                    return;
+                }
                 _userModel.CurUserType = value;
                 //刷新关卡图
                 PhotoController.Instance.PhotoPreloading(true, true);

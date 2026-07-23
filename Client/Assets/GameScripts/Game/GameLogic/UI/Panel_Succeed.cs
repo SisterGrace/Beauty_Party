@@ -18,18 +18,18 @@ namespace GameLogic
 	{
 		private List<Transform> _allAnimNodes = new List<Transform>();
 		private List<TBRewardData> _rewardDatas;
-		private bool _isAnim;
-		//关卡所选照片信息
-		private OneSelectPhotoInfo _selectPhotoInfo;
-		//是否正在加载视频
-		private bool _isLoading;
-		private float mRotateSpeed = -360f;
-		//是否能免费下载
-		private bool _isFreeDownload;
-		//关卡钻石奖励数量
-		private int _diamondCount;
-		//是否喜欢
-		private bool _isLike;
+	private bool _isAnim;
+	//关卡所选照片信息
+	private OneSelectPhotoInfo _selectPhotoInfo;
+	//是否正在加载视频
+	private bool _isLoading;
+	private float mRotateSpeed = -360f;
+	//是否能免费下载
+	private bool _isFreeDownload;
+	//关卡钻石奖励数量
+	private int _diamondCount;
+	//是否喜欢
+	private bool _isLike;
 		
 		//动画相关参数（可通过GameScene配置）
 		private static SucceedAnimConfig _animConfig = SucceedAnimConfig.Default;
@@ -159,35 +159,51 @@ namespace GameLogic
 			LoadImageAsync();
 			if (_selectPhotoInfo.IsVideo)
 			{
-				mPhotoAVPro.OpenMedia(MediaPathType.AbsolutePathOrURL, _selectPhotoInfo.VideoUrl);
+				mPhotoAVPro.gameObject.SetActive(true);
+                mPhotoAVPro.OpenMedia(MediaPathType.AbsolutePathOrURL, _selectPhotoInfo.VideoUrl);
 			}
+			else
+			{
+                mPhotoAVPro.gameObject.SetActive(false);
+            }
 		}
 		private void LoadImageAsync()
 		{
 			_photoLoad.LoadUIImg(_selectPhotoInfo.Imgurl);
 		}
-		private void OnMediaPlayerEvent(MediaPlayer mp, MediaPlayerEvent.EventType et, ErrorCode errorCode)
+	private void OnMediaPlayerEvent(MediaPlayer mp, MediaPlayerEvent.EventType et, ErrorCode errorCode)
+	{
+		switch (et)
 		{
-			switch (et)
-			{
-				case MediaPlayerEvent.EventType.Started:
-					//开始播放，关闭加载动画
-					_isLoading = false;
-					mAVProVideoUI.Show();
-					break;
-			}
-		}
-		private void SetLikeIcon()
-		{
-			_isLike = !_isLike;
-			mLikeIcon.SetActive(_isLike);
-			UserController.Instance.SetUserPhotoLike(_selectPhotoInfo.Id, _isLike,true);
-			AudioManager.Play(AudioType.Sound, _isLike?AudioDef.UI_clickLove:AudioDef.UI_closeLove);
-			if (_isLike)
-			{
-				mLike.PlayEffect();
-			}
-		}
+		case MediaPlayerEvent.EventType.Started:
+			//开始播放，关闭加载动画
+			_isLoading = false;
+			mAVProVideoUI.Show();
+			// 开始视频音频检测
+			VideoAudioHelper.StartVideoAudioCheck(mp);
+			break;
+		case MediaPlayerEvent.EventType.FinishedPlaying:
+			// 视频播放结束，停止检测并恢复背景音乐
+			VideoAudioHelper.StopVideoAudioCheck();
+			break;
+		case MediaPlayerEvent.EventType.Error:
+		// 播放错误，停止检测并恢复背景音乐
+		VideoAudioHelper.StopVideoAudioCheck();
+		break;
+	}
+}
+
+private void SetLikeIcon()
+{
+	_isLike = !_isLike;
+	mLikeIcon.SetActive(_isLike);
+	UserController.Instance.SetUserPhotoLike(_selectPhotoInfo.Id, _isLike,true);
+	AudioManager.Play(AudioType.Sound, _isLike?AudioDef.UI_clickLove:AudioDef.UI_closeLove);
+	if (_isLike)
+	{
+		mLike.PlayEffect();
+	}
+}
 		#region 视频和照片保存
 		private async UniTask SaveVideoAndPhotoToGallery(bool isUseDowCount = false)
 		{
@@ -593,17 +609,27 @@ namespace GameLogic
 
 		#endregion
 
-		protected override void Close()
-		{
-			base.Close();
+protected override void Close()
+{
+	VideoAudioHelper.CancelCheck();
+	
+	// 如果视频正在播放，不播放BGM
+	// 如果没有视频或视频未播放，播放BGM
+	if (mPhotoAVPro == null || mPhotoAVPro.Control == null || !mPhotoAVPro.Control.IsPlaying())
+	{
+		AudioManager.Play(TK_Engine.AudioType.Music, AudioDef.BGM1, false, true);
+	}
+	
+	base.Close();
 
-		}
+}
 
-		protected override void OnDestroy()
-		{
-			base.OnDestroy();
-			mPhotoAVPro?.CloseMedia();
-		}
+protected override void OnDestroy()
+{
+	VideoAudioHelper.CancelCheck();
+	base.OnDestroy();
+	mPhotoAVPro?.CloseMedia();
+}
 	}
 	
 	/// <summary>

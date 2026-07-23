@@ -50,12 +50,31 @@ public static class TableImageResourceChecker
     /// 当前操作名称
     /// </summary>
     public static string CurrentOperationName => _currentOperationName;
-    
+
     #endregion
-    
+
     #region 编辑器菜单项
-    
+
 #if UNITY_EDITOR
+    [MenuItem("Tools/图片资源检查/检查视频文件")]
+    private static void CheckVideoFilesMenu()
+    {
+        if (_isChecking)
+        {
+            bool stop = EditorUtility.DisplayDialog("操作确认",
+                $"当前正在执行: {_currentOperationName}\n是否停止当前检查并开始视频检查？",
+                "停止并开始", "取消");
+            if (stop)
+            {
+                ForceStopCheck();
+                CheckVideoFiles().Forget();
+            }
+        }
+        else
+        {
+            CheckVideoFiles().Forget();
+        }
+    }
     [MenuItem("Tools/图片资源检查/检查表格中所有图片")]
     private static void CheckAllTableImagesMenu()
     {
@@ -938,58 +957,27 @@ public static class TableImageResourceChecker
             return "Unknown";
         }
     }
-    
-    /// <summary>
-    /// 保存缺失图片到日志
-    /// </summary>
+
     private static async UniTask SaveMissingImagesAsync(
-        List<string> missingImageIds, 
-        CancellationToken cancellationToken = default)
+     List<string> missingImageIds,
+     CancellationToken cancellationToken = default)
     {
         string logPath = GetMissingImagesLogPath();
-        
         try
         {
-            await UniTask.RunOnThreadPool(() => 
+            await UniTask.RunOnThreadPool(() =>
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                
-                // 读取已有的缺失图片
-                HashSet<string> existingMissing = new HashSet<string>();
-                if (File.Exists(logPath))
-                {
-                    string[] existingLines = File.ReadAllLines(logPath);
-                    foreach (string line in existingLines)
-                    {
-                        if (!string.IsNullOrWhiteSpace(line))
-                        {
-                            existingMissing.Add(line.Trim());
-                        }
-                    }
-                }
-                
-                // 添加新的缺失图片
-                foreach (string imageId in missingImageIds)
-                {
-                    existingMissing.Add(imageId);
-                }
-                
-                // 保存回文件
-                File.WriteAllLines(logPath, existingMissing);
+                // 直接覆盖写入，不再读取旧文件
+                File.WriteAllLines(logPath, missingImageIds);
             });
-            
-            Debug.Log($"缺失图片日志已更新: {logPath} ({missingImageIds.Count} 个新增)");
-        }
-        catch (OperationCanceledException)
-        {
-            throw;
+            Debug.Log($"缺失图片日志已更新（覆盖写入）: {logPath}");
         }
         catch (Exception e)
         {
             Debug.LogError($"保存缺失图片日志失败: {e.Message}");
         }
     }
-    
     /// <summary>
     /// 获取缺失图片日志路径
     /// </summary>
@@ -1015,6 +1003,297 @@ public static class TableImageResourceChecker
         public string ImageType { get; set; }
         public string RowId { get; set; }
     }
-    
+
+    #endregion
+
+    #region 视频检查功能
+
+    /// <summary>
+    /// 检查表格中标记为视频（IsVideo = true）的图片资源对应的 .mp4 文件是否存在
+    /// </summary>
+    public static async UniTaskVoid CheckVideoFiles()
+    {
+#if UNITY_EDITOR
+        try
+        {
+            StartNewCheck("检查视频文件");
+            var cancellationToken = _currentCheckCancellationTokenSource.Token;
+
+            var photosTable = ConfigLoader.Instance.Tables.TbCfgPhotos.DataList;
+            if (photosTable == null || photosTable.Count == 0)
+            {
+                EditorUtility.DisplayDialog("错误", "TbCfgPhotos 表格为空或未加载", "确定");
+                CompleteCheck();
+                return;
+            }
+
+            var videoItems = new List<VideoItem>();
+            foreach (var photo in photosTable)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                // 读取 IsVideo 字段（bool 类型）
+                bool isVideo = false;
+                var videoProp = photo.GetType().GetProperty("IsVideo");
+                if (videoProp != null)
+                    isVideo = (bool)videoProp.GetValue(photo);
+                else
+                {
+                    Debug.LogWarning($"行 {GetRowId(photo)} 缺少 IsVideo 字段，跳过");
+                    continue;
+                }
+
+                if (!isVideo) continue;
+
+                string imageId = photo.ImageID?.ToString() ?? "";
+                if (string.IsNullOrEmpty(imageId))
+                {
+                    Debug.LogWarning($"行 {GetRowId(photo)} 的 ImageID 为空，跳过");
+                    continue;
+                }
+
+                videoItems.Add(new VideoItem
+                {
+                    ID = photo.ID,
+                    ImageId = imageId,
+                    RowId = GetRowId(photo)
+                });
+            }
+
+            if (videoItems.Count == 0)
+            {
+                EditorUtility.DisplayDialog("提示", "没有需要检查的视频记录（IsVideo = true）", "确定");
+                CompleteCheck();
+                return;
+            }
+
+            Debug.Log($"开始检查 {videoItems.Count} 个视频文件");
+            await CheckVideoItemsAsync(videoItems, "视频文件检查", cancellationToken);
+            CompleteCheck();
+        }
+        catch (OperationCanceledException)
+        {
+            Debug.Log("视频检查被用户取消");
+            CompleteCheck();
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"检查视频文件失败: {e.Message}");
+            CompleteCheck();
+            EditorUtility.DisplayDialog("错误", $"检查失败: {e.Message}", "确定");
+        }
+#endif
+    }
+
+    /// <summary>
+    /// 批量检查视频文件
+    /// </summary>
+    private static async UniTask CheckVideoItemsAsync(
+        List<VideoItem> videoItems,
+        string operationName,
+        CancellationToken cancellationToken)
+    {
+#if UNITY_EDITOR
+        EditorUtility.DisplayProgressBar(operationName, "初始化...", 0);
+
+        try
+        {
+            int total = videoItems.Count;
+            int completed = 0;
+            int existsCount = 0;
+            int missingCount = 0;
+            List<string> missingVideos = new List<string>();
+
+            int batchSize = 10;
+            for (int i = 0; i < total; i += batchSize)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                int endIndex = Mathf.Min(i + batchSize, total);
+                var batchTasks = new List<UniTask<bool>>();
+
+                for (int j = i; j < endIndex; j++)
+                {
+                    var item = videoItems[j];
+                    batchTasks.Add(CheckVideoItemAsync(item, cancellationToken));
+                }
+
+                bool[] batchResults = await UniTask.WhenAll(batchTasks);
+
+                for (int j = 0; j < batchResults.Length; j++)
+                {
+                    completed++;
+                    if (batchResults[j])
+                        existsCount++;
+                    else
+                    {
+                        missingCount++;
+                        missingVideos.Add(videoItems[i + j].ImageId);
+                    }
+
+                    float progress = (float)completed / total;
+                    EditorUtility.DisplayProgressBar(operationName,
+                        $"正在检查 {completed}/{total}", progress);
+                }
+
+                await UniTask.Delay(100, cancellationToken: cancellationToken);
+            }
+
+            EditorUtility.ClearProgressBar();
+
+            StringBuilder result = new StringBuilder();
+            result.AppendLine($"{operationName} 完成:");
+            result.AppendLine($"=================================");
+            result.AppendLine($"检查总数: {total}");
+            result.AppendLine($"存在: {existsCount}");
+            result.AppendLine($"缺失: {missingCount}");
+
+            if (missingCount > 0)
+            {
+                result.AppendLine();
+                result.AppendLine("缺失的视频（仅显示 ImageId）:");
+                for (int i = 0; i < Mathf.Min(missingVideos.Count, 15); i++)
+                {
+                    result.AppendLine($"  {i + 1}. {missingVideos[i]}.mp4");
+                }
+                if (missingVideos.Count > 15)
+                    result.AppendLine($"  ... 还有 {missingVideos.Count - 15} 个");
+
+                string logPath = GetMissingVideosLogPath();
+                await UniTask.RunOnThreadPool(() =>
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    File.WriteAllLines(logPath, missingVideos);
+                });
+                result.AppendLine($"缺失日志已保存至: {logPath}");
+            }
+
+            Debug.Log(result.ToString());
+            EditorUtility.DisplayDialog("检查结果", result.ToString(), "确定");
+
+            if (missingCount > 0)
+            {
+                bool openLog = EditorUtility.DisplayDialog("缺失视频",
+                    $"发现 {missingCount} 个缺失视频，是否查看日志？", "是", "否");
+                if (openLog)
+                {
+                    string logPath = GetMissingVideosLogPath();
+                    if (File.Exists(logPath))
+                        EditorUtility.RevealInFinder(logPath);
+                }
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            EditorUtility.ClearProgressBar();
+            throw;
+        }
+        catch (Exception e)
+        {
+            EditorUtility.ClearProgressBar();
+            throw;
+        }
+#endif
+    }
+
+    /// <summary>
+    /// 检查单个视频文件是否存在（使用 HEAD 请求）
+    /// </summary>
+    private static async UniTask<bool> CheckVideoItemAsync(
+        VideoItem item,
+        CancellationToken cancellationToken)
+    {
+        string videoName = $"{item.ImageId}.mp4";
+        string fullUrl = BuildVideoUrl(item.ID, videoName);
+
+        if (string.IsNullOrEmpty(fullUrl))
+        {
+            Debug.LogError($"无法构建视频 URL: ID={item.ID}, ImageId={item.ImageId}");
+            return false;
+        }
+
+        try
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            using (UnityWebRequest request = UnityWebRequest.Head(fullUrl))
+            {
+                var asyncOp = request.SendWebRequest();
+                while (!asyncOp.isDone)
+                {
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        request.Abort();
+                        throw new OperationCanceledException(cancellationToken);
+                    }
+                    await UniTask.Yield();
+                }
+
+                if (request.result == UnityWebRequest.Result.Success && request.responseCode == 200)
+                {
+                    Debug.Log($"视频存在: {videoName} (行: {item.RowId})");
+                    return true;
+                }
+                else
+                {
+                    Debug.LogWarning($"视频不存在: {videoName} (行: {item.RowId}) - 状态码: {request.responseCode}");
+                    return false;
+                }
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            Debug.Log($"视频检查被取消: {videoName}");
+            throw;
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"检查视频失败: {videoName} (行: {item.RowId}) - {e.Message}");
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// 构建视频 URL —— 使用 Constant 表中的 VideoAUrl / VideoBUrl（根据 ABGroup）
+    /// </summary>
+    private static string BuildVideoUrl(int ID, string videoName)
+    {
+        var photo = ConfigLoader.Instance.Tables.TbCfgPhotos.Get(ID);
+        if (photo == null)
+        {
+            Debug.LogError($"未找到 ID={ID} 的图片数据");
+            return "";
+        }
+
+        // 根据 ABGroup 选择对应的视频域名（注意：这里固定使用安卓，若需要 iOS 可自行扩展）
+        string baseUrl = photo.ABGroup == 1
+            ? ConfigLoader.Constant.VideoBUrl
+            : ConfigLoader.Constant.VideoAUrl;
+
+        // 确保末尾有 '/'
+        if (!string.IsNullOrEmpty(baseUrl) && !baseUrl.EndsWith("/"))
+            baseUrl += "/";
+
+        return $"{baseUrl}{videoName}";
+    }
+
+    /// <summary>
+    /// 获取缺失视频日志路径
+    /// </summary>
+    private static string GetMissingVideosLogPath()
+    {
+        return Path.Combine(Application.dataPath, "../MissingVideos.log");
+    }
+
+    /// <summary>
+    /// 视频项数据结构
+    /// </summary>
+    private class VideoItem
+    {
+        public int ID { get; set; }
+        public string ImageId { get; set; }
+        public string RowId { get; set; }
+    }
+
     #endregion
 }

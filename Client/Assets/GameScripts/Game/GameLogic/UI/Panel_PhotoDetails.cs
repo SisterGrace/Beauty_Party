@@ -1,35 +1,35 @@
+using Config.common;
+using Cysharp.Threading.Tasks;
+using RenderHeads.Media.AVProVideo;
 using System;
-using TK_Engine;
-using UnityEngine;
-
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
-using Config.common;
-using Cysharp.Threading.Tasks;
+using TK_Engine;
+using UnityEngine;
+using UnityEngine.UI;
 using Y_Base;
-using RenderHeads.Media.AVProVideo;
-using Rect = UnityEngine.Rect;
 using AudioType = TK_Engine.AudioType;
+using Rect = UnityEngine.Rect;
 
 namespace GameLogic
 {
 	[Window(UILayer.UI)]
 	public partial class Panel_PhotoDetails : UIWindow
 	{
-		public PhotoItemInfo _PhotoItemInfo;
-		private bool _isLoading;
-		private float mRotateSpeed = -360f;
-		//当前相片是否喜欢
-		private bool _isLike;
-		//当前选项卡所有数据列表
-		private List<PhotoItemInfo> _photoList;
-		private CancellationTokenSource cancellationTokenSource;
-		//是否是视频
-		private bool _isVideo;
-		//是否能免费下载
-		private bool _isFreeDownload;
-		protected override void OnRefresh()
+	public PhotoItemInfo _PhotoItemInfo;
+	private bool _isLoading;
+	private float mRotateSpeed = -360f;
+	//当前相片是否喜欢
+	private bool _isLike;
+	//当前选项卡所有数据列表
+	private List<PhotoItemInfo> _photoList;
+	private CancellationTokenSource cancellationTokenSource;
+	//是否是视频
+	private bool _isVideo;
+	//是否能免费下载
+	private bool _isFreeDownload;
+	protected override void OnRefresh()
 		{
 			mVideoNode.Hide();
 			mImgNode.Hide();
@@ -83,31 +83,52 @@ namespace GameLogic
 				//mFreeCount.SetLanguage("uitips_photo_free", freeCount);
 			}
 		}
-		private void SetABShow()
+	private void SetABShow()
+	{
+		_isVideo = _PhotoItemInfo.ABType == 1;
+		cancellationTokenSource = new CancellationTokenSource();
+		LoadImageAsync();
+		if (_PhotoItemInfo.IsVideo)
 		{
-			_isVideo = _PhotoItemInfo.ABType == 1;
-			cancellationTokenSource = new CancellationTokenSource();
-			LoadImageAsync();
-			if (_PhotoItemInfo.IsVideo)
-			{
-				mPhotoAVPro.AutoOpen = true;
-				mPhotoAVPro.OpenMedia(MediaPathType.AbsolutePathOrURL, _PhotoItemInfo.VideoUrl);
-			}
+			mPhotoAVPro.AudioVolume = 1f;
+			mPhotoAVPro.AudioMuted = false;
+			mPhotoAVPro.AutoOpen = true;
+			mPhotoAVPro.OpenMedia(MediaPathType.AbsolutePathOrURL, _PhotoItemInfo.VideoUrl);
 		}
-		private void OnMediaPlayerEvent(MediaPlayer mp, MediaPlayerEvent.EventType et, ErrorCode errorCode)
+	}
+	private void OnMediaPlayerEvent(MediaPlayer mp, MediaPlayerEvent.EventType et, ErrorCode errorCode)
+	{
+		//Log.Info($"此时的AVpro状态：{et}，错误码：{errorCode}");
+		switch (et)
 		{
-			Log.Info($"此时的AVpro状态：{et}，错误码：{errorCode}");
-			switch (et)
-			{
-				case MediaPlayerEvent.EventType.Started:
-					//开始播放，关闭加载动画
-					_isLoading = false;
-					mVideoLoading.Hide();
-					mVideoNode.Show();
-					mSetBtns.Show();
-					break;
-			}
-		}
+		case MediaPlayerEvent.EventType.Started:
+			//开始播放，关闭加载动画
+			_isLoading = false;
+			mVideoLoading.Hide();
+			mVideoNode.Show();
+			mSetBtns.Show();
+			// 开始视频音频检测
+			VideoAudioHelper.StartVideoAudioCheck(mp);
+			break;
+		case MediaPlayerEvent.EventType.FinishedPlaying:
+			// 视频播放结束，停止检测并恢复背景音乐
+			VideoAudioHelper.StopVideoAudioCheck();
+			break;
+		case MediaPlayerEvent.EventType.Error:
+			// 播放错误，停止检测并恢复背景音乐
+			VideoAudioHelper.StopVideoAudioCheck();
+			break;
+	}
+}
+
+/// <summary>
+/// 检查视频是否有音轨
+/// </summary>
+	private bool HasAudioTrack(MediaPlayer mp)
+	{
+		if (mp == null || mp.Info == null) return false;
+		return mp.Info.HasAudio();
+	}
 		private async UniTask LoadImageAsync()
 		{
 			try
@@ -137,7 +158,13 @@ namespace GameLogic
 			sprite.name = $"{_PhotoItemInfo.Imgurl}";
 			//if(mPhotoIcon.sprite!= null) return;
 			mPhotoIcon.sprite = sprite;
-		}
+            if (aspectRatioFitter != null)
+            {
+                aspectRatioFitter.aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
+                aspectRatioFitter.aspectRatio = (float)tex.width / (float)tex.height;
+                //Debug.LogError(aspectRatioFitter.aspectRatio + " width:" + tex.width + " height:" + tex.height);
+            }
+        }
 		protected override void OnUpdate()
 		{
 			if (_isLoading)
@@ -355,20 +382,30 @@ namespace GameLogic
 				}
 			}
 		}
-		protected override void Close()
-		{
-			base.Close();
+protected override void Close()
+{
+	VideoAudioHelper.CancelCheck();
+	
+	// 如果是视频并且正在播放，不播放BGM（让视频继续播放）
+	// 如果没有视频或视频未播放，播放BGM
+	if (!_isVideo || mPhotoAVPro == null || mPhotoAVPro.Control == null || !mPhotoAVPro.Control.IsPlaying())
+	{
+		AudioManager.Play(TK_Engine.AudioType.Music, AudioDef.BGM1, false, true);
+	}
+	
+	base.Close();
 
-		}
+}
 
-		protected override void OnDestroy()
-		{
-			mPhotoAVPro?.CloseMedia();
-			base.OnDestroy();
-			cancellationTokenSource?.Cancel();
-			cancellationTokenSource?.Dispose();
-			GameEvent.RemoveEventListener<int>(EventType.RefreshCurrency, UpdateGoldCount);
-			GameEvent.RemoveEventListener(EventType.DownloadPicture, AdDownloadPic);
-		}
+protected override void OnDestroy()
+{
+	VideoAudioHelper.CancelCheck();
+	mPhotoAVPro?.CloseMedia();
+	base.OnDestroy();
+	cancellationTokenSource?.Cancel();
+	cancellationTokenSource?.Dispose();
+	GameEvent.RemoveEventListener<int>(EventType.RefreshCurrency, UpdateGoldCount);
+	GameEvent.RemoveEventListener(EventType.DownloadPicture, AdDownloadPic);
+}
 	}
 }

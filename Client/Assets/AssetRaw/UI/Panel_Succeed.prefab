@@ -439,7 +439,7 @@ MonoBehaviour:
   _mediaReference: {fileID: 0}
   _mediaPath:
     _pathType: 0
-    _path: https://s.akshakya.com/fantasytile/Video/B/B_1_14_10001.mp4
+    _path: 
   _fallbackMediaHints:
     transparency: 0
     alphaPacking: 0
