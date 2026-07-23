@@ -64,7 +64,8 @@ namespace GameLogic
 			switch (et)
 			{
 				case MediaPlayerEvent.EventType.FinishedPlaying://播放结束，关闭当前界面
-					Hide();
+                    //VideoAudioHelper.StopVideoAudioCheck(this.WindowName);
+                    Hide();
 					break;
 			}
 		}

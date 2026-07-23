@@ -218,8 +218,8 @@ MonoBehaviour:
     FileName: assets_assetraw_ui_panel_gameloading_bb43d727edb4416208e5c695ffed57fe.bundle
     FileCRC32: e2133e4a
   - PackageName: DefaultPackage
-    FileName: assets_assetraw_ui_panel_game_0cc96573c901bad371c5bdb13f9da809.bundle
-    FileCRC32: 2bd4c65a
+    FileName: assets_assetraw_ui_panel_game_00e9b92dbf11a1201923b6ee337d9526.bundle
+    FileCRC32: 0daa2f73
   - PackageName: DefaultPackage
     FileName: assets_assetraw_ui_panel_getreward_1_9ad3a4593a4b375e69b6d96e64e30036.bundle
     FileCRC32: 77047bb0
@@ -230,8 +230,8 @@ MonoBehaviour:
     FileName: assets_assetraw_ui_panel_guide_af4881490caff35c106384709865497f.bundle
     FileCRC32: 8041b321
   - PackageName: DefaultPackage
-    FileName: assets_assetraw_ui_panel_home_2a6d981ff0e52b0da4fde00d7e5091e0.bundle
-    FileCRC32: fd601153
+    FileName: assets_assetraw_ui_panel_home_73453d315f1ceddccaf707458b37883b.bundle
+    FileCRC32: 9c56e314
   - PackageName: DefaultPackage
     FileName: assets_assetraw_ui_panel_inlevelsetting_2986d16c448c7cc88a6fefaf648ea89d.bundle
     FileCRC32: 3bb09af5
@@ -251,8 +251,8 @@ MonoBehaviour:
     FileName: assets_assetraw_ui_panel_noad_029b0f584e223ed5ed7dc7f3356c7db4.bundle
     FileCRC32: 2ed2b64a
   - PackageName: DefaultPackage
-    FileName: assets_assetraw_ui_panel_photodetails_45a561decb9af07c1c13dfeb425b87df.bundle
-    FileCRC32: 0005c2d3
+    FileName: assets_assetraw_ui_panel_photodetails_b8db176e82330586c00355db20b1e05b.bundle
+    FileCRC32: e080ce90
   - PackageName: DefaultPackage
     FileName: assets_assetraw_ui_panel_photo_0eb92d7de63a6ff020f21da42e7f667c.bundle
     FileCRC32: 7675ca5b
@@ -539,8 +539,8 @@ MonoBehaviour:
     FileName: share_assets_plugins_textmesh pro_fonts_daca5fd4b228c17a1b1b23f79056d0f7.bundle
     FileCRC32: 65513a8f
   - PackageName: DefaultPackage
-    FileName: share_assets_plugins_textmesh pro_resources_fonts & materials_8ba95d241666ab834596703cc4787f37.bundle
-    FileCRC32: 5a32a38f
+    FileName: share_assets_plugins_textmesh pro_resources_fonts & materials_6a222de5894deafdf78ca20b28371dc2.bundle
+    FileCRC32: 559d8827
   - PackageName: DefaultPackage
     FileName: share_assets_plugins_textmesh pro_resources_sprite assets_55f167513337e99109e01997387a7a1f.bundle
     FileCRC32: 6e36513f

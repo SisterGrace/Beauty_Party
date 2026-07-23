@@ -31,7 +31,8 @@ namespace GameLogic
 	private bool _isFreeDownload;
 	protected override void OnRefresh()
 		{
-			mVideoNode.Hide();
+            
+            mVideoNode.Hide();
 			mImgNode.Hide();
 			mSetBtns.Hide();
 			mVideoLoading.Show();
@@ -47,7 +48,8 @@ namespace GameLogic
 			SetABShow();
 			mlikeIcon.SetActive(_isLike);
 			SetswitchBtns(_PhotoItemInfo.Index);
-		}
+            VideoAudioHelper.SwitchToPage(this.WindowName);
+        }
 
 		protected override void RegisterEvent()
 		{
@@ -108,15 +110,15 @@ namespace GameLogic
 		mVideoNode.Show();
 		mSetBtns.Show();
 		// 开始视频音频检测（传入视频URL和页面名称）
-		VideoAudioHelper.StartVideoAudioCheck(mp, _PhotoItemInfo.VideoUrl, "Panel_PhotoDetails");
+		VideoAudioHelper.StartVideoAudioCheck(mp, _PhotoItemInfo.VideoUrl,this.WindowName);
 		break;
 	case MediaPlayerEvent.EventType.FinishedPlaying:
 		// 视频播放结束，停止检测并恢复背景音乐
-		VideoAudioHelper.StopVideoAudioCheck("Panel_PhotoDetails");
+		VideoAudioHelper.StopVideoAudioCheck(this.WindowName);
 		break;
 	case MediaPlayerEvent.EventType.Error:
 		// 播放错误，停止检测并恢复背景音乐
-		VideoAudioHelper.StopVideoAudioCheck("Panel_PhotoDetails");
+		VideoAudioHelper.StopVideoAudioCheck(this.WindowName);
 		break;
 	}
 }
@@ -392,8 +394,8 @@ protected override void Close()
 	{
 		AudioManager.Play(TK_Engine.AudioType.Music, AudioDef.BGM1, false, true);
 	}
-	
-	base.Close();
+            VideoAudioHelper.StopVideoAudioCheck(this.WindowName, true);
+            base.Close();
 
 }
 

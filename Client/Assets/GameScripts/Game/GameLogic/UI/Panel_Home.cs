@@ -48,7 +48,8 @@ namespace GameLogic
 	private string _currentVideoUrl = ""; // 当前播放的视频URL
 	protected override void OnRefresh()
 		{
-			_activityList = new List<Widget_ActivityIcon>();
+            
+            _activityList = new List<Widget_ActivityIcon>();
 			_isShowBanner = true;
 			_isAtOnceGuide = true;
 			RefreshCurrency(-1);
@@ -368,8 +369,9 @@ namespace GameLogic
 				mvideoPLayer.AudioMuted = false;
 				mvideoPLayer.AutoOpen = true;
 				mvideoPLayer.OpenMedia(MediaPathType.AbsolutePathOrURL, vUrl);
-				// 记录视频URL，用于卡顿检测
-				_currentVideoUrl = vUrl;
+                    VideoAudioHelper.RegisterHome(mvideoPLayer, vUrl);
+                    // 记录视频URL，用于卡顿检测
+                    _currentVideoUrl = vUrl;
 			}
 		}
 		_Upsidedown = false;
