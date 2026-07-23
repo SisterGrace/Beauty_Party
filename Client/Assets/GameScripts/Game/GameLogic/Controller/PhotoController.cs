@@ -212,7 +212,7 @@ namespace GameLogic
                 (levelInfo.LevelPhotosA.Count == 0 && levelInfo.LevelPhotosB.Count == 0);//循环模式强制随机，无视配表
             if (isRandom)
             {
-                Log.Info($"[PhotoTrace] 当前关卡LevelId={curLevel}, 图片来源=【随机】(LevelPhotosA和LevelPhotosB都为空，走SetLevelUsePhotoId随机逻辑)");
+                Log.Info($"[PhotoTrace] 当前关卡LevelId={curLevel}, 图片来源=【随机】(LevelPhotosA和LevelPhotosB都为空或者循环开启，走SetLevelUsePhotoId随机逻辑)");
                 SetLevelUsePhotoId(isRefresh);
             }
             else
