@@ -31,8 +31,8 @@ namespace GameLogic
         public static void RegisterHome(MediaPlayer homePlayer, string homeVideoUrl)
         {
             ResetAllState();
-            _homePlayer = homePlayer;
-            _homeVideoUrl = homeVideoUrl;
+            _homePlayer = homePlayer;          // 允许为 null
+            _homeVideoUrl = homeVideoUrl ?? ""; // 避免 null
             Log.Info($"[VideoAudioHelper] Home已注册");
         }
 

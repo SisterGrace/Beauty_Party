@@ -75,8 +75,9 @@ namespace GameLogic
 			SDKManager.Instance.Button_ShowIV(HCIVPositionName.IV_Victory,IvType.IV1);
 			//RV按钮上报
 			SDKManager.Instance.LogEvent("RV_Button_Show","Position",HCRVPositionName.RV_SuccMore.ToString());
-			
-		}
+            VideoAudioHelper.SwitchToPage(this.WindowName);
+
+        }
 
 		protected override void RegisterEvent()
 		{

@@ -48,7 +48,8 @@ namespace GameLogic
 	private string _currentVideoUrl = ""; // 当前播放的视频URL
 	protected override void OnRefresh()
 		{
-            
+            // ★ 总是注册 Home（即使当前没有视频，也传入播放器引用和当前URL）
+            VideoAudioHelper.RegisterHome(mvideoPLayer, _currentVideoUrl);
             _activityList = new List<Widget_ActivityIcon>();
 			_isShowBanner = true;
 			_isAtOnceGuide = true;
