@@ -532,7 +532,7 @@ MonoBehaviour:
   m_ActiveWindow: 3
   m_ShowFullWindow: 0
   m_ShowSRDebugger: 0
-  m_IsOpenLog: 1
+  m_IsOpenLog: 0
   m_ConsoleWindow:
     m_LockScroll: 1
     m_MaxLine: 100
