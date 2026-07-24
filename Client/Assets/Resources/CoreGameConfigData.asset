@@ -21,15 +21,15 @@ MonoBehaviour:
     SSUrl: 
     AdjustToken_Android: 
     AdjustToken_iOS: 
-    AdmobAppID_Android: 
+    AdmobAppID_Android: ca-app-pub-6527369457594416~2568854984
     AdmobAppID_iOS: 
   toponLocalConfig:
-    appId: 
-    appKey: 
-    interstitialPlacementId: 
-    rewardedPlacementId: 
-    bannerPlacementId: 
-    splashPlacementId: 
+    appId: h6a26574ee8226
+    appKey: a1f65a6e800bf199a17ddea4b6b26965d
+    interstitialPlacementId: n6a265a12489ea
+    rewardedPlacementId: n6a265a213fd14
+    bannerPlacementId: n6a2659bb25df9
+    splashPlacementId: n6a2659ec1e4cb
   mtgLocalConfig:
     appId: 
     appKey: 
