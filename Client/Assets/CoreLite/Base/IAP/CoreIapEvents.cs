@@ -11,15 +11,17 @@ namespace CoreLite
         public static void IAPButtonShow(string productId, string productName, Dictionary<string, object> eventData = null)
         {
             eventData ??= new Dictionary<string, object>();
-
+#if IAP_ENABLE
             var productInfo = CoreSdkMgr.GetProductInfoById(productId);
-            var currency = "";
-            var price = "";
             if (productInfo != null)
             {
                 currency = productInfo.metadata.isoCurrencyCode;
                 price = productInfo.metadata.localizedPriceString;
             }
+#endif
+            var currency = "";
+            var price = "";
+            
 
             if (!float.TryParse(price, out var fPrice))
             {
@@ -348,13 +350,13 @@ namespace CoreLite
 
         private static string GetPaymentPlatform()
         {
-        #if UNITY_IOS
+#if UNITY_IOS
             return "Appstore";
-        #elif UNITY_ANDROID
+#elif UNITY_ANDROID
             return "GooglePlay";
-        #else
+#else
             return "Other";
-        #endif
+#endif
         }
 
     }

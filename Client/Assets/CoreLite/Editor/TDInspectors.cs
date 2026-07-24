@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿#if SSThinkingData
+using UnityEngine;
 using UnityEditor;
 using UnityEditorInternal;
 
@@ -138,3 +139,4 @@ namespace ThinkingData.Analytics.Editors
         }
     }
 }
+#endif

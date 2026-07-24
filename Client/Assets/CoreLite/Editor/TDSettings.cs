@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if SSThinkingData
+using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
@@ -84,3 +85,4 @@ namespace ThinkingData.Analytics.Editors {
 
 
 }
+#endif

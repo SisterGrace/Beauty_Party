@@ -57,16 +57,16 @@ public class CoreDemo : MonoBehaviour
 
             CoreLogUtils.Debug("PurchaseCallback :"+ JsonUtility.ToJson(res));
         });
-
+#if IAP_ENABLE
         CoreSdkMgr.AddProductsStatic(new Dictionary<string, ProductType>()
         {
-            #if UNITY_ANDROID
+#if UNITY_ANDROID
             { "com.fantasytile.coins_2",ProductType.Consumable},
-            #else
+#else
             { "com.oopscroco.1280diamonds",ProductType.Consumable},
-            #endif
+#endif
         });
-
+#endif
         CoreSdkMgr.RegisterFirebaseActivateHandler(() =>{
             
             CoreLogUtils.Debug("CoreLite SDK 收到firebase激活");
@@ -128,9 +128,9 @@ public class CoreDemo : MonoBehaviour
         CoreLogUtils.Debug("在线参数 PictureURL："+pricacy);
 #if UNITY_ANDROID
         var req = new CoreLiteCreateOrder.Request("diamond1","com.fantasytile.coins_2","1 diamond",40,1,"USD","{\"GamedDiamond\":1}","0");
-#else        
+#else
         var req = new CoreLiteCreateOrder.Request("diamond1280","com.oopscroco.1280diamonds","1 diamond1280",128,1,"USD","{\"GamedDiamond\":1}","0");
-#endif        
+#endif
         CoreLogUtils.Debug("ButtonBuyCoins req:"+req.unit_price);
         CoreSdkMgr.CreatePaymentOrder(req, (res,msg,paymentInfos) =>
         {

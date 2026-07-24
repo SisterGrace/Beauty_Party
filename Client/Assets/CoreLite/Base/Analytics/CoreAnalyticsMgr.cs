@@ -1,12 +1,9 @@
-using AdjustSdk;
-// using CodiceApp.EventTracking.Plastic;
+
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using ThinkingData.Analytics;
 using UnityEngine;
 using UnityEngine.UIElements;
-// using static Codice.Client.Common.EventTracking.TrackFeatureUseEvent.Features.DesktopGUI.Filters;
 
 namespace CoreLite
 {
@@ -27,6 +24,9 @@ namespace CoreLite
         #region  在线参数
         public static string GetConfigStr(string key, string defaultValue = "")
         {
+#if LAUNCHER_AD
+            return CoreLauncherMgr.Instance.GetAdGameConfig();
+#endif
             return CoreFirebaseMgr.Instance.GetConfigStr(key, defaultValue);   
         }
 
@@ -39,7 +39,7 @@ namespace CoreLite
         {
             return CoreFirebaseMgr.Instance.GetConfigBool(key, defaultValue);
         }
-        #endregion
+#endregion
 
         #region  事件上报
         public static void TrackEvent(string eventName)
@@ -78,6 +78,12 @@ namespace CoreLite
             if (eventName.Contains("Up2SDK") || eventName.Contains("IAP") || eventName.Contains("RV_AchieveShow_Match") || eventName.Contains("Parameter_Connect")
                || eventName.Contains("User_") || eventName.Contains("BN_") || eventName.Contains("RV_Button_Show") || eventName.Contains("SP_Winner")|| eventName.Contains("SP_ShowSkip") 
                ) return false;
+#if LAUNCHER_AD
+            if (eventName.Contains("RV_") || eventName.Contains("IV_") || eventName.Contains("BN_") || eventName.Contains("SP_"))
+            {
+                return false;
+            }
+#endif
             return true;
         }
         public static void TrackEvent(string eventName, Dictionary<string, object> dict)
@@ -150,14 +156,14 @@ namespace CoreLite
         #region  公共事件属性/用户属性
         public static void UserSet(Dictionary<string, object> dic,bool setOnce = false)
         {
-            #if SSThinkingData
+#if SSThinkingData
             CoreThinkingDataMgr.Instance.UserSet(dic, setOnce);
 #endif
         }
 
         public static void SetSuperProperties(Dictionary<string, object> superProperties)
         {
-            #if SSThinkingData
+#if SSThinkingData
             CoreThinkingDataMgr.Instance.SetSuperProperties(superProperties);
 #endif
         }

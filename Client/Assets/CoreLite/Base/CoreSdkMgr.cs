@@ -4,7 +4,6 @@ using UnityEngine.Purchasing;
 using static CoreLite.CoreGameConfig;
 using static CoreLite.CoreIapH5Mgr;
 using static CoreLite.CoreProductListRequest;
-using AdjustSdk;
 using UnityEngine;
 
 namespace CoreLite
@@ -80,11 +79,16 @@ namespace CoreLite
 #if USE_XMSDK
             CoreXmSdkMgr.Instance.InitRiskDetection(baseUrl);
 #endif
-            //CoreAsnMgr.Instance.StartReqAsn();
+            CoreAsnMgr.Instance.StartReqAsn();//好像是数据库
+#if IAP_ENABLE
             CoreIapNativeMgr.Instance.PreInitialize();
-            CoreIapH5Mgr.Instance.Init();
             CoreIapNativeMgr.Instance.Initialize();
-#if UNITY_ANDROID||UNITY_EDITOR
+#endif
+#if H5
+            CoreIapH5Mgr.Instance.Init();
+#endif
+            
+#if UNITY_ANDROID || UNITY_EDITOR
             CoreAnalyticsMgr.Init();
             CoreAdsMgr.Instance.Init(_splashCloseCallback);
 #else
@@ -128,7 +132,7 @@ namespace CoreLite
         /// <param name="callback">回调: bool 成功/失败; msg: 错误信息; List&lt;OrderListData&gt;: 订单列表</param>
         public static void QueryOrderList(CoreLiteQueryOrderList.Request req, Action<bool, string, CoreLiteQueryOrder.OrderListData> callback)
             => CoreIapH5Mgr.Instance.QueryOrderList(req, callback);
-
+#if IAP_ENABLE
         /// <summary>
         /// 根据商品ID获取商品信息
         /// </summary>
@@ -154,6 +158,7 @@ namespace CoreLite
         /// 初始化前静态添加商品ID
         /// </summary>
         public static void AddProductsStatic(Dictionary<string, ProductType> products) => CoreIapNativeMgr.Instance.ProductDic = products;
+#endif
         /// <summary>
         /// 支付回调
         /// </summary>
@@ -183,14 +188,16 @@ namespace CoreLite
         {
             if (!req.payment_method.Contains("stripe"))
             {
+#if IAP_ENABLE
                 CoreIapNativeMgr.Instance.RemoveVerifyFailOrderId(req.order_no);
                 CoreIapNativeMgr.Instance.DoConfirmPendingPurchaseByID(req.product_id);
                 CoreIapIosOrderMgr.RemoveOrder(req.product_id);
+#endif
             }
             CoreIapH5Mgr.Instance.ReportOrderReward(new CoreLiteQueryOrder.Request(req.order_no, CorePrefs.UserId), _callback);
             CoreIapEvents.IAPCheckingOrder(req);
         }
-        #endregion
+#endregion
 
         #region  在线参数
         public static Action OnFirebaseActivated;
@@ -236,7 +243,7 @@ namespace CoreLite
 
         public static void TrackAdClick(double revenue, string adType, string platformName, string adUnitId, string networkName, string networkPlacementId) { }
 #endif
-        #endregion
+#endregion
 
         #region  事件上报
         public static void TrackRewardButtonClick(string position)

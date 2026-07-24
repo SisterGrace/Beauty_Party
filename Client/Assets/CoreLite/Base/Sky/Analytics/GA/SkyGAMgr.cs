@@ -1,4 +1,4 @@
-
+#if GA
 using GameAnalyticsSDK;
 using GameAnalyticsSDK.Events;
 using GameAnalyticsSDK.Wrapper;
@@ -44,3 +44,4 @@ namespace Sky
         }
     }
 }
+#endif

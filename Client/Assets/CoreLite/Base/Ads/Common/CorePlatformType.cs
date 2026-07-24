@@ -14,6 +14,7 @@ namespace CoreLite
         TPN,
         Kwai,
         Max,
+        Launcher,  // 新增
         NULL
     }
 }

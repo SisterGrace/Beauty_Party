@@ -1,3 +1,4 @@
+#if IAP_ENABLE
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -27,7 +28,7 @@ namespace CoreLite
 
             var res = new CoreLitePurchase.Result(req.create_order_request,CoreIapH5Mgr.Instance.CreateFailQueryResultEntity(null),true, false ,req.payment_type);
             CoreSdkMgr.OnPurchaseComplete?.Invoke(res);
-#else 
+#else
             
             if (req.payment_type == CoreLitePaymentType.H5)
             {
@@ -102,11 +103,11 @@ namespace CoreLite
                             "", 
                             mGameExtraParam, 
                             "BuyProductID FAIL. Not purchasing product, either is not found or is not available for purchase",
-                            #if UNITY_ANDROID
+#if UNITY_ANDROID
                             "googleplay",
-                            #else
+#else
                             "appstore",
-                            #endif
+#endif
                             0
                             );
 
@@ -326,11 +327,11 @@ namespace CoreLite
             if (args.state != DataState.def) return;
             
             // 记录订单处理次数，处理5次还是失败就不处理了
-#if UNITY_ANDROID            
+#if UNITY_ANDROID
             var orderId = args.msg["order_no"];
 #else
             var orderId = args.msg["order_id"];
-#endif            
+#endif
             mRepeatCountDic[orderId] = mRepeatCountDic.GetValueOrDefault(orderId) + 1;
 
             // 开始处理,设置正在处理的状态
@@ -339,7 +340,7 @@ namespace CoreLite
             var gameExtraParam = args.msg.GetValueOrDefault("mGameExtraParam")?.ToString() ?? mGameExtraParam;
 
             // Android/iOS平台才校验
-#if (UNITY_IOS || UNITY_ANDROID) 
+#if (UNITY_IOS || UNITY_ANDROID)
             CoreServerMgr.Instance.IapReport(args.msg.ToDictionary(kv => kv.Key, kv => (object)kv.Value), (code, msg, data) =>
             {
                 CoreLogUtils.Debug("[iap] IapReport callback code :"+code+""+msg+""+data+ " game purchase:"+CoreSdkMgr.OnPurchaseComplete);
@@ -379,7 +380,7 @@ namespace CoreLite
                             "Goolge"
 #else
                             "Apple"
-#endif                  
+#endif
 
                         );
                     
@@ -390,11 +391,11 @@ namespace CoreLite
                 {
                     if (NotRetryCode.Contains(code))
                     {
-#if UNITY_ANDROID                        
+#if UNITY_ANDROID
                         RemoveVerifyFailOrderId(args.msg["order_no"]);
 #else
                         RemoveVerifyFailOrderId(args.msg["order_id"]);
-#endif      
+#endif
                     }
                     else
                     {
@@ -523,7 +524,7 @@ namespace CoreLite
                 List<DataConfig> list = ES3.Load(_purchaseOrderMap) as List<DataConfig>;
 #if UNITY_ANDROID
                 var value = _productInfo.msg["order_no"];
-#else           
+#else
                 var value = _productInfo.msg["order_id"];
 #endif
                 var want = list.Find(e => e.msg.ContainsValue(value));
@@ -544,7 +545,7 @@ namespace CoreLite
                 List<DataConfig> list = ES3.Load(_purchaseOrderMap) as List<DataConfig>;
 #if UNITY_ANDROID
                 var value = _productInfo.msg["order_no"];
-#else           
+#else
                 var value = _productInfo.msg["order_id"];
 #endif
                 var want = list.Find(e => e.msg.ContainsValue(value));
@@ -581,7 +582,7 @@ namespace CoreLite
                 List<DataConfig> list = ES3.Load(_purchaseOrderMap) as List<DataConfig>;
 #if UNITY_ANDROID
                 var value = _productInfo.msg["order_no"];
-#else           
+#else
                 var value = _productInfo.msg["order_id"];
 #endif
                 var want = list.Find(e => e.msg.ContainsValue(value));
@@ -818,11 +819,11 @@ namespace CoreLite
                 product.metadata.localizedPrice.ToString(), 
                 mGameExtraParam,
                 "Purchase failed callback reason:" + failureDescription.reason.ToString() + "msg:" + failureDescription.message,
-    #if UNITY_ANDROID
+#if UNITY_ANDROID
                 "Goolge",
-    #else
+#else
                 "Apple",
-    #endif
+#endif
                 0
             );
             ProcessLocalOrder();
@@ -924,4 +925,4 @@ namespace CoreLite
         #endregion
     }
 }
-
+#endif

@@ -1,7 +1,8 @@
-
+#if GA
 using GameAnalyticsSDK;
 using GameAnalyticsSDK.Events;
 using GameAnalyticsSDK.Wrapper;
+#endif
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEngine;
@@ -18,8 +19,10 @@ namespace Sky
         public static void TrackEvent(string eventName)
         {
             if (string.IsNullOrEmpty(eventName)) return;
+#if GA
             var safeName = CoreStringUtils.SanitizeEventName(eventName, allowUnicode: true, maxLength: 60);
             GameAnalytics.NewDesignEvent(safeName);
+#endif
         }
 
         /// <summary>
@@ -34,8 +37,10 @@ namespace Sky
             var fields = new Dictionary<string, object>();
             if (key != null && value != null)
                 fields[key] = value;
+#if GA
             var safeName = CoreStringUtils.SanitizeEventName(eventName, allowUnicode: true, maxLength: 60);
             GameAnalytics.NewDesignEvent(safeName, fields);
+#endif
         }
 
         /// <summary>
@@ -50,9 +55,11 @@ namespace Sky
                     TrackEvent(eventName);
                 return;
             }
+#if GA
             var safeName = CoreStringUtils.SanitizeEventName(eventName, allowUnicode: true, maxLength: 60);
             // 将 properties 作为自定义字段传入
             GameAnalytics.NewDesignEvent(safeName, properties);
+#endif
         }
 
         /// <summary>

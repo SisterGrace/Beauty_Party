@@ -200,8 +200,10 @@ namespace CoreLite
             }
             else
             {
+#if IAP_ENABLE
                 // 走原生app支付
                 CoreIapNativeMgr.Instance.BuyProductByID(new CoreLiteBuy.Request(req,currentOrderId,CoreLitePaymentType.NativeApp,""));
+#endif
             }
         }
 

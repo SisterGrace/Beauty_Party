@@ -2,7 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+#if SSThinkingData
 using ThinkingData.Analytics;
+#endif
 using UnityEngine;
 
 namespace CoreLite

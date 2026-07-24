@@ -65,7 +65,7 @@ namespace CoreLite
             var source = "ad_impression";
             if (revenue < 0)
             {
-                LogTool.DebugLog($"[Firebase] ad_impression skipped: revenue={revenue} < 0, reporting ad_impression_error");
+                Sky.LogTool.DebugLog($"[Firebase] ad_impression skipped: revenue={revenue} < 0, reporting ad_impression_error");
                 var errorProps = new Dictionary<string, object>
                 {
                     { "ad_platform", platform },

@@ -25,6 +25,8 @@ namespace CoreLite
 
         void ClearAllAds(); // 立即停止并清除该平台所有广告（配置变为空时调用）
 
+        public (string adId, string adSource, double adEcpm) GetInterstitialAdInfo();
+
         #region 横幅广告功能
 
         /// <summary>

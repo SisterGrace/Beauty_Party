@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using AnyThinkAds.Api;
 
 namespace CoreLite
 {
@@ -138,35 +137,6 @@ namespace CoreLite
         {
             _skipNextHotSplashCheck = true;
         }
-        
-        /// <summary>
-        /// 获取开屏广告信息（adId, adSource, adEcpm），用于打点上报
-        /// </summary>
-        private (string adId, string adSource, double adEcpm) GetSplashAdInfo()
-        {
-            string adId = "";
-            string adSource = "";
-            double adEcpm = 0;
-            
-            string bestPlacement = CoreTpnSplash.Instance.GetHighestPayingPlacement();
-            if (!string.IsNullOrEmpty(bestPlacement))
-            {
-                try
-                {
-                    var statusJson = ATSplashAd.Instance.checkAdStatus(bestPlacement);
-                    var status = JsonUtility.FromJson<CoreLiteTpnAdStatus>(statusJson);
-                    if (status?.adInfo != null)
-                    {
-                        adId = status.adInfo.network_placement_id;
-                        adSource = "Topon_" + status.adInfo.network_firm_id.ToString();
-                        adEcpm = status.adInfo.publisher_revenue*1000;
-                    }
-                }
-                catch { }
-            }
-            
-            return (adId, adSource, adEcpm);
-        }
 
         private void CheckSplashAd(bool isCold)
         {
@@ -179,29 +149,12 @@ namespace CoreLite
                 StartCoroutine(FlushColdStartSplashEvents());
             }
 
-            // 获取开屏广告信息（用于 SP_Position 和 SP_AchieveShow_Match）
-            var spAdInfo = GetSplashAdInfo();
-
             // SP_Position 打点：触发开屏展示时机
             TrackSplashEvent("SP_Position", new Dictionary<string, object>
             {
-                //{ "launch_type", CurrentLaunchType },
-                { "ad_platform", "TPN" },
-                { "ad_source", spAdInfo.adSource },
-                { "ad_id", spAdInfo.adId },
-                { "ad_ecpm", spAdInfo.adEcpm }
-            });
-            
-            // SP_AchieveShow_Match 打点：调用展示API
-            TrackSplashEvent("SP_AchieveShow_Match", new Dictionary<string, object>
-            {
-                //{ "launch_type", CurrentLaunchType },
-                { "ad_platform", "TPN" },
-                { "ad_source", spAdInfo.adSource },
-                { "ad_id", spAdInfo.adId },
-                { "ad_ecpm", spAdInfo.adEcpm }
-            });
 
+            });
+           
             if (!isCold)
             {
                 if (_skipNextHotSplashCheck)
@@ -370,7 +323,12 @@ namespace CoreLite
         /// <summary>H5 跳转 / 订单轮询（purchasePending）或原生商店支付中会阻断热开；支付结束后会恢复。</summary>
         private static bool IsPaymentFlowBlockingHotSplash()
         {
+
+#if IAP_ENABLE
             return CoreIapH5Mgr.Instance.purchasePending || CoreIapNativeMgr.Instance.IsPurchaseInProgress;
+#else
+            return false;
+#endif
         }
 
         private static string SPLASH_CONFIG_KEY = "Splash_AD_RULES";
@@ -378,7 +336,7 @@ namespace CoreLite
 
         public SplashConfig GetSplashConfig()
         {
-            string json = CoreFirebaseMgr.Instance.GetConfigStr(SPLASH_CONFIG_KEY, SPLASH_CONFIG_DEFAULT);
+            string json = CoreAnalyticsMgr.GetConfigStr(SPLASH_CONFIG_KEY, SPLASH_CONFIG_DEFAULT);
             try
             {
                 var configs = CoreDataUtils.FromJsonArray<SplashConfig>(json);

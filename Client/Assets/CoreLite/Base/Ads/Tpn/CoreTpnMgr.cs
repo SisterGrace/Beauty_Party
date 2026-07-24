@@ -1,5 +1,4 @@
-//#define TOPON_TEST
-//#define ADMOB_TEST
+#if TPN_AD
 using System.Collections.Generic;
 using AnyThinkAds.Api;
 using UnityEngine;
@@ -98,6 +97,31 @@ namespace CoreLite
 #else
             CoreLogUtils.Debug("[CoreLiteTpn] Skip init on non-mobile platform");
 #endif
+        }
+        public (string adId, string adSource, double adEcpm) GetInterstitialAdInfo()
+        {
+            string adId = "";
+            string adSource = "";
+            double adEcpm = 0;
+
+            string bestPlacement = CoreTpnInter.Instance.GetHighestPayingPlacement();
+            if (!string.IsNullOrEmpty(bestPlacement))
+            {
+                try
+                {
+                    var statusJson = ATInterstitialAd.Instance.checkAdStatus(bestPlacement);
+                    var status = JsonUtility.FromJson<CoreLiteTpnAdStatus>(statusJson);
+                    if (status?.adInfo != null)
+                    {
+                        adId = status.adInfo.network_placement_id;
+                        adSource = "Topon_" + status.adInfo.network_firm_id.ToString();
+                        adEcpm = status.adInfo.publisher_revenue * 1000;
+                    }
+                }
+                catch { }
+            }
+
+            return (adId, adSource, adEcpm);
         }
 
         private void OnSdkInitSuccess()
@@ -515,3 +539,4 @@ namespace CoreLite
         #endregion
     }
 }
+#endif

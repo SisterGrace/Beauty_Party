@@ -10,7 +10,7 @@ namespace CoreLite
         public ICoreAdService Client { get; set; }
         public CoreLiteAdsType AdType { get; set; }
         public CorePlatformType PlatformType { get; set; }
-        
+
         public int CompareTo(CoreAdsBidResult other)
         {
             return other.Revenue.CompareTo(this.Revenue);

@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+#if SSThinkingData
 using ThinkingData.Analytics;
+#endif
 using UnityEngine;
 using System.Linq;
 using Newtonsoft.Json;
@@ -65,6 +67,7 @@ namespace CoreLite
         {
             if(string.IsNullOrEmpty(CoreConfigMgr.Instance.GetSSAppId()) || string.IsNullOrEmpty(CoreConfigMgr.Instance.GetSSUrl())) return args;
             var ssProperties = new Dictionary<string, object>(){};
+            #if SSThinkingData
             if (TDAnalytics.GetSuperProperties().Count > 0)
             {
                 ssProperties = ssProperties.Concat(TDAnalytics.GetSuperProperties()).ToDictionary(postParK => postParK.Key, PostParV => PostParV.Value);
@@ -74,6 +77,7 @@ namespace CoreLite
             {
                 ssProperties = ssProperties.Concat(TDAnalytics.GetPresetProperties().ToDictionary()).ToDictionary(postParK => postParK.Key, PostParV => PostParV.Value);
             }
+            #endif
             args.AddIfNotExists("ss_super_properties", JsonConvert.SerializeObject(ssProperties));
             return args;
         }
@@ -206,7 +210,9 @@ namespace CoreLite
             args.AddIfNotExists("country", "");
             args.AddIfNotExists("user_id", CorePrefs.UserId);
             args.AddIfNotExists("user_type", 0);
+#if SSThinkingData
             args.AddIfNotExists("ss_distinct_id", TDAnalytics.GetDistinctId() ?? "");
+#endif
             args.AddIfNotExists("ss_account_id", ss_account_id ?? "");
             args.AddIfNotExists("ts", "" + CoreTimeUtils.CurrentTimestamp());
         }

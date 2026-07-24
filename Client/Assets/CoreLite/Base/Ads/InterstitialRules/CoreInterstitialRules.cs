@@ -211,7 +211,7 @@ namespace CoreLite
 
         public ConfigItem GetInterRules(IvType index)
         {
-            string jsonData = CoreFirebaseMgr.Instance.GetConfigStr("IV_Switch", INTER_RULES_DEFAULT_VALUE);
+            string jsonData = CoreAnalyticsMgr.GetConfigStr("IV_Switch", INTER_RULES_DEFAULT_VALUE);
             //CoreLogUtils.Debug($"CoreLite IV rule jsondata: {jsonData}");
             
             ConfigItem CreateDefaultConfig()

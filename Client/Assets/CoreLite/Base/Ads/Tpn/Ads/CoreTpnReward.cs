@@ -1,3 +1,4 @@
+#if TPN_AD
 using System;
 using System.Collections.Generic;
 using AnyThinkAds.Api;
@@ -367,3 +368,4 @@ namespace CoreLite
         }
     }
 }
+#endif

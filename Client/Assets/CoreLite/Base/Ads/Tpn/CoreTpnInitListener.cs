@@ -1,3 +1,4 @@
+#if TPN_AD
 using System;
 using AnyThinkAds.Api;
 
@@ -53,3 +54,4 @@ namespace CoreLite
         }
     }
 }
+#endif

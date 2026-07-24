@@ -9,7 +9,7 @@ namespace CoreLite
     {
         public static string GetSource(string configKey, string defaultSource)
         {
-            var configJson = CoreFirebaseMgr.Instance.GetConfigStr(configKey);
+            var configJson = CoreAnalyticsMgr.GetConfigStr(configKey);
             if (string.IsNullOrEmpty(configJson)) return defaultSource;
 
             try
