@@ -9,15 +9,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7062b70106d636b45aa3752195033bd0, type: 3}
+  m_Script: {fileID: 11500000, guid: 3df33a3a99b17684bbcd5eced653ffef, type: 3}
   m_Name: SkyConfigData
   m_EditorClassIdentifier: 
   analyticsConfig:
     fireBaseAppID_Android: 
     fireBaseAppID_iOS: 
-    GA_Game_key: 535a5cb4e17090c0dd693662ba562daa
-    GA_Secret_key: 4e2e1c6ba65fcfdb9b2d240f8ddafc7e43dfecda
-    reyun_ID: e97dbbdaee70a917
+    GA_Game_key: 
+    GA_Secret_key: 
+    reyun_ID: 
   maxLocalConfig:
     appId: 
     appKey: 
