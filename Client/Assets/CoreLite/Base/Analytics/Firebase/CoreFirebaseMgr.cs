@@ -158,12 +158,13 @@ namespace CoreLite
         {
             return _isInitialized;
         }
-#if FIRBASE
+
         private void OnTokenReceived(object sender, Firebase.Messaging.TokenReceivedEventArgs token)
         {
+            #if ADJUST
             Adjust.SetPushToken(token?.Token);
+            #endif
         }
-#endif
 
         private void GroupingSet()
         {
