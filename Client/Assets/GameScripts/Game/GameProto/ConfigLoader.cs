@@ -170,7 +170,7 @@ public class ConfigLoader : Singleton<ConfigLoader>
         var tempList = new List<CfgPhotos>();
         foreach (var item in Instance.Tables.TbCfgPhotos.DataList)
         {
-            if (item.IsRandomEnabled)
+            if (item.IsRandomEnabled && item.ABGroup == Abtype)
             {
                 tempList.Add(item);
             }
