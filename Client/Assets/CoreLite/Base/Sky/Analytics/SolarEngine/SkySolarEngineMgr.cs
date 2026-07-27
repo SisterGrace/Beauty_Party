@@ -122,7 +122,11 @@ namespace Sky
             _attributionCoroutine = null;
         }
 
+#if UNITY_EDITOR
+        public void FinalizeAsPaid(string network, string campaign, string adgroup, string creative, string clickId)
+#else
         private void FinalizeAsPaid(string network, string campaign, string adgroup, string creative, string clickId)
+#endif
         {
             if (SkySolarEnginePrefs.IsFinalized) return;
 
@@ -195,7 +199,7 @@ namespace Sky
             LogTool.DebugLog("[SolarEngine] Finalized as ORGANIC user");
         }
 
-        #endregion
+#endregion
 
         #region 事件上报（不变）
         public void TrackEvent(string eventName)
