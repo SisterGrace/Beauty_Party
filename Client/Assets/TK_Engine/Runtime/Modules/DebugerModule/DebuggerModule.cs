@@ -154,7 +154,7 @@ namespace TK_Engine
             base.Awake();
             if (!m_IsOpenLog)
             {
-                Debug.unityLogger.logEnabled = false;
+                //Debug.unityLogger.logEnabled = false;
             }
             _eventSystem = GameObject.Find("UIRoot/EventSystem");
             _debuggerManager = ModuleImpSystem.GetModule<IDebuggerManager>();
