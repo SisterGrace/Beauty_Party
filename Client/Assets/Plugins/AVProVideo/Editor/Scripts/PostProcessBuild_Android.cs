@@ -107,7 +107,7 @@ namespace RenderHeads.Media.AVProVideo.Editor
 				stringBuilder.AppendLine( "android.useFullClasspathForDexingTransform=true" );
 #else
 				// Add in line to set enableDexingArtifactTransform to false
-				stringBuilder.AppendLine( "android.enableDexingArtifactTransform=false" );
+				//stringBuilder.AppendLine( "android.enableDexingArtifactTransform=false" );
 #endif
 
 				// Add in line to set useAndroidX to true
