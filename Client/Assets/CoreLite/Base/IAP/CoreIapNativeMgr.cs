@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -195,7 +196,7 @@ namespace CoreLite
         public PurchaseProcessingResult ProcessPurchase(PurchaseEventArgs e)
         {
             m_PurchaseInProgress = false;
-            var wrapper = (Dictionary<string, object>)MiniJson.JsonDecode(e.purchasedProduct.receipt);
+            var wrapper = JsonConvert.DeserializeObject<Dictionary<string, object>>(e.purchasedProduct.receipt);
             var store = (string)wrapper["Store"];
             var payload = (string)wrapper["Payload"];
             var profileId = mGameExtraParam;
@@ -206,10 +207,10 @@ namespace CoreLite
             var gameServerChannel = "";
 
 #if UNITY_ANDROID
-            var payloadObj = (Dictionary<string, object>)MiniJson.JsonDecode(payload);
+            var payloadObj = JsonConvert.DeserializeObject<Dictionary<string, object>>(payload);
             var o = (string)payloadObj["json"];
 
-            var payloadData = (Dictionary<string, object>)MiniJson.JsonDecode(o);
+            var payloadData = JsonConvert.DeserializeObject<Dictionary<string, object>>(o);
 
             if (payloadData.TryGetValue("obfuscatedAccountId", out var obfuscatedAccountIdValue))
             {
@@ -244,9 +245,9 @@ namespace CoreLite
             string orderId;
             if (Application.platform == RuntimePlatform.Android)
             {
-                var gpDetails = (Dictionary<string, object>)MiniJson.JsonDecode(payload);
+                var gpDetails = JsonConvert.DeserializeObject<Dictionary<string, object>>(payload);
                 var gpJson = (string)gpDetails["json"];
-                var tokenJson = (Dictionary<string, object>)MiniJson.JsonDecode(gpJson);
+                var tokenJson = JsonConvert.DeserializeObject<Dictionary<string, object>>(gpJson);
                 token = (string)tokenJson["purchaseToken"];
                 orderId = (string)tokenJson["orderId"];
 
@@ -810,8 +811,8 @@ namespace CoreLite
             var res = new CoreLitePurchase.Result(CoreIapH5Mgr.Instance.currentOrderReq,CoreIapH5Mgr.Instance.CreateFailQueryResultEntity(),false,false,CoreLitePaymentType.NativeApp);
             CoreSdkMgr.OnPurchaseComplete?.Invoke(res);
             mIsRestoreClick = false;
-            CoreIapEvents.IAPFail(mProductName, 
-                failureDescription.productId, 
+            CoreIapEvents.IAPFail(mProductName,
+                product.definition.id,
                 "",
                 "",
                 product.metadata.isoCurrencyCode, 
