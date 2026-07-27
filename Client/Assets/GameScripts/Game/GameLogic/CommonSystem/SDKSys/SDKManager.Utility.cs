@@ -128,6 +128,15 @@ namespace GameLogic
         {
             _isPromote = promote;
             Log.Info("是否为买量用户：" + promote + " network：" + network + " clickLable：" + clickLabe);
+            if(promote)
+            {
+                GameEvent.Send(EventType.SetUserType, 1);
+            }
+            else
+            {
+                GameEvent.Send(EventType.SetUserType, 0);
+            }
+            
         }
 
 #if USE_UP2SDK
