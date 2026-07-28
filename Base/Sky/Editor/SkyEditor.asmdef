@@ -1,0 +1,18 @@
+{
+    "name": "SkyEditor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:e6fcf0d19d90fd54fbf5b1eb1298b099"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
