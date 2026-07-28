@@ -27,7 +27,6 @@ dependencies {
     implementation 'androidx.media3:media3-exoplayer:1.4.1' // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/chartboost/Editor/Dependencies.xml:13
     implementation 'androidx.media3:media3-ui:1.4.1' // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/chartboost/Editor/Dependencies.xml:14
     implementation 'androidx.recyclerview:recyclerview:1.1.0' // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/gtm/Editor/Dependencies.xml:8
-    implementation 'com.adjust.sdk:adjust-android:5.4.6' // Assets/Adjust/Native/Editor/Dependencies.xml:5
     implementation 'com.android.installreferrer:installreferrer:2.2' // Assets/Script/SDKManager/Up2SDK/Editor/Dependencies.xml:7
     implementation 'com.anythink.sdk:adapter-tpn-admob:24.9.0.1.0' // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/admob/Editor/Dependencies.xml:3
     implementation 'com.anythink.sdk:adapter-tpn-applovin:13.5.1.1.0' // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/applovin/Editor/Dependencies.xml:3

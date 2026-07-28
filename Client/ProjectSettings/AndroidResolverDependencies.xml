@@ -8,7 +8,6 @@
     <package>androidx.media3:media3-exoplayer:1.4.1</package>
     <package>androidx.media3:media3-ui:1.4.1</package>
     <package>androidx.recyclerview:recyclerview:1.1.0</package>
-    <package>com.adjust.sdk:adjust-android:5.4.6</package>
     <package>com.android.installreferrer:installreferrer:2.2</package>
     <package>com.anythink.sdk:adapter-tpn-admob:24.9.0.1.0</package>
     <package>com.anythink.sdk:adapter-tpn-applovin:13.5.1.1.0</package>
