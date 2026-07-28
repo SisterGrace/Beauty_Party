@@ -1,8 +1,9 @@
+using Config.common;
+using CoreLite;
+using Sky;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using Config.common;
-using CoreLite;
 using TK_Engine;
 using UnityEngine;
 using EventType = GameLogic.EventType;
@@ -306,4 +307,33 @@ public partial class SROptions
         {
         });
     }
+
+#if UNITY_EDITOR
+    // 方式一：通过右键组件菜单触发（Inspector 中右键点击组件）
+    [Category("发送买量用户信息")]
+    public void Editor_ForcePaidUser()
+    {
+        // 1. 重置持久化状态，防止被 IsFinalized 拦截至（如果已经归因过）
+        SkySolarEnginePrefs.HasAttribution = false;
+        SkySolarEnginePrefs.IsFinalized = false;
+        SkySolarEnginePrefs.IsPaidUser = false;
+        SkySolarEnginePrefs.Network = "";
+        SkySolarEnginePrefs.Campaign = "";
+        SkySolarEnginePrefs.Adgroup = "";
+        SkySolarEnginePrefs.Creative = "";
+        SkySolarEnginePrefs.ClickLabel = "";
+        // 3. 模拟一个典型的买量渠道（例如：巨量引擎、Meta、Unity Ads 等）
+        string mockNetwork = "TestNetwork_Meta";
+        string mockCampaign = "Test_Campaign_2026";
+        string mockAdgroup = "Test_Adgroup_01";
+        string mockCreative = "Test_Creative_Red";
+        string mockClickId = "click_test_abc123";
+
+        // 4. 调用私有方法标记为付费用户
+        // 由于 FinalizeAsPaid 是 private，但在同一个类中可以直接调用
+        SkySolarEngineMgr.Instance.FinalizeAsPaid(mockNetwork, mockCampaign, mockAdgroup, mockCreative, mockClickId);
+
+        LogTool.DebugLog("[SolarEngine Test] 强制模拟为买量用户（非自然量）已生效！", LogTool.Color.green);
+    }
+#endif
 }
