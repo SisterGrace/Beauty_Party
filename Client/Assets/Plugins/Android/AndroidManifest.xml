@@ -24,11 +24,5 @@
     </activity>
     <!-- Firebase 后台消息转发服务 -->
     <service android:name="com.google.firebase.messaging.MessageForwardingService" android:permission="android.permission.BIND_JOB_SERVICE" android:exported="true" />
-    <!-- Adjust 安装引荐接收器 -->
-    <receiver android:name="com.adjust.sdk.AdjustReferrerReceiver" android:permission="android.permission.INSTALL_PACKAGES" android:exported="true">
-      <intent-filter>
-        <action android:name="com.android.vending.INSTALL_REFERRER" />
-      </intent-filter>
-    </receiver>
   </application>
 </manifest>
