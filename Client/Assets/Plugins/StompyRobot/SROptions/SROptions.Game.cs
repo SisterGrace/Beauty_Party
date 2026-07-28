@@ -308,7 +308,7 @@ public partial class SROptions
         });
     }
 
-#if UNITY_EDITOR
+/*#if UNITY_EDITOR
     // 方式一：通过右键组件菜单触发（Inspector 中右键点击组件）
     [Category("发送买量用户信息")]
     public void Editor_ForcePaidUser()
@@ -335,5 +335,5 @@ public partial class SROptions
 
         LogTool.DebugLog("[SolarEngine Test] 强制模拟为买量用户（非自然量）已生效！", LogTool.Color.green);
     }
-#endif
+#endif*/
 }
