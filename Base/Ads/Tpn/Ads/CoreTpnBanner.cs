@@ -3,7 +3,9 @@ using System;
 using System.Collections.Generic;
 using AnyThinkAds.Api;
 using UnityEngine;
+#if Up_2SDK
 using Up2SDK;
+#endif
 
 namespace CoreLite
 {
@@ -293,7 +295,9 @@ namespace CoreLite
                     { "ecpm", revenue * 1000 },
                     { "show_id", "" }
                 });*/
+#if Up_2SDK
                 Up2SDKManager.Instance.OnToponAdShow(firmId, AdsType.Banner, placementId, revenue * 1000, "");
+#endif
 #endif
                 CoreLogUtils.Debug("[CoreLiteTpn] Banner OnAdImpress: " + placementId);
             }, null);
@@ -347,7 +351,9 @@ namespace CoreLite
                     { "ad_id", placementId },
                     { "show_id", "" }
                 });*/
+#if Up_2SDK
                 Up2SDKManager.Instance.OnToponAdClick(firmId, AdsType.Banner, placementId, "");
+#endif
 #endif
             }, null);
         }
