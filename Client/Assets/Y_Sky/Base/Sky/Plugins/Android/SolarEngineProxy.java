@@ -7,9 +7,9 @@ import androidx.annotation.Keep;
 
 import com.reyun.solar.engine.OnAttributionListener;
 import com.reyun.solar.engine.OnInitializationCallback;
-import com.reyun.solar.engine.SEAdClickEventModel;
-import com.reyun.solar.engine.SEAdImpEventModel;
-import com.reyun.solar.engine.SEPurchaseEventModel;
+import com.reyun.solar.engine.infos.SEAdImpEventModel;
+import com.reyun.solar.engine.infos.SEAdClickEventModel;
+import com.reyun.solar.engine.infos.SEPurchaseEventModel;
 import com.reyun.solar.engine.SolarEngineConfig;
 import com.reyun.solar.engine.SolarEngineManager;
 
