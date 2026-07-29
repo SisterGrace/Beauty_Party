@@ -81,7 +81,6 @@ namespace GameLogic
                     break;
                 case LoadType.InitSDK:
                     InitSDK();
-                    Log.Warning("初始化SDK");
                     break;
                 case LoadType.Login:
                     Login();
@@ -91,11 +90,9 @@ namespace GameLogic
                     break;
                 case LoadType.GameData:
                     LoadGameData();
-                    Log.Warning("加载游戏数据");
                     break;
                 case LoadType.LoadScene:
                     LoadScene();
-                    Log.Warning("加载场景");
                     break;
                 case LoadType.ResetGame :
                     ResetGame();
@@ -175,6 +172,7 @@ namespace GameLogic
         {
             if (!_isSDKInited)
             {
+                Log.Warning("初始化SDK");
                 _isSDKInited = true;
                 _timeSp.Start();
                 //初始化SDK
@@ -236,7 +234,7 @@ namespace GameLogic
         {
             if (!_loadGameDataIn)
             {
-                
+                Log.Warning("加载游戏数据");
                 _loadGameDataIn = true;
                 _timeSp.Restart();
 #if UNITY_EDITOR
@@ -261,6 +259,7 @@ namespace GameLogic
         {
             if (_handle == null)
             {
+                Log.Warning("加载场景");
                 _timeSp.Restart();
                 //_handle = GameModule.Resource.LoadSceneAsync("Game", LoadSceneMode.Single, false);
                 if (!OpenLevelEditor)

@@ -39,7 +39,7 @@ namespace GameLogic
                 _currentPanelName = panelName; // 关键：设置当前页面为 Home
             }
 
-            Log.Info($"[VideoAudioHelper] Home已注册，名称: {_homePanelName}");
+            //Log.Info($"[VideoAudioHelper] Home已注册，名称: {_homePanelName}");
         }
 
         public static void SwitchToPage(string newPanelName)
@@ -64,7 +64,7 @@ namespace GameLogic
                         _pageStack.Push(temp.Pop());
                 }
                 _pageStack.Push(_currentPanelName);
-                Log.Info($"[VideoAudioHelper] 压栈: {_currentPanelName}，栈深度: {_pageStack.Count}");
+                //Log.Info($"[VideoAudioHelper] 压栈: {_currentPanelName}，栈深度: {_pageStack.Count}");
             }
 
             // 停止旧检测（但不恢复BGM）
@@ -73,7 +73,7 @@ namespace GameLogic
 
             // 更新当前页面名
             _currentPanelName = newPanelName;
-            Log.Info($"[VideoAudioHelper] 切换到页面: {newPanelName}");
+            //Log.Info($"[VideoAudioHelper] 切换到页面: {newPanelName}");
 
             // 如果切换到 Home 且栈为空，启动 Home 检测
             if (newPanelName == _homePanelName && _pageStack.Count == 0)
@@ -87,7 +87,7 @@ namespace GameLogic
             // 非顶层页面静音并忽略
             if (panelName != _currentPanelName)
             {
-                Log.Info($"[VideoAudioHelper] 忽略启动请求：当前顶层 {_currentPanelName}，请求来自 {panelName}，静音视频");
+                //Log.Info($"[VideoAudioHelper] 忽略启动请求：当前顶层 {_currentPanelName}，请求来自 {panelName}，静音视频");
                 mp.Control?.MuteAudio(true);
                 return;
             }
@@ -102,14 +102,14 @@ namespace GameLogic
 
             if (_currentVideoUrl != videoUrl)
             {
-                Log.Info($"[VideoAudioHelper] 切换视频: {videoUrl}");
+                //Log.Info($"[VideoAudioHelper] 切换视频: {videoUrl}");
                 _currentPlayer?.Control?.MuteAudio(true);
                 _currentVideoUrl = videoUrl;
             }
 
             // ★ 先静音视频，直到确认有音轨再取消静音
             mp.Control?.MuteAudio(true);
-            Log.Info($"[VideoAudioHelper] 视频已静音，开始检测");
+            //Log.Info($"[VideoAudioHelper] 视频已静音，开始检测");
 
             _currentPlayer = mp;
             _isChecking = true;
@@ -120,7 +120,7 @@ namespace GameLogic
         {
             if (panelName != _currentPanelName)
             {
-                Log.Info($"[VideoAudioHelper] 停止请求来自 {panelName}，当前页面 {_currentPanelName}，忽略");
+                //Log.Info($"[VideoAudioHelper] 停止请求来自 {panelName}，当前页面 {_currentPanelName}，忽略");
                 return;
             }
 
@@ -143,14 +143,14 @@ namespace GameLogic
 
                 if (_pageStack.Count == 0)
                 {
-                    Log.Info($"[VideoAudioHelper] 所有非Home页面已关闭，自动恢复Home");
+                    //Log.Info($"[VideoAudioHelper] 所有非Home页面已关闭，自动恢复Home");
                     _currentPanelName = _homePanelName;
                     StartHomeDetection();
                 }
                 else
                 {
                     _currentPanelName = _pageStack.Peek();
-                    Log.Info($"[VideoAudioHelper] 回退到页面: {_currentPanelName}");
+                    //Log.Info($"[VideoAudioHelper] 回退到页面: {_currentPanelName}");
                     if (!AudioManager.IsPlaying(TK_Engine.AudioType.Music))
                         AudioManager.Play(TK_Engine.AudioType.Music, BGM_AUDIO_NAME, false, false);
                 }
@@ -200,7 +200,7 @@ namespace GameLogic
                 Log.Warning($"[VideoAudioHelper] Home未注册或URL为空，无法启动检测");
                 return;
             }
-            Log.Info($"[VideoAudioHelper] 启动Home检测");
+            //Log.Info($"[VideoAudioHelper] 启动Home检测");
             StartVideoAudioCheck(_homePlayer, _homeVideoUrl, _homePanelName);
         }
 
@@ -214,13 +214,13 @@ namespace GameLogic
 
             try
             {
-                Log.Info($"[VideoAudioHelper] 等待视频开始播放...");
+                //Log.Info($"[VideoAudioHelper] 等待视频开始播放...");
                 while (_isChecking)
                 {
                     await UniTask.Delay(100, cancellationToken: token);
                     if (mp.Control != null && mp.Control.IsPlaying() && !mp.Control.IsBuffering())
                     {
-                        Log.Info($"[VideoAudioHelper] 视频开始播放");
+                        //Log.Info($"[VideoAudioHelper] 视频开始播放");
                         break;
                     }
                 }
@@ -229,14 +229,14 @@ namespace GameLogic
                 // 检查音轨
                 if (!HasAudioTrack(mp))
                 {
-                    Log.Info($"[VideoAudioHelper] 视频无音轨，保持BGM，静音视频");
+                    //Log.Info($"[VideoAudioHelper] 视频无音轨，保持BGM，静音视频");
                     // 视频已静音，无需额外操作，保持静音即可
                     _isChecking = false;
                     return;
                 }
 
                 // ---- 有音轨，立即切换至视频音效 ----
-                Log.Info($"[VideoAudioHelper] 立即切换至视频音效");
+                //Log.Info($"[VideoAudioHelper] 立即切换至视频音效");
                 AudioManager.Stop(TK_Engine.AudioType.Music, true);   // 停止BGM
                 mp.Control?.MuteAudio(false);                          // 取消静音
                 _hasPlayedAudio = true;

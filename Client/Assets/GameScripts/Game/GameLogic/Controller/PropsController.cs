@@ -1048,7 +1048,7 @@ namespace GameLogic
                 url = $"{ConfigLoader.Constant.ImgAUrl}{imgName}.{imgType}";
 #endif
             }
-            Log.Info($"[PropsController] GetImgUrl: AB={AbType}, ImageID={imgName}, 最终URL={url}");
+            //Log.Info($"[PropsController] GetImgUrl: AB={AbType}, ImageID={imgName}, 最终URL={url}");
             return url;
         }
 

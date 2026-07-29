@@ -199,7 +199,7 @@ namespace GameLogic
                 }
             }
             SetCurLevelPhotoIds(Curphotoids);
-            Log.Info($"[PhotoTrace] 配置关卡最终PhotoIds=[{string.Join(", ", Curphotoids)}]");
+            //Log.Info($"[PhotoTrace] 配置关卡最终PhotoIds=[{string.Join(", ", Curphotoids)}]");
         }
         //预加载图到内存中，没有的就网络下载
         public async UniTask  PhotoPreloading(bool isRefresh,bool isPreload)
@@ -231,7 +231,7 @@ namespace GameLogic
                     var cfg = ConfigLoader.Instance.Tables.TbCfgPhotos.Get(dataInfo[i]);
                     string imgurl = PropsController.GetImgUrl(cfg.ImageID, cfg.ImageType, cfg.ABGroup);
                     string videourl = PropsController.GetVideoUrl(cfg.ImageID, cfg.ABGroup, cfg.IsVideo);
-                    Log.Info($"[PhotoTrace] 预加载第{i+1}张: PhotoID={cfg.ID}, ImageID={cfg.ImageID}, ABGroup={cfg.ABGroup}, IsVideo={cfg.IsVideo}\n  → 图片URL: {imgurl}\n  → 视频URL: {videourl}");
+                    //Log.Info($"[PhotoTrace] 预加载第{i+1}张: PhotoID={cfg.ID}, ImageID={cfg.ImageID}, ABGroup={cfg.ABGroup}, IsVideo={cfg.IsVideo}\n  → 图片URL: {imgurl}\n  → 视频URL: {videourl}");
                     await ImgUtil.GetTextureAsync(imgurl);
                 }
             }

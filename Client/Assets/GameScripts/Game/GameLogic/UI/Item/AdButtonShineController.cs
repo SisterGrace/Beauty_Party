@@ -82,7 +82,7 @@ namespace GameLogic
                 bool shouldEnable = adIcon.activeInHierarchy;
                 shineEffect.enabled = shouldEnable;
                 shinyEffectForUGUI.enabled= shouldEnable;
-                Debug.Log($"[AdButtonShineController] {gameObject.name}: adIcon={adIcon.name}, active={shouldEnable}, shineEffect.enabled={shineEffect.enabled}");
+                //Debug.Log($"[AdButtonShineController] {gameObject.name}: adIcon={adIcon.name}, active={shouldEnable}, shineEffect.enabled={shineEffect.enabled}");
             }
             else
             {
