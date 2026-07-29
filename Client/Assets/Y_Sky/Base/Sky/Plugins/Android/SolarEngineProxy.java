@@ -19,7 +19,7 @@ import java.util.Iterator;
 
 /**
  * 热云 SolarEngine Android 桥接（重写版）。
- * 数据区域：海外（com.reyun.solar.engine.oversea）  SDK 版本：1.3.1.4
+ * 数据区域：海外（com.reyun.solar.engine.oversea）  
  *
  * 提供给 Unity 端的入口：
  *   - setUnityCallbackTarget(name)         指定接收回调的 GameObject 名
