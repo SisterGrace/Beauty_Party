@@ -57,7 +57,7 @@ namespace Sky
         /// 广告收益事件上报（适配 SolarEngine 预置事件 _appImp）
         /// 使用官方桥接方法 trackAdImpression
         /// </summary>
-        public static void TrackAdImpressionEvent(double revenue, string network, string unit, string format, string platform, string pos = "", int formatNumber = 0, int positionNumber = 0)
+        public static void TrackAdImpressionEvent(double revenue, string network, string unit, string format, string platform, string pos = "", int formatNumber = 0, int positionNumber = 0, string currency = "USD")
         {
             if (!SkySolarEngineMgr.Instance.TrackingEnable()) return;
             
@@ -94,7 +94,7 @@ namespace Sky
                 adNetworkAppID: "",
                 adNetworkADID: unit,
                 ecpm: revenue*1000,
-                currencyType: "USD",
+                currencyType: currency,  // 使用从 TopOn 回调中获取的货币类型
                 isRenderSuccess: true,
                 customProperties: new Dictionary<string, object>
                 {

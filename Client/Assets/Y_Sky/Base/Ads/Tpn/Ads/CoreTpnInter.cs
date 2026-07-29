@@ -259,6 +259,7 @@ namespace CoreLite
                 string adSource = e?.callbackInfo?.network_firm_id != null ? "Topon_" + firmId : PlatformName;
                 string adId = e?.callbackInfo?.network_placement_id ?? "";
                 double revenue = e?.callbackInfo?.publisher_revenue ?? 0;
+                string currency = e?.callbackInfo?.currency ?? "USD";  // 从 TopOn 回调中获取货币类型
                 if (!_placementRevenue.ContainsKey(placementId)) _placementRevenue[placementId] = revenue;
                 string pos = CoreAdsMgr.Instance._ivPos ?? "";
                 string format = CoreLiteAdsType.Interstitial.ToString();
@@ -279,7 +280,8 @@ namespace CoreLite
                         format, PlatformName,
                         pos,
                         formatNumber,
-                        positionNumber);
+                        positionNumber,
+                        currency);  // 传递货币类型
                 }
 #if UNITY_ANDROID
                 CoreAnalyticsMgr.TrackEvent("Up2SDK_ToponAdShow", new Dictionary<string, object>
