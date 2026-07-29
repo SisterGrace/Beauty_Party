@@ -145,7 +145,7 @@ namespace Sky
                 _attributionCoroutine = null;
             }
             CoreSdkMgr.Instance.OnUserAttributionReceived?.Invoke(true, SkySolarEnginePrefs.Network, SkySolarEnginePrefs.ClickLabel);
-            Sky.SkyAnalyticsMgr.DesignEvent("SE", "Attribution", "Success", true, finalNetwork);
+            //Sky.SkyAnalyticsMgr.DesignEvent("SE", "Attribution", "Success", true, finalNetwork);
 
             float passTime = Time.realtimeSinceStartup - _appStartTime;
             int passTimeSeconds = Mathf.CeilToInt(passTime);
@@ -182,7 +182,7 @@ namespace Sky
                 _attributionCoroutine = null;
             }
             CoreSdkMgr.Instance.OnUserAttributionReceived?.Invoke(false, SkySolarEnginePrefs.Network, SkySolarEnginePrefs.ClickLabel);
-            Sky.SkyAnalyticsMgr.DesignEvent("SE", "Attribution", "Organic", true, "Organic");
+            //Sky.SkyAnalyticsMgr.DesignEvent("SE", "Attribution", "Organic", true, "Organic");
 
             float passTime = Time.realtimeSinceStartup - _appStartTime;
             int passTimeSeconds = Mathf.CeilToInt(passTime);
@@ -348,7 +348,7 @@ namespace Sky
         public void OnAttributionFail(string code)
         {
             LogTool.DebugLog("[SolarEngine] OnAttributionFail, code=" + code, LogTool.Color.yellow);
-            Sky.SkyAnalyticsMgr.DesignEvent("SE", "Attribution", "Fail", true, code ?? "");
+            //Sky.SkyAnalyticsMgr.DesignEvent("SE", "Attribution", "Fail", true, code ?? "");
         }
 
         private static bool IsPaidUser(string network)
