@@ -54,61 +54,200 @@ namespace Sky
         #endregion
 
         /// <summary>
-        /// 广告收益事件上报
-        /// </summary>
-        /// <summary>
         /// 广告收益事件上报（适配 SolarEngine 预置事件 _appImp）
+        /// 使用官方桥接方法 trackAdImpression
         /// </summary>
         public static void TrackAdImpressionEvent(double revenue, string network, string unit, string format, string platform, string pos = "", int formatNumber = 0, int positionNumber = 0)
         {
+            if (!SkySolarEngineMgr.Instance.TrackingEnable()) return;
+            
             if (revenue < 0)
             {
-                LogTool.DebugLog($"[SolarEngine] ad_impression skipped: revenue={revenue} < 0, reporting ad_impression_error");
-                var errorProps = new Dictionary<string, object>
-        {
-            { "ad_platform", platform },
-            { "ad_source", network },
-            { "ad_format", format },
-            { "value", revenue },
-            { "ad_unit_id", unit },
-            { "currency", "USD" },
-        };
-                if (!string.IsNullOrEmpty(pos))
-                    errorProps["position"] = pos;
-                // 错误事件可以保留自定义，或者也改为预置 _appImp（收入为0），这里按原逻辑保留
-                TrackEvent("ad_impression_error", errorProps);
+                LogTool.DebugLog($"[SolarEngine] ad_impression skipped: revenue={revenue} < 0");
                 return;
             }
 
-            // 重要：计算 eCPM（千次展示收益）
-            // 假设 revenue 是单次展示收益（例如 0.002 USD），则 ecpm = 0.002 * 1000 = 2.0
-            // 如果业务侧传入的 revenue 本身就是 eCPM，则不需要乘以 1000，请根据实际情况调整。
-            double ecpm = revenue * 1000;
+            // 解析广告平台名称（从 network 参数提取）
+            string adNetworkPlatform = ParseAdNetworkPlatform(network);
+            if (string.IsNullOrEmpty(adNetworkPlatform))
+            {
+                LogTool.Error($"[SolarEngine] Cannot parse adNetworkPlatform from network: {network}");
+                return;
+            }
 
-            // 构造 SolarEngine 预置事件 _appImp 的参数字典
-            var revenueProps = new Dictionary<string, object>
-    {
-        // 必填：收益字段（必须是 ecpm，单位与 currency 对应）
-        { "ecpm", ecpm },
-        { "currency", "USD" },
-        
-        // 必填：广告平台标识（建议使用官方枚举值，如 admob, csj, pangle 等）
-        { "ad_platform", platform },
-        // 广告网络名称（如 admob, facebook 等）
-        { "ad_source", network },
-        // 广告位 ID（对应方法的 unit 参数）
-        { "ad_unit_id", unit },
-        // 广告形式（如 rewarded, interstitial, banner）
-        { "ad_format", format },
-    };
+            // 解析聚合平台
+            string mediationPlatform = platform.ToLower() == "tpn" ? "topon" : platform.ToLower();
+            
+            // 映射广告类型
+            int adType = 0;
+            string formatLower = format.ToLower();
+            if (formatLower.Contains("reward")) adType = 1;
+            else if (formatLower.Contains("splash")) adType = 2;
+            else if (formatLower.Contains("inter")) adType = 3;
+            else if (formatLower.Contains("banner")) adType = 5;
 
-            // 可选：广告位置
-            if (!string.IsNullOrEmpty(pos))
-                revenueProps["position"] = pos;
+            // 调用桥接方法（使用官方 SEAdImpEventModel）
+            SkySolarEngineMgr.Instance.TrackAdImpression(
+                adNetworkPlatform: adNetworkPlatform,
+                mediationPlatform: mediationPlatform,
+                adType: adType,
+                adNetworkAppID: "",
+                adNetworkADID: unit,
+                ecpm: revenue,
+                currencyType: "USD",
+                isRenderSuccess: true,
+                customProperties: new Dictionary<string, object>
+                {
+                    { "ad_format", format },
+                    { "ad_platform", platform },
+                    { "ad_source", network },
+                    { "position", pos }
+                }
+            );
+        }
 
-            // 关键改动：改为调用 TrackPresetEvent，事件名固定为 _appImp
-            // 这样 SolarEngine 后台才会将其识别为广告收益，归因到 ROI 报表中
-            TrackPresetEvent("_appImp", revenueProps);
+        /// <summary>
+        /// 广告点击事件（_appClick）
+        /// 在广告点击回调中调用
+        /// </summary>
+        public static void TrackAdClickEvent(double revenue, string network, string unit, string format, string platform, string pos = "")
+        {
+            if (!SkySolarEngineMgr.Instance.TrackingEnable()) return;
+            
+            if (string.IsNullOrEmpty(network) || string.IsNullOrEmpty(unit))
+            {
+                LogTool.DebugLog("[SolarEngine] TrackAdClick skipped: missing required params");
+                return;
+            }
+
+            // 解析参数（与展示事件逻辑一致）
+            string adNetworkPlatform = ParseAdNetworkPlatform(network);
+            if (string.IsNullOrEmpty(adNetworkPlatform))
+            {
+                LogTool.Error($"[SolarEngine] Cannot parse adNetworkPlatform from network: {network}");
+                return;
+            }
+
+            string mediationPlatform = platform.ToLower() == "tpn" ? "topon" : platform.ToLower();
+            
+            int adType = 0;
+            string formatLower = format.ToLower();
+            if (formatLower.Contains("reward")) adType = 1;
+            else if (formatLower.Contains("splash")) adType = 2;
+            else if (formatLower.Contains("inter")) adType = 3;
+            else if (formatLower.Contains("banner")) adType = 5;
+
+            // 调用桥接方法（使用官方 SEAdClickEventModel）
+            SkySolarEngineMgr.Instance.TrackAdClick(
+                adNetworkPlatform: adNetworkPlatform,
+                mediationPlatform: mediationPlatform,
+                adType: adType,
+                adNetworkADID: unit,
+                customProperties: new Dictionary<string, object>
+                {
+                    { "ad_format", format },
+                    { "ad_platform", platform },
+                    { "ad_source", network },
+                    { "position", pos }
+                }
+            );
+        }
+
+        /// <summary>
+        /// 应用内购买事件（_appPur）
+        /// 在支付成功/失败回调中调用
+        /// </summary>
+        public static void TrackPurchaseEvent(
+            double payAmount,
+            string currencyType = "CNY",
+            int payStatus = 1,
+            string orderId = "",
+            string payType = "",
+            string productId = "",
+            string productName = "",
+            int productNum = 1,
+            string failReason = "")
+        {
+            if (!SkySolarEngineMgr.Instance.TrackingEnable()) return;
+            
+            if (payAmount < 0)
+            {
+                LogTool.DebugLog($"[SolarEngine] TrackPurchase skipped: payAmount={payAmount} < 0");
+                return;
+            }
+
+            // payStatus: 1=成功, 2=失败
+            if (payStatus != 1 && payStatus != 2)
+            {
+                payStatus = 1;
+            }
+
+            // 调用桥接方法（使用官方 SEPurchaseEventModel）
+            SkySolarEngineMgr.Instance.TrackPurchase(
+                payAmount: payAmount,
+                currencyType: currencyType,
+                payStatus: payStatus,
+                orderId: orderId,
+                payType: payType,
+                productId: productId,
+                productName: productName,
+                productNum: productNum,
+                failReason: failReason
+            );
+        }
+
+        /// <summary>
+        /// 从 network 参数解析广告平台名称
+        /// network 格式: "Topon_2", "Topon_12" 等
+        /// </summary>
+        private static string ParseAdNetworkPlatform(string network)
+        {
+            if (string.IsNullOrEmpty(network)) return "";
+            
+            // 提取 firmId
+            if (network.StartsWith("Topon_"))
+            {
+                string firmIdStr = network.Substring(6);
+                if (int.TryParse(firmIdStr, out int firmId))
+                {
+                    return MapFirmIdToPlatform(firmId);
+                }
+            }
+            
+            return "";
+        }
+
+        /// <summary>
+        /// 映射 TopOn firmId 到平台名称
+        /// </summary>
+        private static string MapFirmIdToPlatform(int firmId)
+        {
+            switch (firmId)
+            {
+                case 1: return "facebook";
+                case 2: return "admob";
+                case 3: return "inmobi";
+                case 4: return "applovin";
+                case 5: return "mintegral";
+                case 7: return "tencent";
+                case 8: return "chartboost";
+                case 10: return "is";
+                case 11: return "unity";
+                case 12: return "vungle";
+                case 15: return "csj";
+                case 16: return "baidu";
+                case 20: return "klein";
+                case 21: return "adcolony";
+                case 22: return "kuaishou";
+                case 23: return "sigmob";
+                case 27: return "fyber";
+                case 28: return "pangle";
+                case 35: return "oppo";
+                case 36: return "huawei";
+                case 37: return "mi";
+                case 38: return "vivo";
+                default: return "";
+            }
         }
 
     }

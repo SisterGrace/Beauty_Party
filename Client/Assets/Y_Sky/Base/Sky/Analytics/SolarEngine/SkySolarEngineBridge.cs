@@ -105,5 +105,104 @@ namespace Sky
             return string.Empty;
 #endif
         }
+
+        // 广告展示收益（_appImp）
+        public static void TrackAdImpression(
+            string adNetworkPlatform,
+            string mediationPlatform,
+            int adType,
+            string adNetworkAppID,
+            string adNetworkADID,
+            float ecpm,
+            string currencyType,
+            bool isRenderSuccess,
+            string customPropertiesJson)
+        {
+#if UNITY_ANDROID && !UNITY_EDITOR
+            try
+            {
+                using var proxy = new AndroidJavaClass(ProxyClass);
+                proxy.CallStatic("trackAdImpression",
+                    adNetworkPlatform ?? "",
+                    mediationPlatform ?? "",
+                    adType,
+                    adNetworkAppID ?? "",
+                    adNetworkADID ?? "",
+                    ecpm,
+                    currencyType ?? "USD",
+                    isRenderSuccess,
+                    customPropertiesJson ?? "{}"
+                );
+            }
+            catch (System.Exception e)
+            {
+                LogTool.Error("[SolarEngine] TrackAdImpression bridge exception: " + e);
+            }
+#endif
+        }
+
+        // 广告点击（_appClick）
+        public static void TrackAdClick(
+            string adNetworkPlatform,
+            string mediationPlatform,
+            int adType,
+            string adNetworkADID,
+            string customPropertiesJson)
+        {
+#if UNITY_ANDROID && !UNITY_EDITOR
+            try
+            {
+                using var proxy = new AndroidJavaClass(ProxyClass);
+                proxy.CallStatic("trackAdClick",
+                    adNetworkPlatform ?? "",
+                    mediationPlatform ?? "",
+                    adType,
+                    adNetworkADID ?? "",
+                    customPropertiesJson ?? "{}"
+                );
+            }
+            catch (System.Exception e)
+            {
+                LogTool.Error("[SolarEngine] TrackAdClick bridge exception: " + e);
+            }
+#endif
+        }
+
+        // 应用内购买（_appPur）
+        public static void TrackPurchase(
+            string orderId,
+            double payAmount,
+            string currencyType,
+            string payType,
+            string productId,
+            string productName,
+            int productNum,
+            int payStatus,
+            string failReason,
+            string customPropertiesJson)
+        {
+#if UNITY_ANDROID && !UNITY_EDITOR
+            try
+            {
+                using var proxy = new AndroidJavaClass(ProxyClass);
+                proxy.CallStatic("trackPurchase",
+                    orderId ?? "",
+                    payAmount,
+                    currencyType ?? "CNY",
+                    payType ?? "",
+                    productId ?? "",
+                    productName ?? "",
+                    productNum,
+                    payStatus,
+                    failReason ?? "",
+                    customPropertiesJson ?? "{}"
+                );
+            }
+            catch (System.Exception e)
+            {
+                LogTool.Error("[SolarEngine] TrackPurchase bridge exception: " + e);
+            }
+#endif
+        }
     }
 }

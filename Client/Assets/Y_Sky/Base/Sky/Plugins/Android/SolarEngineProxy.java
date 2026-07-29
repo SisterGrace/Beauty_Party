@@ -7,6 +7,9 @@ import androidx.annotation.Keep;
 
 import com.reyun.solar.engine.OnAttributionListener;
 import com.reyun.solar.engine.OnInitializationCallback;
+import com.reyun.solar.engine.SEAdClickEventModel;
+import com.reyun.solar.engine.SEAdImpEventModel;
+import com.reyun.solar.engine.SEPurchaseEventModel;
 import com.reyun.solar.engine.SolarEngineConfig;
 import com.reyun.solar.engine.SolarEngineManager;
 
@@ -24,6 +27,9 @@ import java.util.Iterator;
  *   - initialize(appKey, enableLog)        用户同意隐私后调用，开始正式上报；同时挂归因监听
  *   - trackEvent(name, propsJson)          上报自定义事件
  *   - trackPresetEvent(name, propsJson)    上报预置事件（_appStart 等）
+ *   - trackAdImpression(...)               广告展示收益事件（_appImp）
+ *   - trackAdClick(...)                    广告点击事件（_appClick）
+ *   - trackPurchase(...)                   应用内购买事件（_appPur）
  *
  * 归因回调通过 UnityPlayer.UnitySendMessage 回到 Unity：
  *   GameObject = sUnityCallbackTarget（默认 "Sky.SkySolarEngineMgr"）
@@ -162,6 +168,120 @@ public final class SolarEngineProxy {
         } catch (Throwable t) {
             Log.e(TAG, "getAttribution threw", t);
             return "";
+        }
+    }
+
+    /**
+     * 广告展示收益事件（_appImp）
+     * 文档：https://help.solar-engine.com/cn/docs/yu-ding-yi-shi-jian#ddf7239b7394338e3d62aa57598f0bb1
+     */
+    public static void trackAdImpression(
+            String adNetworkPlatform,
+            String mediationPlatform,
+            int adType,
+            String adNetworkAppID,
+            String adNetworkADID,
+            float ecpm,
+            String currencyType,
+            boolean isRenderSuccess,
+            String customPropertiesJson) {
+        
+        if (TextUtils.isEmpty(adNetworkPlatform) || TextUtils.isEmpty(adNetworkADID)) {
+            Log.w(TAG, "trackAdImpression: missing required params");
+            return;
+        }
+        
+        try {
+            JSONObject customProps = parseJson(customPropertiesJson);
+            SEAdImpEventModel model = new SEAdImpEventModel(
+                    adNetworkPlatform,
+                    TextUtils.isEmpty(mediationPlatform) ? "custom" : mediationPlatform,
+                    adType,
+                    TextUtils.isEmpty(adNetworkAppID) ? "" : adNetworkAppID,
+                    adNetworkADID,
+                    ecpm,
+                    TextUtils.isEmpty(currencyType) ? "USD" : currencyType,
+                    isRenderSuccess,
+                    customProps
+            );
+            SolarEngineManager.getInstance().trackAdImpression(model);
+            Log.i(TAG, "trackAdImpression: platform=" + adNetworkPlatform + ", ecpm=" + ecpm);
+        } catch (Throwable t) {
+            Log.e(TAG, "trackAdImpression threw", t);
+        }
+    }
+
+    /**
+     * 广告点击事件（_appClick）
+     * 文档：https://help.solar-engine.com/cn/docs/yu-ding-yi-shi-jian#01134ef29655208d50386a08288e4789
+     */
+    public static void trackAdClick(
+            String adNetworkPlatform,
+            String mediationPlatform,
+            int adType,
+            String adNetworkADID,
+            String customPropertiesJson) {
+        
+        if (TextUtils.isEmpty(adNetworkPlatform) || TextUtils.isEmpty(adNetworkADID)) {
+            Log.w(TAG, "trackAdClick: missing required params");
+            return;
+        }
+        
+        try {
+            JSONObject customProps = parseJson(customPropertiesJson);
+            SEAdClickEventModel model = new SEAdClickEventModel(
+                    adNetworkPlatform,
+                    TextUtils.isEmpty(mediationPlatform) ? "custom" : mediationPlatform,
+                    adType,
+                    adNetworkADID,
+                    customProps
+            );
+            SolarEngineManager.getInstance().trackAdClick(model);
+            Log.i(TAG, "trackAdClick: platform=" + adNetworkPlatform + ", unit=" + adNetworkADID);
+        } catch (Throwable t) {
+            Log.e(TAG, "trackAdClick threw", t);
+        }
+    }
+
+    /**
+     * 应用内购买事件（_appPur）
+     * 文档：https://help.solar-engine.com/cn/docs/yu-ding-yi-shi-jian#0ed9733361cf603f44d3153d31d5fbaa
+     */
+    public static void trackPurchase(
+            String orderId,
+            double payAmount,
+            String currencyType,
+            String payType,
+            String productId,
+            String productName,
+            int productNum,
+            int payStatus,
+            String failReason,
+            String customPropertiesJson) {
+        
+        if (payAmount < 0) {
+            Log.w(TAG, "trackPurchase: payAmount < 0, skip");
+            return;
+        }
+        
+        try {
+            JSONObject customProps = parseJson(customPropertiesJson);
+            SEPurchaseEventModel model = new SEPurchaseEventModel(
+                    TextUtils.isEmpty(orderId) ? "" : orderId,
+                    payAmount,
+                    TextUtils.isEmpty(currencyType) ? "CNY" : currencyType,
+                    TextUtils.isEmpty(payType) ? "" : payType,
+                    TextUtils.isEmpty(productId) ? "" : productId,
+                    TextUtils.isEmpty(productName) ? "" : productName,
+                    productNum,
+                    payStatus,
+                    TextUtils.isEmpty(failReason) ? "" : failReason,
+                    customProps
+            );
+            SolarEngineManager.getInstance().trackPurchase(model);
+            Log.i(TAG, "trackPurchase: amount=" + payAmount + ", status=" + payStatus);
+        } catch (Throwable t) {
+            Log.e(TAG, "trackPurchase threw", t);
         }
     }
 
