@@ -75,7 +75,7 @@ namespace Sky
                 return;
             }
 
-            // 解析聚合平台
+            // 解析聚合平台!注意！！！目前没有其他聚合！！只解析topon即可！！如果有其他平台这里要重新写！！！
             string mediationPlatform = platform.ToLower() == "tpn" ? "topon" : platform.ToLower();
             
             // 映射广告类型
@@ -219,7 +219,7 @@ namespace Sky
 
         /// <summary>
         /// 映射 TopOn firmId 到平台名称
-        /// 参考：TopOn 官方文档 https://docs.toponad.com/#/zh-cn/android/NetworkAccess/NetworkAccessOverview
+        /// 参考：TopOn 官方文档 https://help.toponad.net/cn/docs/2KR6QU#TopOn_%E6%94%AF%E6%8C%81%E8%81%9A%E5%90%88%E4%BB%A5%E4%B8%8B%E5%B9%BF%E5%91%8A%E5%B9%B3%E5%8F%B0
         /// </summary>
         private static string MapFirmIdToPlatform(int firmId)
         {
@@ -234,7 +234,7 @@ namespace Sky
                 case 11: return "is";           // ironSource
                 case 12: return "unity";        // Unity Ads
                 case 13: return "vungle";       // Liftoff(Vungle)
-                case 25: return "startapp";     // Start.io
+                case 25: return "startio";     // Start.io
                 case 29: return "sigmob";       // Sigmob
                 case 32: return "mytarget";     // VK(myTarget)
                 case 33: return "gam";          // Google Ad Manager
@@ -247,7 +247,7 @@ namespace Sky
                 case 58: return "verve";        // Verve Group
                 case 59: return "bigo";         // Bigo Ads
                 case 65: return "bidmachine";   // Bidmachine
-                case 66: return "topon";        // TopOn ADX
+                case 66: return "toponadx";        // TopOn ADX
                 case 71: return "premiumads";   // PremiumAds
                 case 75: return "aps";          // Amazon Publisher Services
                 case 77: return "kuaishou";     // Kwai Network
