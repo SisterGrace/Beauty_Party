@@ -345,17 +345,15 @@ namespace GameLogic
             return allConfigs.Count > 0;
         }
 
-
+       
 
         /// <summary>
-        /// 获取当前AB类型下所有未获得的奖励类型9的商城照片
+        /// 获取当前AB类型下所有未获得的动态照片（排除已获得和不进入随机队列的照片）
         /// </summary>
-        private List<int> GetUnobtainedDynamicPhotos()
+        private List<CfgPhotos> GetUnobtainedDynamicPhotos()
         {
-            var tbPhotoGroupRew = ConfigLoader.Instance.Tables.TbCfgPhotoGroupRew;
-            var photoGroup = tbPhotoGroupRew.GetOrDefault(9);
-            var photoIdList = UserController.Instance.GetCurUserType == 1 ? photoGroup.BPhotoRews: photoGroup.APhotoRews;
-            var saclelist1 = photoIdList.FindAll(a => !UserController.Instance.IsGetPhoto(a));
+            var saclelist = ConfigLoader.GetRandomPhotoList(UserController.Instance.GetCurUserType);
+            var saclelist1 = saclelist.FindAll(a => !UserController.Instance.IsGetPhoto(a.ID));
             return saclelist1;
         }
 
@@ -396,9 +394,9 @@ namespace GameLogic
             var unobtained = GetUnobtainedDynamicPhotos();
             if (unobtained.Count == 0)
             {
-                // 该AB类型下所有照片已获得，返回当前组
-                //currentIds.Clear();
-                //Save();
+                // 该AB类型下所有照片已获得，清空并返回空
+                currentIds.Clear();
+                Save();
                 return currentIds;
             }
 
@@ -407,7 +405,7 @@ namespace GameLogic
             int count = System.Math.Min(10, unobtained.Count);
             for (int i = 0; i < count; i++)
             {
-                currentIds.Add(unobtained[i]);
+                currentIds.Add(unobtained[i].ID);
             }
             Save();
             return currentIds;

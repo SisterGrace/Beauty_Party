@@ -107,7 +107,7 @@ namespace GameLogic
 			// 先检查配表的照片商品是否全部已购买
 			bool allConfigPurchased = UserController.Instance.IsAllConfigPhotosPurchased();
 
-			if (UserController.Instance.GetCurUserType == 0||!allConfigPurchased)
+			if (!allConfigPurchased)
 			{
 				// 配表模式：前10个走原有逻辑
 				for (int i = 0; i < photoCfgs.Count; i++)
