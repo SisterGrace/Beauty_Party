@@ -219,33 +219,43 @@ namespace Sky
 
         /// <summary>
         /// 映射 TopOn firmId 到平台名称
+        /// 参考：TopOn 官方文档 https://docs.toponad.com/#/zh-cn/android/NetworkAccess/NetworkAccessOverview
         /// </summary>
         private static string MapFirmIdToPlatform(int firmId)
         {
             switch (firmId)
             {
-                case 1: return "facebook";
-                case 2: return "admob";
-                case 3: return "inmobi";
-                case 4: return "applovin";
-                case 5: return "mintegral";
-                case 7: return "tencent";
-                case 8: return "chartboost";
-                case 10: return "is";
-                case 11: return "unity";
-                case 12: return "vungle";
-                case 15: return "csj";
-                case 16: return "baidu";
-                case 20: return "klein";
-                case 21: return "adcolony";
-                case 22: return "kuaishou";
-                case 23: return "sigmob";
-                case 27: return "fyber";
-                case 28: return "pangle";
-                case 35: return "oppo";
-                case 36: return "huawei";
-                case 37: return "mi";
-                case 38: return "vivo";
+                case 1: return "facebook";      // Meta(Facebook)
+                case 2: return "admob";         // Admob
+                case 3: return "inmobi";        // Inmobi
+                case 5: return "applovin";      // Applovin
+                case 6: return "mintegral";     // Mintegral
+                case 9: return "chartboost";    // Chartboost
+                case 11: return "is";           // ironSource
+                case 12: return "unity";        // Unity Ads
+                case 13: return "vungle";       // Liftoff(Vungle)
+                case 25: return "startapp";     // Start.io
+                case 29: return "sigmob";       // Sigmob
+                case 32: return "mytarget";     // VK(myTarget)
+                case 33: return "gam";          // Google Ad Manager
+                case 34: return "yandex";       // Yandex
+                case 37: return "fyber";        // Digital Turbine(Fyber)
+                case 40: return "helium";       // Helium
+                case 48: return "a4g";          // A4G(Admob)
+                case 50: return "pangle";       // Pangle
+                case 57: return "reklamup";     // ReklamUp
+                case 58: return "verve";        // Verve Group
+                case 59: return "bigo";         // Bigo Ads
+                case 65: return "bidmachine";   // Bidmachine
+                case 66: return "topon";        // TopOn ADX
+                case 71: return "premiumads";   // PremiumAds
+                case 75: return "aps";          // Amazon Publisher Services
+                case 77: return "kuaishou";     // Kwai Network
+                case 81: return "mi";           // Xiaomi Columbus
+                case 83: return "taurusx";      // TaurusX(Webeye)
+                case 84: return "smaato";       // Smaato
+                case 91: return "moloco";       // Moloco
+                case 100: return "opera";       // Opera
                 default: return "";
             }
         }
