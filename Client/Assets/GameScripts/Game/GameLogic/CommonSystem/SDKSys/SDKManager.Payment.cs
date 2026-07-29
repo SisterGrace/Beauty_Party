@@ -221,6 +221,19 @@ namespace GameLogic
                 var cfg = RechargeController.Instance.GetCfg(result.create_order_request.product_id);
                 GetIAPTotalCost += (float)cfg.Price;
                 RechargeController.Instance.SendReward(result.create_order_request.product_id);
+                
+               /* // 上报 SolarEngine 内购成功事件
+                Sky.SkySolarEngineEvents.TrackPurchaseEvent(
+                    payAmount: cfg.Price,
+                    currencyType: "USD",  // 根据实际货币类型调整（USD/CNY）
+                    payStatus: 1,  // 1=成功
+                    orderId: result.query_order_reuslt?.order_no ?? "",
+                    payType: result.payment_type == CoreIapH5Mgr.CoreLitePaymentType.H5 ? "h5" : "googleplay",
+                    productId: result.create_order_request.product_id,
+                    productName: cfg.product_name ?? "",
+                    productNum: 1
+                );*/
+                
                 CoreSdkMgr.LogCheckingOrder(result.query_order_reuslt, (status, info) =>
                 {
                     Log.Info($"支付上报服务端结果：{status}-------{info}");
@@ -230,6 +243,24 @@ namespace GameLogic
             {
                 ReadFailOrderId(true);
                 Log.Info($"此时支付失败的方式为：{result.payment_type}");
+                
+               /* // 上报 SolarEngine 内购失败事件
+                if (result.create_order_request != null)
+                {
+                    var cfg = RechargeController.Instance.GetCfg(result.create_order_request.product_id);
+                    Sky.SkySolarEngineEvents.TrackPurchaseEvent(
+                        payAmount: cfg != null ? cfg.Price : 0,
+                        currencyType: "USD",
+                        payStatus: 2,  // 2=失败
+                        orderId: result.query_order_reuslt?.order_no ?? "",
+                        payType: result.payment_type == CoreIapH5Mgr.CoreLitePaymentType.H5 ? "h5" : "googleplay",
+                        productId: result.create_order_request.product_id,
+                        productName: cfg?.product_name ?? "",
+                        productNum: 1,
+                        failReason: "payment_failed"
+                    );
+                }*/
+                
                 if (result.payment_type == CoreIapH5Mgr.CoreLitePaymentType.H5)
                 {
                     GetPayDailyTimes++;
