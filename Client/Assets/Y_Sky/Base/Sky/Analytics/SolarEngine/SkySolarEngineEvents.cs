@@ -110,7 +110,7 @@ namespace Sky
         /// 广告点击事件（_appClick）
         /// 在广告点击回调中调用
         /// </summary>
-        public static void TrackAdClickEvent(double revenue, string network, string unit, string format, string platform, string pos = "")
+        public static void TrackAdClickEvent(string network, string unit, string format, string platform, string pos = "")
         {
             if (!SkySolarEngineMgr.Instance.TrackingEnable()) return;
             
