@@ -93,7 +93,7 @@ namespace Sky
                 adType: adType,
                 adNetworkAppID: "",
                 adNetworkADID: unit,
-                ecpm: revenue,
+                ecpm: revenue*1000,
                 currencyType: "USD",
                 isRenderSuccess: true,
                 customProperties: new Dictionary<string, object>
