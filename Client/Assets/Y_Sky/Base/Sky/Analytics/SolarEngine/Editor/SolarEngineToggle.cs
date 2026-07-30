@@ -21,11 +21,11 @@ public class SolarEngineToggle : IPreprocessBuildWithReport
     public int callbackOrder => 0;
 
     // ========== 文件路径（相对于 Assets 目录） ==========
-    private const string JavaFilePath = "Y_Sky/Base/Sky/Plugins/Android/SolarEngineProxy.java";
-    private const string JavaFileDisabled = "Y_Sky/Base/Sky/Plugins/Android/SolarEngineProxy.java_not";
+    private const string JavaFilePath = "SolarEngine/Plugins/Android/SolarEngineProxy.java";
+    private const string JavaFileDisabled = "SolarEngine/Plugins/Android/SolarEngineProxy.java_not";
 
-    private const string XmlFilePath = "Y_Sky/Base/Sky/Analytics/SolarEngine/Editor/SolarEngineDependencies.xml";
-    private const string XmlFileDisabled = "Y_Sky/Base/Sky/Analytics/SolarEngine/Editor/SolarEngineDependencies.xml_not";
+    private const string XmlFilePath = "SolarEngine/Editor/SolarEngineDependencies.xml";
+    private const string XmlFileDisabled = "SolarEngine/Editor/SolarEngineDependencies.xml_not";
 
     // ========== 宏定义名称 ==========
     private const string MacroName = "SOLAR_ENGINE";
