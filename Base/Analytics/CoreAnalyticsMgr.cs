@@ -120,9 +120,9 @@ namespace CoreLite
         /// <param name="pos">广告展示点位，客户端根据实际位置上报</param>
         /// <param name="formatNumber">第几次展示该格式的广告（1、2、3…），每个广告格式独立统计</param>
         /// <param name="positionNumber">第几次展示该点位的广告（1、2、3…），每个广告触发点位独立统计</param>
-        public static void TrackAdImpressionEvent(double revenue, string network, string unit, string placement, string format, string platform, string pos = "", int formatNumber = 0, int positionNumber = 0)
+        public static void TrackAdImpressionEvent(double revenue, string network, string unit, string placement, string format, string platform, string pos = "", int formatNumber = 0, int positionNumber = 0, string currency = "USD")
         {
-            CoreLogUtils.Debug("TrackAdImpressionEvent"+" revenue:"+revenue+" network:"+network+" unit:"+unit+" placement:"+placement+" format:"+format+" platform:"+platform+" pos:"+pos+" format_number:"+formatNumber+" position_number:"+positionNumber);
+            CoreLogUtils.Debug("TrackAdImpressionEvent"+" revenue:"+revenue+" network:"+network+" unit:"+unit+" placement:"+placement+" format:"+format+" platform:"+platform+" pos:"+pos+" format_number:"+formatNumber+" position_number:"+positionNumber+" currency:"+currency);
             
             // 上报买量消耗成本事件（热云）
             CoreAnalyticsMgr.TrackEvent("track_ad_spend", new Dictionary<string, object>
@@ -132,7 +132,7 @@ namespace CoreLite
             
             CoreFirebaseEvents.TrackAdImpressionEvent(revenue, network, unit, format, platform, pos, formatNumber, positionNumber);
             Sky.SkyGAEvents.TrackAdImpressionEvent(revenue, network, unit, format, platform, pos, formatNumber, positionNumber);
-            Sky.SkySolarEngineEvents.TrackAdImpressionEvent(revenue, network, unit, format, platform, pos, formatNumber, positionNumber);
+            Sky.SkySolarEngineEvents.TrackAdImpressionEvent(revenue, network, unit, format, platform, pos, formatNumber, positionNumber, currency);
 #if ADJUST
             CoreAdjustEvents.TrackAdImpressionEvent(revenue, network, unit, placement);
 #endif

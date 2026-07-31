@@ -52,7 +52,7 @@ namespace CoreLite
             sb.AppendLine($"Response Headers: \n {GetHeadersAsString(request.GetResponseHeaders())}");
             var downloadHandlerText = request.downloadHandler != null ? request.downloadHandler.text : "";
             sb.AppendLine($"Response: {downloadHandlerText}");
-            Debug.Log(sb.ToString());
+            //Debug.Log(sb.ToString());
 #endif
 
             if (request.result == UnityWebRequest.Result.Success)

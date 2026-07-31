@@ -124,16 +124,42 @@ namespace CoreLite
         /// </summary>
         public static void LogClickEvent(AdLoadType loadType, double revenue, string pos, string placement, string network, string platform, string unit)
         {
-            return;
+            // 上报 ThinkingData/Firebase/GA 等统计
             CoreAnalyticsMgr.TrackEvent(ClickEventNames[(int)loadType], new Dictionary<string, object>
             {
                 {"Position", pos ?? ""},
                 {"ad_id", placement ?? ""},
                 {"ad_platform", network ?? ""},
-                //{"ad_platform", platform ?? ""},
-                //{"ad_unit_name", unit ?? ""},
                 {"ecpm", revenue}
             });
+
+            // 上报 SolarEngine 点击事件（_appClick）- 不包含收益字段
+            string format = GetAdFormat(loadType);
+            Sky.SkySolarEngineEvents.TrackAdClickEvent(
+                network: network,
+                unit: unit,
+                format: format,
+                platform: platform,
+                pos: pos
+            );
+        }
+
+        /// <summary>
+        /// 根据广告类型获取格式名称
+        /// </summary>
+        private static string GetAdFormat(AdLoadType loadType)
+        {
+            switch (loadType)
+            {
+                case AdLoadType.Reward: return "Rewarded";
+                case AdLoadType.Interstitial: return "Interstitial";
+                case AdLoadType.Splash: return "Splash";
+                case AdLoadType.Banner: return "Banner";
+                case AdLoadType.Native: return "Native";
+                case AdLoadType.NativeFullscreen: return "NativeFullscreen";
+                case AdLoadType.NativeSmall: return "NativeSmall";
+                default: return "Unknown";
+            }
         }
     }
 }

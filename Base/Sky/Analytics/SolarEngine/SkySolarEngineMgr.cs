@@ -145,7 +145,7 @@ namespace Sky
                 _attributionCoroutine = null;
             }
             CoreSdkMgr.Instance.OnUserAttributionReceived?.Invoke(true, SkySolarEnginePrefs.Network, SkySolarEnginePrefs.ClickLabel);
-            Sky.SkyAnalyticsMgr.DesignEvent("SE", "Attribution", "Success", true, finalNetwork);
+            //Sky.SkyAnalyticsMgr.DesignEvent("SE", "Attribution", "Success", true, finalNetwork);
 
             float passTime = Time.realtimeSinceStartup - _appStartTime;
             int passTimeSeconds = Mathf.CeilToInt(passTime);
@@ -182,7 +182,7 @@ namespace Sky
                 _attributionCoroutine = null;
             }
             CoreSdkMgr.Instance.OnUserAttributionReceived?.Invoke(false, SkySolarEnginePrefs.Network, SkySolarEnginePrefs.ClickLabel);
-            Sky.SkyAnalyticsMgr.DesignEvent("SE", "Attribution", "Organic", true, "Organic");
+            //Sky.SkyAnalyticsMgr.DesignEvent("SE", "Attribution", "Organic", true, "Organic");
 
             float passTime = Time.realtimeSinceStartup - _appStartTime;
             int passTimeSeconds = Mathf.CeilToInt(passTime);
@@ -220,6 +220,82 @@ namespace Sky
         {
             if (!IsInitialized || string.IsNullOrEmpty(eventName)) return;
             SkySolarEngineBridge.TrackPresetEvent(eventName, ToJson(properties));
+        }
+
+        /// <summary>
+        /// 广告展示收益事件（_appImp）
+        /// </summary>
+        public void TrackAdImpression(
+            string adNetworkPlatform,
+            string mediationPlatform,
+            int adType,
+            string adNetworkAppID,
+            string adNetworkADID,
+            double ecpm,
+            string currencyType,
+            bool isRenderSuccess,
+            Dictionary<string, object> customProperties = null)
+        {
+            if (!IsInitialized) return;
+
+            float ecpmFloat = (float)ecpm;
+            string customJson = customProperties != null ? ToJson(customProperties) : "{}";
+
+            SkySolarEngineBridge.TrackAdImpression(
+                adNetworkPlatform, mediationPlatform, adType,
+                adNetworkAppID ?? "", adNetworkADID ?? "",
+                ecpmFloat, currencyType, isRenderSuccess, customJson);
+
+            LogTool.DebugLog($"[SolarEngine] TrackAdImpression: platform={adNetworkPlatform}, " +
+                $"mediation={mediationPlatform}, type={adType}, adId={adNetworkADID}, ecpm={ecpm}");
+        }
+
+        /// <summary>
+        /// 广告点击事件（_appClick）
+        /// </summary>
+        public void TrackAdClick(
+            string adNetworkPlatform,
+            string mediationPlatform,
+            int adType,
+            string adNetworkADID,
+            Dictionary<string, object> customProperties = null)
+        {
+            if (!IsInitialized) return;
+
+            string customJson = customProperties != null ? ToJson(customProperties) : "{}";
+
+            SkySolarEngineBridge.TrackAdClick(
+                adNetworkPlatform, mediationPlatform, adType,
+                adNetworkADID ?? "", customJson);
+
+            LogTool.DebugLog($"[SolarEngine] TrackAdClick: platform={adNetworkPlatform}, unit={adNetworkADID}");
+        }
+
+        /// <summary>
+        /// 应用内购买事件（_appPur）
+        /// </summary>
+        public void TrackPurchase(
+            double payAmount,
+            string currencyType,
+            int payStatus,
+            string orderId = "",
+            string payType = "",
+            string productId = "",
+            string productName = "",
+            int productNum = 1,
+            string failReason = "",
+            Dictionary<string, object> customProperties = null)
+        {
+            if (!IsInitialized) return;
+
+            string customJson = customProperties != null ? ToJson(customProperties) : "{}";
+
+            SkySolarEngineBridge.TrackPurchase(
+                orderId, payAmount, currencyType, payType,
+                productId, productName, productNum, payStatus,
+                failReason, customJson);
+
+            LogTool.DebugLog($"[SolarEngine] TrackPurchase: amount={payAmount}, status={payStatus}");
         }
         #endregion
 
@@ -272,7 +348,7 @@ namespace Sky
         public void OnAttributionFail(string code)
         {
             LogTool.DebugLog("[SolarEngine] OnAttributionFail, code=" + code, LogTool.Color.yellow);
-            Sky.SkyAnalyticsMgr.DesignEvent("SE", "Attribution", "Fail", true, code ?? "");
+            //Sky.SkyAnalyticsMgr.DesignEvent("SE", "Attribution", "Fail", true, code ?? "");
         }
 
         private static bool IsPaidUser(string network)
