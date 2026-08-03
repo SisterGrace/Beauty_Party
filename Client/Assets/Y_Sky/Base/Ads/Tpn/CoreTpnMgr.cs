@@ -268,7 +268,7 @@ namespace CoreLite
             try
             {
                 // 使用 TopOn Unity 插件提供的 API 调起测试工具（需链接包 debugger-ui-tpn）
-                ATSDKAPI.showDebuggerUI();
+                ATSDKAPI.showDebuggerUI("06f402c6cc6e648864b017edebda4fce07fc89a8");//debug key
                 CoreLogUtils.Debug("[CoreLiteTpn] Debugger UI launched via ATSDKAPI.showDebuggerUI()");
             }
             catch (System.Exception e)
