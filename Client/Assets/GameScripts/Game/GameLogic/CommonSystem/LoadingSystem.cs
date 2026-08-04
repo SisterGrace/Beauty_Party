@@ -234,7 +234,7 @@ namespace GameLogic
         {
             if (!_loadGameDataIn)
             {
-                Log.Warning("加载游戏数据");
+                Log.Info("加载游戏数据");
                 _loadGameDataIn = true;
                 _timeSp.Restart();
 #if UNITY_EDITOR

@@ -159,7 +159,7 @@ namespace GameLogic
                         {
                             if (ct > threshold)
                             {
-                                Log.Warning($"{config.LevelName} Layer坐标({coord.X},{coord.Y})中存在cardType={ct}，超过{threshold}");
+                                Log.Info($"{config.LevelName} Layer坐标({coord.X},{coord.Y})中存在cardType={ct}，超过{threshold}");
                                 //return;
                             }
                         }
