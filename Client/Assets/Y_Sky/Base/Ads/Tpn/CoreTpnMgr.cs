@@ -89,11 +89,8 @@ namespace CoreLite
 
 
             CoreLogUtils.Debug("[CoreLiteTpn] ATSDKAPI.initSDK begin appId:" + _appId);
-            var listener = new CoreTpnInitListener(
-                _appId,
-                onSuccess: OnSdkInitSuccess,
-                onFail: OnSdkInitFail);
-            AnyThinkAds.Api.ATSDKAPI.initSDK(_appId, _appKey, listener);
+            CoreLogUtils.Debug("[CoreLiteTpn] Showing GDPR consent dialog...");
+            ATSDKAPI.showGDPRConsentDialog(new ConsentDismissListener(_appId, _appKey, OnSdkInitSuccess, OnSdkInitFail));
 #else
             CoreLogUtils.Debug("[CoreLiteTpn] Skip init on non-mobile platform");
 #endif

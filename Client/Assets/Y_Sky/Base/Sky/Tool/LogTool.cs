@@ -61,7 +61,7 @@ namespace Sky
             }
             else
             {
-                Debug.Log(string.Format(colorStr, log));
+                Debug.Log(string.Format(colorStr, "[Sky.Log]: "+log));
             }
 
         }
@@ -82,7 +82,7 @@ namespace Sky
             }
             else
             {
-                Debug.LogError("Error!!! [" + path + "_" + name + "]:" + log);
+                Debug.LogError("[Sky.Log]: Error!!! [" + path + "_" + name + "]:" + log);
             }
             str = null;
         }
