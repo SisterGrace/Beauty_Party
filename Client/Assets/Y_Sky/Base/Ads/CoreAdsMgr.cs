@@ -506,7 +506,7 @@ namespace CoreLite
             if (CorePrefs.IsRemoveAds) return;
             foreach (var network in _adNetworks)
             {
-                CoreLogUtils.Debug("init ads sdk network:" + network.ToString());
+                CoreLogUtils.Debug("LoadSplash:" + network.ToString());
                 network.LoadSplash();
             }
         }

@@ -3,7 +3,7 @@ apply plugin: 'com.android.library'
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation("com.google.android.ump:user-messaging-platform:2.1.0")
+    implementation 'com.google.android.ump:user-messaging-platform:3.1.0'
     implementation 'androidx.media3:media3-common:1.4.1'
     implementation 'androidx.media3:media3-container:1.4.1'
     implementation 'androidx.media3:media3-database:1.4.1'

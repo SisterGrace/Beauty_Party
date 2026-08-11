@@ -79,8 +79,9 @@ namespace CoreLite
                 CoreLogUtils.Debug("[CoreLiteTpn] setNetworkLogDebug failed: " + e.Message);
             }
 
-            // TopOn 调试模式：使用硬编码 GAID 开启 Admob 测试广告（避免主线程阻塞获取GAID失败）
-            SetTopOnDebugMode("2d04bdd5-eb09-4df0-9293-250ab4990c5b");
+            SetUMPDebugMode("CECC96A68B641E880BC8530704249FE9");
+            //SetTopOnDebugMode("2d04bdd5-eb09-4df0-9293-250ab4990c5b");
+
 #endif
 #if ADMOB_TEST && UNITY_ANDROID
             SetAdmobTestDevice("CECC96A68B641E880BC8530704249FE9"); // AdMob 设备 hash（从日志获取，非 GAID）
@@ -89,7 +90,6 @@ namespace CoreLite
 
 
             CoreLogUtils.Debug("[CoreLiteTpn] ATSDKAPI.initSDK begin appId:" + _appId);
-            CoreLogUtils.Debug("[CoreLiteTpn] Showing GDPR consent dialog...");
             ATSDKAPI.showGDPRConsentDialog(new ConsentDismissListener(_appId, _appKey, OnSdkInitSuccess, OnSdkInitFail));
 #else
             CoreLogUtils.Debug("[CoreLiteTpn] Skip init on non-mobile platform");
@@ -134,7 +134,7 @@ namespace CoreLite
 #endif
 #if TOPON_TEST && UNITY_ANDROID
             // SDK 初始化成功后，调起 TopOn 测试工具 UI（链接包方式）
-            ShowDebuggerUI();
+            //ShowDebuggerUI();
 #endif
 
             // 开屏优先 load，其余并行
@@ -323,6 +323,56 @@ namespace CoreLite
             catch (System.Exception e)
             {
                 CoreLogUtils.Debug("[CoreLiteTpn] SetTopOnDebugMode failed: " + e.Message);
+            }
+        }
+        /// <summary>
+        /// 通过 Android 桥接强制开启 UMP 测试模式（欧盟地区 + 测试设备）
+        /// 必须在 showGDPRConsentDialog 之前调用
+        /// </summary>
+        /// <param name="testDeviceId">从日志中过滤 "addTestDeviceHashedId" 获取的设备ID</param>
+        /// <summary>
+        /// 通过 Android 桥接强制开启 UMP 测试模式（欧盟地区 + 测试设备）
+        /// 必须在 showGDPRConsentDialog 之前调用
+        /// </summary>
+        /// <param name="testDeviceId">从日志中过滤 "addTestDeviceHashedId" 获取的设备ID</param>
+        private static void SetUMPDebugMode(string testDeviceId)
+        {
+            if (string.IsNullOrEmpty(testDeviceId))
+            {
+                CoreLogUtils.Debug("[CoreLiteTpn] SetUMPDebugMode skipped: testDeviceId is empty");
+                return;
+            }
+
+            try
+            {
+                using (var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
+                using (var activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"))
+                using (var atsdkClass = new AndroidJavaClass("com.secmtp.sdk.core.api.ATSDK")) // 或 "com.anythink.core.api.ATSDK"
+                {
+                    // 1. 构建 ATDebuggerConfig 对象，并设置测试设备 ID
+                    // 注意：Builder 的类名可能因 SDK 版本而异，常见的有：
+                    // com.secmtp.sdk.core.api.ATDebuggerConfig$Builder
+                    // com.anythink.core.api.ATDebuggerConfig$Builder
+                    using (var builder = new AndroidJavaObject("com.secmtp.sdk.core.api.ATDebuggerConfig$Builder"))
+                    {
+                        // 调用 setUMPTestDeviceId 方法设置测试设备
+                        builder.Call<AndroidJavaObject>("setUMPTestDeviceId", testDeviceId);
+                        var config = builder.Call<AndroidJavaObject>("build");
+
+                        // 2. 调用 ATSDK.setDebuggerConfig，传入 context, "", 和 config 对象
+                        // 这对应了 Android 代码：ATSDK.setDebuggerConfig(activity, "", config)
+                        atsdkClass.CallStatic("setDebuggerConfig", activity, "", config);
+
+                        CoreLogUtils.Debug("[CoreLiteTpn] UMP debug mode set with testDeviceId=" + testDeviceId);
+                    }
+                }
+            }
+            catch (System.Exception e)
+            {
+                CoreLogUtils.Debug("[CoreLiteTpn] SetUMPDebugMode failed: " + e.Message);
+                // 如果上述代码失败，可能需要尝试不同的类名
+                // 例如：将 "com.secmtp.sdk.core.api.ATDebuggerConfig$Builder" 
+                // 替换为 "com.anythink.core.api.ATDebuggerConfig$Builder"
             }
         }
 #endif

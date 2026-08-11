@@ -23,7 +23,7 @@ namespace AnyThinkAds.Android
 
         public void initSDK(string appId, string appKey, ATSDKInitListener listener)
         {
-            Debug.Log("initSDK....");
+            Debug.Log("ATSDKAPIClient.initSDK....");
             sdkInitListener = listener;
             try
             {
@@ -201,7 +201,7 @@ namespace AnyThinkAds.Android
 
         public void initSDKSuccess(string appid)
         {
-            Debug.Log("initSDKSuccess...unity3d.");
+            Debug.Log("ATSDKAPIClient.initSDKSuccess...unity3d.");
             if(sdkInitListener != null){
                 sdkInitListener.initSuccess();
             }
