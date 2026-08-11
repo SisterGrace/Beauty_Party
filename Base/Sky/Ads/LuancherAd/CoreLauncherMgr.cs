@@ -20,6 +20,36 @@ namespace CoreLite
         private GameObject _callbackGameObject;
         private LauncherAdCallback _callback;
 
+        // 缓存 AndroidJavaClass 实例，避免重复创建
+        private static AndroidJavaClass _bridgeInstance;
+        
+        /// <summary>
+        /// 获取缓存的 Bridge 类引用，仅在 Android 平台且非编辑器模式下有效
+        /// </summary>
+        public static AndroidJavaClass Bridge
+        {
+            get
+            {
+#if UNITY_ANDROID && !UNITY_EDITOR
+                if (_bridgeInstance == null)
+                {
+                    try
+                    {
+                        _bridgeInstance = new AndroidJavaClass(BridgeClass);
+                        CoreLogUtils.Debug("[CoreLauncherMgr] Bridge class cached successfully.");
+                    }
+                    catch (Exception e)
+                    {
+                        CoreLogUtils.Error("[CoreLauncherMgr] Failed to create Bridge class: " + e.Message);
+                    }
+                }
+                return _bridgeInstance;
+#else
+                return null;
+#endif
+            }
+        }
+
         public string ClientName => PlatformName;
         public CorePlatformType PlatformType => CorePlatformType.Launcher; // 需要在 CorePlatformType 中新增
 
@@ -69,9 +99,9 @@ namespace CoreLite
         private void SetUnityCallbackTarget(string gameObjectName)
         {
 #if UNITY_ANDROID && !UNITY_EDITOR
-            using (var bridge = new AndroidJavaClass(BridgeClass))
+            if (Bridge != null)
             {
-                bridge.CallStatic("setUnityCallbackTarget", gameObjectName);
+                Bridge.CallStatic("setUnityCallbackTarget", gameObjectName);
                 CoreLogUtils.Debug("[CoreLauncherMgr] setUnityCallbackTarget: " + gameObjectName);
             }
 #endif
@@ -89,10 +119,11 @@ namespace CoreLite
 #if UNITY_ANDROID && !UNITY_EDITOR
             try
             {
-                using (var bridge = new AndroidJavaClass(BridgeClass))
+                if (Bridge != null)
                 {
-                    return bridge.CallStatic<string>("getAdGameConfig");
+                    return Bridge.CallStatic<string>("getAdGameConfig");
                 }
+                return "";
             }
             catch (Exception e)
             {
@@ -105,6 +136,7 @@ namespace CoreLite
         }
 
         #endregion
+
 
         #region ICoreAdService - 通用
 
@@ -140,10 +172,11 @@ namespace CoreLite
 #if UNITY_ANDROID && !UNITY_EDITOR
             try
             {
-                using (var bridge = new AndroidJavaClass(BridgeClass))
+                if (Bridge != null)
                 {
-                    return bridge.CallStatic<bool>("isBiddingInterstitialReady");
+                    return Bridge.CallStatic<bool>("isBiddingInterstitialReady");
                 }
+                return false;
             }
             catch (Exception e)
             {
@@ -163,10 +196,11 @@ namespace CoreLite
 #if UNITY_ANDROID && !UNITY_EDITOR
             try
             {
-                using (var bridge = new AndroidJavaClass(BridgeClass))
+                if (Bridge != null)
                 {
-                    return bridge.CallStatic<int>("getBiddingInterstitialCacheCount");
+                    return Bridge.CallStatic<int>("getBiddingInterstitialCacheCount");
                 }
+                return 0;
             }
             catch (Exception e)
             {
@@ -186,7 +220,7 @@ namespace CoreLite
         /// <summary>
         /// 展示插屏广告，可传入场景 ID 用于统计。
         /// </summary>
-        public void ShowInterstitial(string scenarioId)
+        public void ShowInterstitial(string position)
         {
             if (!IsInterstitialAvailable())
             {
@@ -197,10 +231,10 @@ namespace CoreLite
 #if UNITY_ANDROID && !UNITY_EDITOR
             try
             {
-                using (var bridge = new AndroidJavaClass(BridgeClass))
+                if (Bridge != null)
                 {
-                    bridge.CallStatic("showBiddingInterstitial", scenarioId ?? "");
-                    CoreLogUtils.Debug("[CoreLauncherMgr] ShowInterstitial: " + scenarioId);
+                    Bridge.CallStatic("showBiddingInterstitial", position ?? "");
+                    CoreLogUtils.Debug("[CoreLauncherMgr] ShowInterstitial: " + position);
                 }
             }
             catch (Exception e)
@@ -216,9 +250,9 @@ namespace CoreLite
 #if UNITY_ANDROID && !UNITY_EDITOR
             try
             {
-                using (var bridge = new AndroidJavaClass(BridgeClass))
+                if (Bridge != null)
                 {
-                    bridge.CallStatic("destroyBiddingInterstitial");
+                    Bridge.CallStatic("destroyBiddingInterstitial");
                     CoreLogUtils.Debug("[CoreLauncherMgr] DestroyInterstitial");
                 }
             }
@@ -267,10 +301,11 @@ namespace CoreLite
 #if UNITY_ANDROID && !UNITY_EDITOR
             try
             {
-                using (var bridge = new AndroidJavaClass(BridgeClass))
+                if (Bridge != null)
                 {
-                    return bridge.CallStatic<bool>("isBiddingRewardedReady");
+                    return Bridge.CallStatic<bool>("isBiddingRewardedReady");
                 }
+                return false;
             }
             catch (Exception e)
             {
@@ -290,10 +325,11 @@ namespace CoreLite
 #if UNITY_ANDROID && !UNITY_EDITOR
             try
             {
-                using (var bridge = new AndroidJavaClass(BridgeClass))
+                if (Bridge != null)
                 {
-                    return bridge.CallStatic<int>("getBiddingRewardedCacheCount");
+                    return Bridge.CallStatic<int>("getBiddingRewardedCacheCount");
                 }
+                return 0;
             }
             catch (Exception e)
             {
@@ -305,15 +341,10 @@ namespace CoreLite
 #endif
         }
 
-        public void ShowRewarded()
-        {
-            ShowRewarded("");
-        }
-
         /// <summary>
         /// 展示激励视频广告，可传入场景 ID 用于统计。
         /// </summary>
-        public void ShowRewarded(string scenarioId)
+        public void ShowRewarded(string position =null)
         {
             if (!IsRewardedAvailable())
             {
@@ -328,10 +359,10 @@ namespace CoreLite
 #if UNITY_ANDROID && !UNITY_EDITOR
             try
             {
-                using (var bridge = new AndroidJavaClass(BridgeClass))
+                if (Bridge != null)
                 {
-                    bridge.CallStatic("showBiddingRewarded", scenarioId ?? "");
-                    CoreLogUtils.Debug("[CoreLauncherMgr] ShowRewarded: " + scenarioId);
+                    Bridge.CallStatic("showBiddingRewarded", position ?? "");
+                    CoreLogUtils.Debug("[CoreLauncherMgr] ShowRewarded: " + position);
                 }
             }
             catch (Exception e)
@@ -351,9 +382,9 @@ namespace CoreLite
 #if UNITY_ANDROID && !UNITY_EDITOR
             try
             {
-                using (var bridge = new AndroidJavaClass(BridgeClass))
+                if (Bridge != null)
                 {
-                    bridge.CallStatic("destroyBiddingRewarded");
+                    Bridge.CallStatic("destroyBiddingRewarded");
                     CoreLogUtils.Debug("[CoreLauncherMgr] DestroyRewarded");
                 }
             }

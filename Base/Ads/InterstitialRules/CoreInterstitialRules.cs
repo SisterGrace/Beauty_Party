@@ -13,25 +13,29 @@ namespace CoreLite
         public Dictionary<IvType, float> _adTypeTimeInterVal = new Dictionary<IvType, float>();
         public IvType _currentShowIvType = IvType.NULL;
         public float _videoStartTime = 0;
-        public string CanShowInter(IvType _type)
+        public float _firstInterTime = 0;
+        public string CanShowInter(IvType _type, out ADLimitType aDLimitType)
         {
             // 【1】前N次不展示插屏
             var checkIfReachFirstNTimes = CheckIfReachFirstNTimes(_type);
             if (checkIfReachFirstNTimes != null)
             {
+                aDLimitType = ADLimitType.Skip_Level;
                 return checkIfReachFirstNTimes;
             }
 
             // 到达N次后，第N+1次直接展示插屏
             if (string.IsNullOrEmpty(IfFirstCheckPlayerPrefs(_type)))
             {
-                CoreLogUtils.Debug(" [ads]CanShowInter 到达第N+1次且时间满足");
+                CoreLogUtils.Debug(" [ads] 首次：到达第N+1次且时间满足");
+                aDLimitType = ADLimitType.Not;
                 return null;
             }
             else if (IfFirstCheckPlayerPrefs(_type).Equals(1))
             {
-                CoreLogUtils.Debug(" [ads] CanShowInter 到达第N+1次但是时间未到");
-                return "到达N次,但是时间未到";
+                CoreLogUtils.Debug(" [ads] 首次：到达第N+1次但是时间未到");
+                aDLimitType = ADLimitType.First_Time;
+                return " [ads] 首次：到达N次,但是时间未到";
             }
 
             // 非第N+1次，不能直接展示广告； 【2】要判断是否达到了间隔次数；
@@ -52,11 +56,12 @@ namespace CoreLite
                 _ivsCount.Add(innerIvType, currTimes);
             }
 
-            CoreLogUtils.Debug(" [ads] CanShowInter 当前间隔次数：" + currTimes + " 远端次数：" + needTimes + " IV Type:" + _type);
+            CoreLogUtils.Debug(" [ads] 非首次：当前间隔次数：" + currTimes + " 远端次数：" + needTimes + " IV Type:" + _type);
             if (currTimes <= needTimes)
             {
+                aDLimitType = ADLimitType.Over_Level;
                 // 没到频次控制时间
-                return "CanShowInter 当前间隔次数：" + currTimes + "远端次数：" + needTimes + " IV Type:" + _type;
+                return "非首次：当前间隔次数：" + currTimes + "远端次数：" + needTimes + " IV Type:" + _type;
             }
 
             //【3】判断是否达到最小时间间隔
@@ -64,7 +69,8 @@ namespace CoreLite
             var mIvStartTime = _videoStartTime; //GetCurrentTimeInterVal(_type);
             var adInterTime = Time.realtimeSinceStartup - mIvStartTime;
             bool canShowFlag = adInterTime >= timeInterVal;
-            var msg = "CanShowInter 插屏时间间隔：当前时间：" + adInterTime + " 远端时间：" + timeInterVal + " IV Type:" + _type + " canShowFlag:" +
+            aDLimitType = ADLimitType.Interval_Time;
+            var msg = "非首次：插屏时间间隔：当前时间：" + adInterTime + " 远端时间：" + timeInterVal + " IV Type:" + _type + " canShowFlag:" +
                     canShowFlag;
             CoreLogUtils.Debug(" [ads]" + msg);
 
@@ -78,7 +84,7 @@ namespace CoreLite
             {
                 return msg;
             }
-
+            aDLimitType = ADLimitType.Not;
             return null;
         }
         public void ResetIvsCount(IvType _type)
@@ -166,8 +172,8 @@ namespace CoreLite
 
             reachTime += 1;
             CorePrefs.SetInt(reachKey, reachTime);
-            var msg = "插屏类型："+ _type.ToString() + " 前N次不展示插屏,本地次数:" + reachTime + " 远端参数：" + GetInterRules(_type).Skip_Level +
-                    "IV Type:" + _type;
+            var msg = "首次：插屏类型：" + _type.ToString() + " 前N次不展示插屏,本地次数:" + reachTime + " 远端参数：" + GetInterRules(_type).Skip_Level +
+                    " IV Type:" + _type;
             CoreLogUtils.Debug(" [ads]" + msg + "canshow:" + canShow);
             if (!canShow)
             {
@@ -183,14 +189,14 @@ namespace CoreLite
             string values = CorePrefs.GetString(key, "");
             if (values.Length <= 0)
             {
-                int timeInterVal = GetInterRules(_type).Interval_Time;
-                if (_videoStartTime == 0)
+                int timeInterVal = GetInterRules(_type).First_Time;
+                if (_firstInterTime == 0)
                 {
                     CorePrefs.SetString(key, key);
                     return null;
                 }
 
-                var adInterTime = Time.realtimeSinceStartup - _videoStartTime;
+                var adInterTime = Time.realtimeSinceStartup - _firstInterTime;
                 bool canShowFlag = adInterTime >= timeInterVal;
                 CoreLogUtils.Debug(" [ads]" + "到达N +1次了,插屏类型:" + _type + " 远端时间间隔:" + timeInterVal + " 当前时间：" + adInterTime);
                 if (canShowFlag)
@@ -212,6 +218,7 @@ namespace CoreLite
         public ConfigItem GetInterRules(IvType index)
         {
             string jsonData = CoreAnalyticsMgr.GetConfigStr("IV_Switch", INTER_RULES_DEFAULT_VALUE);
+
             //CoreLogUtils.Debug($"CoreLite IV rule jsondata: {jsonData}");
             
             ConfigItem CreateDefaultConfig()
@@ -219,6 +226,7 @@ namespace CoreLite
                 return new ConfigItem
                 {
                     Type = 1,
+                    First_Time = 0,
                     Over_Level = 0,
                     Interval_Time = 0,
                     Skip_Level = 1
@@ -237,12 +245,13 @@ namespace CoreLite
             }
         }
 
-        private static string INTER_RULES_DEFAULT_VALUE = "[{\"Type\":1,\"Over_Level\":0,\"Interval_Time\":0,\"Skip_Level\":1}]";
+        private static string INTER_RULES_DEFAULT_VALUE = "[{\"Type\":1,\"First_Time\":0,\"Over_Level\":0,\"Interval_Time\":0,\"Skip_Level\":1}]";
 
         [System.Serializable]
         public class ConfigItem
         {
             public int Type;
+            public int First_Time;
             public int Over_Level;
             public int Interval_Time;
             public int Skip_Level;

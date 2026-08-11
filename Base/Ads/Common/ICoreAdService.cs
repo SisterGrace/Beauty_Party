@@ -71,7 +71,7 @@ namespace CoreLite
         /// <summary>
         /// 显示插页广告
         /// </summary>
-        void ShowInterstitial();
+        void ShowInterstitial(string position=null);
 
         /// <summary>
         /// 获取插页广告收益信息
@@ -95,7 +95,7 @@ namespace CoreLite
         /// <summary>
         /// 显示激励广告
         /// </summary>
-        void ShowRewarded();
+        void ShowRewarded(string positon=null);
 
         /// <summary>
         /// 获取激励广告收益信息
