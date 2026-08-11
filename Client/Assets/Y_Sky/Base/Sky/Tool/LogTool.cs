@@ -1,6 +1,5 @@
 ﻿
 using CoreLite;
-using log4net.Util;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 namespace Sky
