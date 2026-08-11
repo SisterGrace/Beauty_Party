@@ -7,7 +7,7 @@ namespace Sky
     public class LogTool : MonoBehaviour
     {
         static bool logFlg = true;
-        public static bool AllLogFlg = true;
+        public static bool AllLogFlg = false;
         public enum Color
         {
             none,
