@@ -80,8 +80,8 @@ namespace CoreLite
                 CoreLogUtils.Debug("[CoreLiteTpn] setNetworkLogDebug failed: " + e.Message);
             }
 
-            SetUMPDebugMode("CECC96A68B641E880BC8530704249FE9");
-            SetTopOnDebugMode("2d04bdd5-eb09-4df0-9293-250ab4990c5b");
+            SetUMPAndAdDebugMode("CECC96A68B641E880BC8530704249FE9", "2d04bdd5-eb09-4df0-9293-250ab4990c5b");//不能两个一起测试，只能一个一个测试
+            //SetTopOnDebugMode();
 
 #endif
 #if ADMOB_TEST && UNITY_ANDROID
@@ -326,21 +326,17 @@ namespace CoreLite
                 CoreLogUtils.Debug("[CoreLiteTpn] SetTopOnDebugMode failed: " + e.Message);
             }
         }
+ 
         /// <summary>
-        /// 通过 Android 桥接强制开启 UMP 测试模式（欧盟地区 + 测试设备）
+        /// 通过 Android 桥接强制开启 UMP 测试模式（欧盟地区 + 测试设备）含指定广告
         /// 必须在 showGDPRConsentDialog 之前调用
         /// </summary>
         /// <param name="testDeviceId">从日志中过滤 "addTestDeviceHashedId" 获取的设备ID</param>
-        /// <summary>
-        /// 通过 Android 桥接强制开启 UMP 测试模式（欧盟地区 + 测试设备）
-        /// 必须在 showGDPRConsentDialog 之前调用
-        /// </summary>
-        /// <param name="testDeviceId">从日志中过滤 "addTestDeviceHashedId" 获取的设备ID</param>
-        private static void SetUMPDebugMode(string testDeviceId)
+        private static void SetUMPAndAdDebugMode(string testDeviceId,string gaid)
         {
             if (string.IsNullOrEmpty(testDeviceId))
             {
-                CoreLogUtils.Debug("[CoreLiteTpn] SetUMPDebugMode skipped: testDeviceId is empty");
+                CoreLogUtils.Debug("[CoreLiteTpn] SetUMPAndAdDebugMode skipped: testDeviceId is empty");
                 return;
             }
 
@@ -350,11 +346,12 @@ namespace CoreLite
                 using (var activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"))
                 using (var atsdkClass = new AndroidJavaClass("com.secmtp.sdk.core.api.ATSDK")) // 或 "com.anythink.core.api.ATSDK"
                 {
-                    // 1. 构建 ATDebuggerConfig 对象，并设置测试设备 ID
-                    // 注意：Builder 的类名可能因 SDK 版本而异，常见的有：
-                    // com.secmtp.sdk.core.api.ATDebuggerConfig$Builder
-                    // com.anythink.core.api.ATDebuggerConfig$Builder
-                    using (var builder = new AndroidJavaObject("com.secmtp.sdk.core.api.ATDebuggerConfig$Builder"))
+                    // 读取 Admob 网络常量，兜底用 2
+                    int admobNetwork;
+                    try { admobNetwork = atsdkClass.GetStatic<int>("Admob_NETWORK"); }
+                    catch { admobNetwork = 2; }
+
+                    using (var builder = new AndroidJavaObject("com.secmtp.sdk.core.api.ATDebuggerConfig$Builder", admobNetwork))
                     {
                         // 调用 setUMPTestDeviceId 方法设置测试设备
                         builder.Call<AndroidJavaObject>("setUMPTestDeviceId", testDeviceId);
@@ -362,18 +359,16 @@ namespace CoreLite
 
                         // 2. 调用 ATSDK.setDebuggerConfig，传入 context, "", 和 config 对象
                         // 这对应了 Android 代码：ATSDK.setDebuggerConfig(activity, "", config)
-                        atsdkClass.CallStatic("setDebuggerConfig", activity, "", config);
+                        atsdkClass.CallStatic("setDebuggerConfig", activity, gaid, config);
 
                         CoreLogUtils.Debug("[CoreLiteTpn] UMP debug mode set with testDeviceId=" + testDeviceId);
+                        CoreLogUtils.Debug("[CoreLiteTpn] TopOn debug mode ON: Admob(network=" + admobNetwork + ") GAID=" + gaid);
                     }
                 }
             }
             catch (System.Exception e)
             {
-                CoreLogUtils.Debug("[CoreLiteTpn] SetUMPDebugMode failed: " + e.Message);
-                // 如果上述代码失败，可能需要尝试不同的类名
-                // 例如：将 "com.secmtp.sdk.core.api.ATDebuggerConfig$Builder" 
-                // 替换为 "com.anythink.core.api.ATDebuggerConfig$Builder"
+                CoreLogUtils.Debug("[CoreLiteTpn] SetUMPAndAdDebugMode failed: " + e.Message);
             }
         }
 #endif
