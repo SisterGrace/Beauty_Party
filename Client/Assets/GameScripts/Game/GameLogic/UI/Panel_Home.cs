@@ -398,9 +398,10 @@ namespace GameLogic
 					mvideoPLayer.PlaybackRate = rate;
 					mvideoPLayer.Play();*/
 					break;
-		case MediaPlayerEvent.EventType.Error:
-			//播放错误，关闭加载动画
-			mAVProVideoUI.Hide();
+				case MediaPlayerEvent.EventType.Error:
+                    Log.Warning($"视频播放出错：{errorCode}，自动触发完成回调");
+                    //播放错误，关闭加载动画
+                    mAVProVideoUI.Hide();
 			// 停止检测并恢复BGM
 			VideoAudioHelper.StopVideoAudioCheck(this.WindowName);
 			break;
