@@ -251,7 +251,7 @@ namespace CoreLite
         public static void TrackIAPButtonShow(string productId, string productName, Dictionary<string, object> eventData = null)
             => CoreIapEvents.IAPButtonShow(productId, productName, eventData);
         public static void TrackEvent(string eventName) => CoreAnalyticsMgr.TrackEvent(eventName);
-        public static void TrackEvent(string eventName, string key, object value) => CoreAnalyticsMgr.TrackEvent(eventName, key, value);
+        //public static void TrackEvent(string eventName, string key, object value) => CoreAnalyticsMgr.TrackEvent(eventName, key, value);
         public static void TrackEvent(string eventName, Dictionary<string, object> dict) => CoreAnalyticsMgr.TrackEvent(eventName, dict);
         #endregion
 

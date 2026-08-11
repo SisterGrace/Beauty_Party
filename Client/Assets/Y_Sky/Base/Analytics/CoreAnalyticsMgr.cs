@@ -50,6 +50,9 @@ namespace CoreLite
             CoreFirebaseEvents.TrackEvent(eventName);
             Sky.SkyGAEvents.TrackEvent(eventName);
             Sky.SkySolarEngineEvents.TrackEvent(eventName);
+#if LAUNCHER_AD
+            Sky.LauncherEvents.TrackEvent(eventName,null);
+#endif
 #if ADJUST
             CoreAdjustEvents.TrackEvent(eventName);
 #endif
@@ -107,6 +110,9 @@ namespace CoreLite
             Sky.SkyGAEvents.TrackEvent(eventName, dict);
             Sky.SkySolarEngineEvents.TrackEvent(eventName, dict);
             CoreFirebaseEvents.TrackEvent(eventName, dict);
+#if LAUNCHER_AD
+            Sky.LauncherEvents.TrackEvent(eventName, dict);
+#endif
 #if ADJUST
             CoreAdjustEvents.TrackEvent(eventName);
 #endif
@@ -115,7 +121,7 @@ namespace CoreLite
 #endif
         }
 
-        #endregion
+#endregion
         #region  广告事件上报
         /// <param name="pos">广告展示点位，客户端根据实际位置上报</param>
         /// <param name="formatNumber">第几次展示该格式的广告（1、2、3…），每个广告格式独立统计</param>

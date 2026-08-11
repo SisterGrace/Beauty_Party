@@ -43,6 +43,7 @@ namespace CoreLite
                 CoreLiteSplashAdsMgr.Instance.OnSplashAdClose = _action;
                 CoreLiteSplashAdsMgr.Instance.SetSplash();
             }
+            CoreInterstitialRules.Instance._firstInterTime = Time.realtimeSinceStartup;
         }
 
         private void InitializeAdNetworks()
@@ -87,12 +88,18 @@ namespace CoreLite
         {
             CoreLogUtils.Debug("[AdsMgr] ShowRewardedVideo " + _pos);
             CoreAnalyticsMgr.TrackEvent("RV_Button_Click", new Dictionary<string, object>() { { "Position", _pos } });
+#if LAUNCHER_AD
+            LauncherEvents.TriggerADEvent(_pos, "RV");
+#endif
             _rvPos = _pos;
 
             var rvDidEnterFullscreen = false;
             _rvShowCallback = () =>
             {
                 CoreLogUtils.Debug(" [ads] rewarded video show callback");
+#if LAUNCHER_AD
+                LauncherEvents.AdImpressionEvent(_pos, "RV");
+#endif
                 rvDidEnterFullscreen = true;
                 _adActive = true;
                 CoreInterstitialRules.Instance._videoStartTime = Time.realtimeSinceStartup;
@@ -118,6 +125,19 @@ namespace CoreLite
                 _showFailCallback?.Invoke();
             };
 
+#if UNITY_EDITOR
+            // 编辑器模式：直接模拟激励视频成功
+            CoreLogUtils.Debug("[AdsMgr] Editor mode: simulate rewarded video success");
+            _rvShowCallback?.Invoke();
+            _rvCloseCallback?.Invoke(new Dictionary<string, object>()
+            {
+                { "Position", _pos ?? ""},
+                { "ad_platform", "Editor" },
+                { "isended", true }
+            });
+            return;
+#endif
+
             if (IsRewardedVideoAvailable())
             {
                 CoreLogUtils.Debug("CoreLite show rewarded video");
@@ -137,7 +157,7 @@ namespace CoreLite
                 {
                     CoreBidPlatformMgr.Instance.RecordBidSuccess(winner.PlatformType, CoreLiteAdsType.Rewarded);
                     //CoreAnalyticsMgr.TrackEvent("RV_Winner", BuildBidEventParams(results, _pos));
-                    winner.Client.ShowRewarded();
+                    winner.Client.ShowRewarded(_pos);
                     CheckAndRefreshExpiredBids(CoreLiteAdsType.Rewarded);
                 }
             }
@@ -175,52 +195,11 @@ namespace CoreLite
                 return false;
             }
 
-            /*   string error = CoreInterstitialRules.Instance.CanShowInterPeek(_ivType);
-               // 使用 CanShowInterPeek 仅做只读检查,避免与 ShowInterstitial 内已调用的 CanShowInter 重复计次
-               if (error != null)
-               {
-                   LogTool.DebugLog(" [ads] skip iv by condition:"+ error,LogTool.Color.green);
-
-                   // 规则限制时，广告可能已经准备好了，实时获取广告信息
-                   var adInfo = GetInterstitialAdInfo();
-
-                   if (!string.IsNullOrEmpty(adInfo.adSource))
-                   {
-                       // 有广告信息，上报完整参数
-                       CoreAnalyticsMgr.TrackEvent("IV_ShowFail_Rule_Limit", new Dictionary<string, object>()
-                       {
-                           { "Position", _adPos },
-                           { "ad_platform", "TPN" },
-                           { "ad_source", adInfo.adSource },
-                           { "ad_id", adInfo.adId },
-                           { "ad_ecpm", adInfo.adEcpm }
-                       });
-                       CoreAnalyticsMgr.TrackEvent("IV_ShowFail", new Dictionary<string, object>()
-                       {
-                           { "Position", _adPos },
-                           { "ad_platform", "TPN" },
-                           { "ad_source", adInfo.adSource },
-                           { "ad_id", adInfo.adId },
-                           { "ad_ecpm", adInfo.adEcpm }
-                       });
-                   }
-                   else
-                   {
-                       // 广告未准备好
-                       CoreAnalyticsMgr.TrackEvent("IV_ShowFail_Rule_Limit", new Dictionary<string, object>()
-                       {
-                           { "Position", _adPos }
-                       });
-                       CoreAnalyticsMgr.TrackEvent("IV_ShowFail", new Dictionary<string, object>()
-                       {
-                           { "Position", _adPos }
-                       });
-                   }
-                   return false;
-               }*/
-
             if (!IsInterstitialAvailable())
             {
+#if LAUNCHER_AD
+                LauncherEvents.ADCheckReadyEvent(_adPos,"IV",false);
+#endif
                 CoreLogUtils.Debug(" [ads] iv not ready");
                 CoreAnalyticsMgr.TrackEvent("IV_ShowFail_Not_Ready", new Dictionary<string, object>()
                 {
@@ -237,7 +216,9 @@ namespace CoreLite
                 });
                 return false;
             }
-
+#if LAUNCHER_AD
+            LauncherEvents.ADCheckReadyEvent(_adPos, "IV", true);
+#endif
             return true;
         }
 
@@ -251,6 +232,9 @@ namespace CoreLite
                 _adActive = true;
                 CoreInterstitialRules.Instance._videoStartTime = Time.realtimeSinceStartup;
                 CoreAnalyticsMgr.TrackEvent("IV_Show", eventValue);
+#if LAUNCHER_AD
+                LauncherEvents.AdImpressionEvent(_adPos,"IV");
+#endif
             };
 
             _ivCloseCallback = () =>
@@ -268,6 +252,9 @@ namespace CoreLite
 
                 return;
             }
+#if LAUNCHER_AD
+            LauncherEvents.TriggerADEvent(_adPos, "IV");
+#endif
             // IV_Position 打点：触发插屏展示时机
             //var ivPosInfo = GetInterstitialAdInfo();
             CoreAnalyticsMgr.TrackEvent("IV_Position", new Dictionary<string, object>()
@@ -278,21 +265,25 @@ namespace CoreLite
                 //{"ad_id", ivPosInfo.adId},
                 //{"ad_ecpm", ivPosInfo.adEcpm}
             });
-            string ivRuleMsg = CoreInterstitialRules.Instance.CanShowInter(_IvType);
+            var adlimitType = ADLimitType.Not;
+            string ivRuleMsg = CoreInterstitialRules.Instance.CanShowInter(_IvType, out adlimitType);
             bool ruleAllowsShow = ivRuleMsg == null;
             // 规则未通过时必须直接返回：CheckIfReachFirstNTimes 会先自增计数再返回失败，
             // 随后 CanShowInterPeek 会读到已写入的更大值，易误判为可通过频次，从而错误展示。
+#if LAUNCHER_AD
+            LauncherEvents.ADCheckLimitEvent(_adPos, "IV", !ruleAllowsShow, adlimitType);
+#endif
             if (!ruleAllowsShow)
             {
                 IV_RuleEvent(_adPos);
-                LogTool.DebugLog(_IvType + " 插屏规则未通过！" + ivRuleMsg, LogTool.Color.red);
+                LogTool.DebugLog(_IvType + " 插屏规则未通过！"+ adlimitType.ToString()+" " + ivRuleMsg, LogTool.Color.red);
                 _action?.Invoke(MakeHandCallbackInfo(false, ivRuleMsg ?? "Interstitial blocked by rules.", false), null);
                 return;
             }
-
+            LogTool.DebugLog(_IvType + " 插屏规则通过！");
             if (!IsInterstitialReady(_IvType, _adPos))
             {
-                LogTool.DebugLog("IsInterstitialReady == false ", LogTool.Color.red);
+                LogTool.DebugLog("IsInterstitialReady == false "+ adlimitType.ToString(), LogTool.Color.red);
                 _action?.Invoke(MakeHandCallbackInfo(false, "Interstitial ad can not show yet.", ruleAllowsShow), null);
                 foreach (var network in _adNetworks)
                     network.LoadInterstitial();
@@ -324,7 +315,7 @@ namespace CoreLite
                         {"ad_ecpm", info.adEcpm}
                     });
                         CoreInterstitialRules.Instance.ResetIvsCount(_IvType);
-                        winner.Client.ShowInterstitial();
+                        winner.Client.ShowInterstitial(_adPos);
                         CheckAndRefreshExpiredBids(CoreLiteAdsType.Interstitial);
                     }
                 });
@@ -354,7 +345,7 @@ namespace CoreLite
                     {"ad_ecpm", matchInfo.adEcpm}
                 });
                     CoreInterstitialRules.Instance.ResetIvsCount(_IvType);
-                    winner.Client.ShowInterstitial();
+                    winner.Client.ShowInterstitial(_adPos);
                     CheckAndRefreshExpiredBids(CoreLiteAdsType.Interstitial);
                 }
             }
@@ -370,6 +361,7 @@ namespace CoreLite
                     {
                         { "Position", _adPos }
                     });
+
         }
         /// <summary>
         /// 展示插屏广告，不受频次规则控制；仅当有可用插屏时展示，无可用时直接回调。
@@ -440,7 +432,7 @@ namespace CoreLite
                     {"ad_id", matchInfo.adId},
                     {"ad_ecpm", matchInfo.adEcpm}
                 });
-                winner.Client.ShowInterstitial();
+                winner.Client.ShowInterstitial(_adPos);
                 CheckAndRefreshExpiredBids(CoreLiteAdsType.Interstitial);
             }
         }
