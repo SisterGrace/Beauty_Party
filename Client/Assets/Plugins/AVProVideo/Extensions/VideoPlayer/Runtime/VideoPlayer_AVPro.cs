@@ -850,7 +850,8 @@ namespace RenderHeads.Media.AVProVideo
 					started?.Invoke((VideoPlayer_AVPro)mediaPlayer);
 					break;
 				case MediaPlayerEvent.EventType.Error:
-					errorReceived?.Invoke((VideoPlayer_AVPro)mediaPlayer, errorCode.ToString());
+                    Debug.Log($"视频播放出错：{errorCode}，自动触发完成回调");
+                    errorReceived?.Invoke((VideoPlayer_AVPro)mediaPlayer, errorCode.ToString());
 					break;
 				case MediaPlayerEvent.EventType.FinishedSeeking:
 					seekCompleted?.Invoke((VideoPlayer_AVPro)mediaPlayer);

@@ -117,8 +117,9 @@ namespace GameLogic
 		VideoAudioHelper.StopVideoAudioCheck(this.WindowName);
 		break;
 	case MediaPlayerEvent.EventType.Error:
-		// 播放错误，停止检测并恢复背景音乐
-		VideoAudioHelper.StopVideoAudioCheck(this.WindowName);
+                    Log.Warning($"视频播放出错：{errorCode}，自动触发完成回调");
+                    // 播放错误，停止检测并恢复背景音乐
+                    VideoAudioHelper.StopVideoAudioCheck(this.WindowName);
 		break;
 	}
 }
