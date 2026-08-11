@@ -81,7 +81,7 @@ namespace CoreLite
             }
 
             SetUMPDebugMode("CECC96A68B641E880BC8530704249FE9");
-            //SetTopOnDebugMode("2d04bdd5-eb09-4df0-9293-250ab4990c5b");
+            SetTopOnDebugMode("2d04bdd5-eb09-4df0-9293-250ab4990c5b");
 
 #endif
 #if ADMOB_TEST && UNITY_ANDROID
@@ -135,7 +135,7 @@ namespace CoreLite
 #endif
 #if TOPON_TEST && UNITY_ANDROID
             // SDK 初始化成功后，调起 TopOn 测试工具 UI（链接包方式）
-            //ShowDebuggerUI();
+            ShowDebuggerUI();
 #endif
 
             // 开屏优先 load，其余并行
