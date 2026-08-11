@@ -1,11 +1,14 @@
 ﻿
-using UnityEngine;
+using CoreLite;
+using log4net.Util;
 using System.Runtime.CompilerServices;
+using UnityEngine;
 namespace Sky
 {
     public class LogTool : MonoBehaviour
     {
         static bool logFlg = true;
+        public static bool AllLogFlg = true;
         public enum Color
         {
             none,
@@ -22,14 +25,15 @@ namespace Sky
 
         public static void Init(bool enableFullLog)
         {
-            logFlg = enableFullLog;
-            if (enableFullLog)
+            if (AllLogFlg||enableFullLog)
             {
+                logFlg = true;
                 Debug.unityLogger.logEnabled = true;
                 Debug.unityLogger.filterLogType = LogType.Log;   // 显示所有
             }
             else
             {
+                logFlg = false;
                 Debug.unityLogger.logEnabled = true;             // 保持启用，只过滤级别
                 Debug.unityLogger.filterLogType = LogType.Error; // 仅显示 Error
             }

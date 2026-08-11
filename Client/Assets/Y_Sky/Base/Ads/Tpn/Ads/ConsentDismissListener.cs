@@ -29,7 +29,6 @@ namespace CoreLite
         /// </summary>
         public void onConsentDismiss()
         {
-            UnityEngine.Debug.Log("========== ConsentDismissListener.onConsentDismiss CALLED ==========");
             CoreLogUtils.Debug("[CoreLiteTpn] onConsentDismiss() - GDPR consent handled, initializing SDK...");
             var listener = new CoreTpnInitListener(_appId, _onSuccess, _onFail);
             AnyThinkAds.Api.ATSDKAPI.initSDK(_appId, _appKey, listener);

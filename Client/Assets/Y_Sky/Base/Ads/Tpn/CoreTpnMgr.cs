@@ -1,6 +1,7 @@
 #if TPN_AD
 using System.Collections.Generic;
 using AnyThinkAds.Api;
+using Sky;
 using UnityEngine;
 
 namespace CoreLite
@@ -124,7 +125,7 @@ namespace CoreLite
         private void OnSdkInitSuccess()
         {
             _isInitialized = true;
-            CoreLogUtils.Debug("[CoreLiteTpn] SDK initialized, start loading ads (Splash first)");
+            LogTool.DebugLog("[CoreLiteTpn] SDK initialized, start loading ads (Splash first)");
 
 
 #if ADMOB_TEST && UNITY_ANDROID

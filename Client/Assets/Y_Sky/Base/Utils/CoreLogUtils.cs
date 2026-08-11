@@ -1,3 +1,4 @@
+using Sky;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,12 +7,22 @@ namespace CoreLite
 { 
     public static class CoreLogUtils
     {
-        private static bool _enabled = false;
+        private static bool _enabled = true;
 
         public static bool Enabled
         {
             get => _enabled;
-            set => _enabled = value;
+            set { 
+                if( LogTool.AllLogFlg )
+                {
+                    _enabled = true;
+                }
+                else
+                {
+                    _enabled = value;
+                }
+
+            }
         }
 
         public static void Debug(object message, Object context = null)
