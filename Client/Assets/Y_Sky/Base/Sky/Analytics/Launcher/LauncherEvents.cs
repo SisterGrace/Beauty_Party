@@ -1,5 +1,6 @@
 
 using CoreLite;
+using GameAnalyticsSDK;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -68,6 +69,16 @@ namespace Sky
                 CoreLogUtils.Error("[CoreLauncherMgr] TrackEvent failed: " + e.Message);
             }
 #endif
+        }
+
+        public static void TrackEvent(string eventName, string key, object value)
+        {
+            if (string.IsNullOrEmpty(eventName)) return;
+            // 如果不能转成数字，就按无值上报，但可以通过自定义字段把原始值带过去
+            var fields = new Dictionary<string, object>();
+            if (key != null && value != null)
+                fields[key] = value;
+            TrackEvent(eventName, fields);
         }
         #endregion
         public static void LoadingShowEvent()

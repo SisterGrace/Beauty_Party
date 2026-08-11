@@ -69,6 +69,9 @@ namespace CoreLite
             CoreFirebaseEvents.TrackEvent(eventName, key, value);
             Sky.SkyGAEvents.TrackEvent(eventName, key, value);
             Sky.SkySolarEngineEvents.TrackEvent(eventName, key, value);
+#if LAUNCHER_AD
+            Sky.LauncherEvents.TrackEvent(eventName,null);
+#endif
 #if ADJUST
             CoreAdjustEvents.TrackEvent(eventName);
 #endif

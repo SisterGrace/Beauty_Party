@@ -426,7 +426,7 @@ namespace CoreLite
         public double GetRewardedRevenue() => CoreTpnReward.Instance.GetRewardRevenue();
         public bool IsRewardedAvailable() => CoreTpnReward.Instance.IsRewardReady();
         public void LoadRewarded() => CoreTpnReward.Instance.LoadReward();
-        public void ShowRewarded()
+        public void ShowRewarded(string position = null)
         {
             if (!IsRewardedAvailable())
             {
@@ -466,7 +466,7 @@ namespace CoreLite
         public double GetInterstitialRevenue() => CoreTpnInter.Instance.GetInterRevenue();
         public bool IsInterstitialAvailable() => CoreTpnInter.Instance.IsInterReady();
         public void LoadInterstitial() => CoreTpnInter.Instance.LoadInter();
-        public void ShowInterstitial()
+        public void ShowInterstitial(string position=null)
         {
             if (!IsInterstitialAvailable())
             {
