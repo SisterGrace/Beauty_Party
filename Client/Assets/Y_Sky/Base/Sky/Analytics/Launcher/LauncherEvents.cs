@@ -44,6 +44,7 @@ namespace Sky
         #region 打点上报
         public static void TrackEvent(string eventName, Dictionary<string, object> parameters)
         {
+#if LAUNCHER_AD
             // 2. 核心过滤逻辑：如果不在白名单，直接 return，不做任何处理
             if (!LauncherAllowedEvents.Contains(eventName))
             {
@@ -69,6 +70,7 @@ namespace Sky
                 CoreLogUtils.Error("[CoreLauncherMgr] TrackEvent failed: " + e.Message);
             }
 #endif
+#endif
         }
 
         public static void TrackEvent(string eventName, string key, object value)
@@ -80,7 +82,7 @@ namespace Sky
                 fields[key] = value;
             TrackEvent(eventName, fields);
         }
-        #endregion
+#endregion
         public static void LoadingShowEvent()
         {
             TrackEvent(Loading_Page_Show, null);
