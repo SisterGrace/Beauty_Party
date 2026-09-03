@@ -135,7 +135,7 @@ namespace CoreLite
 #endif
 #if TOPON_TEST && UNITY_ANDROID
             // SDK 初始化成功后，调起 TopOn 测试工具 UI（链接包方式）
-            ShowDebuggerUI();
+            //ShowDebuggerUI();
 #endif
 
             // 开屏优先 load，其余并行
@@ -261,6 +261,48 @@ namespace CoreLite
 #endif
 
 #if TOPON_TEST
+        /// <summary>
+        /// TopOn 测试广告平台枚举（根据 TopOn 官方文档的 network_firm_id）
+        /// 文档来源：https://docs.toponad.com/#/zh-cn/android/mediation/mediation_overview
+        /// </summary>
+        public enum TopOnTestNetwork
+        {
+            Facebook = 1,      // Meta（Bidding S2S）- 美国填充率高，需安装Facebook应用并登录
+            AdMob = 2,         // Google AdMob（Bidding S2S）- 美国填充率高，需Google Play和GAID
+            InMobi = 3,        // InMobi（Bidding S2S/C2S）- 印度填充率高
+            AppLovin = 5,      // AppLovin - 欧美、中国填充率高
+            Mintegral = 6,     // Mintegral（Bidding S2S）- 欧美地区填充率高
+            Chartboost = 9,    // Chartboost（Bidding C2S，需接入Helium）- 中国、美国填充率高
+            IronSource = 11,   // IronSource（Bidding S2S）- 中国填充率高
+            UnityAds = 12,     // Unity Ads（Bidding S2S）- 美国填充率高
+            Vungle = 13,       // Liftoff(Vungle)（Bidding S2S）- 美国填充率高
+            StartApp = 25,     // Start.io（Bidding S2S）
+            Sigmob = 29,       // Sigmob（Bidding C2S）- 中国
+            MyTarget = 32,     // VK(myTarget)（Bidding S2S）
+            GoogleAdManager = 33, // Google Ad Manager
+            Yandex = 34,       // Yandex（Bidding S2S）
+            Fyber = 37,        // Digital Turbine(Fyber)
+            Helium = 40,       // Helium（Bidding C2S）
+            A4G = 48,          // A4G(Admob)
+            Pangle = 50,       // Pangle（Bidding S2S）- 字节跳动，韩国、日本填充率高
+            ReklamUp = 57,     // ReklamUp
+            VerveGroup = 58,   // Verve Group（Bidding C2S）
+            BigoAds = 59,      // Bigo Ads（Bidding S2S）- 新加坡填充率高
+            Bidmachine = 65,   // Bidmachine（Bidding S2S）
+            ADX = 66,          // TopOn ADX（Bidding S2S）- 无需单独SDK
+            PremiumAds = 71,   // PremiumAds
+            APS = 75,          // Amazon Publisher Services（Bidding C2S）
+            Kwai = 77,         // Kwai Network（Bidding C2S）- 快手
+            XiaomiColumbus = 81, // Xiaomi Columbus（Bidding S2S）
+            TaurusX = 83,      // TaurusX(Webeye)（Bidding S2S）
+            Smaato = 84,       // Smaato（Bidding S2S）
+            Moloco = 91,       // Moloco（Bidding S2S）
+            Opera = 100        // Opera（Bidding S2S）
+        }
+
+        // 【配置项】选择要测试的广告平台，修改这里即可切换测试平台
+        private static TopOnTestNetwork TEST_NETWORK = TopOnTestNetwork.Facebook;
+
         private static void ShowDebuggerUI()
         {
             try
@@ -289,7 +331,7 @@ namespace CoreLite
                 }
             }
         }
-
+        
         /// <summary>
         /// TopOn 调试模式：锁定当前设备仅加载指定广告平台的测试广告。
         /// 必须在 ATSDK.initSDK 之前调用。
@@ -308,16 +350,14 @@ namespace CoreLite
                 using (var activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"))
                 using (var atsdkClass = new AndroidJavaClass("com.secmtp.sdk.core.api.ATSDK"))
                 {
-                    // 读取 Admob 网络常量，兜底用 2
-                    int admobNetwork;
-                    try { admobNetwork = atsdkClass.GetStatic<int>("Admob_NETWORK"); }
-                    catch { admobNetwork = 2; }
+                    // 使用配置的测试网络 ID
+                    int adNetwork = (int)TEST_NETWORK;
 
-                    using (var builder = new AndroidJavaObject("com.secmtp.sdk.core.api.ATDebuggerConfig$Builder", admobNetwork))
+                    using (var builder = new AndroidJavaObject("com.secmtp.sdk.core.api.ATDebuggerConfig$Builder", adNetwork))
                     {
                         var config = builder.Call<AndroidJavaObject>("build");
                         atsdkClass.CallStatic("setDebuggerConfig", activity, gaid, config);
-                        CoreLogUtils.Debug("[CoreLiteTpn] TopOn debug mode ON: Admob(network=" + admobNetwork + ") GAID=" + gaid);
+                        CoreLogUtils.Debug("[CoreLiteTpn] TopOn debug mode ON: " + TEST_NETWORK.ToString() + " (network=" + adNetwork + ") GAID=" + gaid);
                     }
                 }
             }
@@ -332,7 +372,7 @@ namespace CoreLite
         /// 必须在 showGDPRConsentDialog 之前调用
         /// </summary>
         /// <param name="testDeviceId">从日志中过滤 "addTestDeviceHashedId" 获取的设备ID</param>
-        private static void SetUMPAndAdDebugMode(string testDeviceId,string gaid)
+        private static void SetUMPAndAdDebugMode(string testDeviceId, string gaid)
         {
             if (string.IsNullOrEmpty(testDeviceId))
             {
@@ -344,25 +384,16 @@ namespace CoreLite
             {
                 using (var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
                 using (var activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"))
-                using (var atsdkClass = new AndroidJavaClass("com.secmtp.sdk.core.api.ATSDK")) // 或 "com.anythink.core.api.ATSDK"
+                using (var atsdkClass = new AndroidJavaClass("com.secmtp.sdk.core.api.ATSDK"))
                 {
-                    // 读取 Admob 网络常量，兜底用 2
-                    int admobNetwork;
-                    try { admobNetwork = atsdkClass.GetStatic<int>("Admob_NETWORK"); }
-                    catch { admobNetwork = 2; }
+                    // 使用配置的测试网络 ID
+                    int adNetwork = (int)TEST_NETWORK;
 
-                    using (var builder = new AndroidJavaObject("com.secmtp.sdk.core.api.ATDebuggerConfig$Builder", admobNetwork))
+                    using (var builder = new AndroidJavaObject("com.secmtp.sdk.core.api.ATDebuggerConfig$Builder", adNetwork))
                     {
-                        // 调用 setUMPTestDeviceId 方法设置测试设备
-                        builder.Call<AndroidJavaObject>("setUMPTestDeviceId", testDeviceId);
                         var config = builder.Call<AndroidJavaObject>("build");
-
-                        // 2. 调用 ATSDK.setDebuggerConfig，传入 context, "", 和 config 对象
-                        // 这对应了 Android 代码：ATSDK.setDebuggerConfig(activity, "", config)
                         atsdkClass.CallStatic("setDebuggerConfig", activity, gaid, config);
-
-                        CoreLogUtils.Debug("[CoreLiteTpn] UMP debug mode set with testDeviceId=" + testDeviceId);
-                        CoreLogUtils.Debug("[CoreLiteTpn] TopOn debug mode ON: Admob(network=" + admobNetwork + ") GAID=" + gaid);
+                        CoreLogUtils.Debug("[CoreLiteTpn] TopOn debug mode ON: " + TEST_NETWORK.ToString() + " (network=" + adNetwork + ") GAID=" + gaid);
                     }
                 }
             }
