@@ -183,6 +183,10 @@ namespace GameLogic
             var list = ConfigLoader.Instance.Tables.TbCfgActivity.DataList;
             foreach (var cfg in list)
             {
+                if(UserController.Instance.GetCurUserType!=1 && cfg.ActType == ActivityType.Gacha)
+                {
+                    continue;//不是1且是抽卡就继续for，不走下边开启
+                }
                 if (cfg.IsOpen)
                 {
                     var data = new ActityData(cfg);
