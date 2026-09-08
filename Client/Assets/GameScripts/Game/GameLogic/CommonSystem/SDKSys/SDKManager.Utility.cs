@@ -120,7 +120,7 @@ namespace GameLogic
             //Debug.Log("Application.OpenURL(ConfigLoader.Constant.PrivacyUrl)");
             Debug.Log(ConfigLoader.Constant.PrivacyUrl);
             //Application.OpenURL(ConfigLoader.Constant.PrivacyUrl);
-            Application.OpenURL("https://rayse7en-png.github.io/privacy-policy-Glam-Tile-Beauty-Party/");
+            Application.OpenURL("https://powerxg-yl.github.io/privacy-policy-GlamTileBeautyParty/");
         }
 
         /// 买量用户归因回调
