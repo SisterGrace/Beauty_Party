@@ -1,6 +1,0 @@
-framework module AnyThinkBigoAdapter {
-  umbrella header "AnyThinkBigoAdapter.h"
-  export *
-
-  module * { export * }
-}
