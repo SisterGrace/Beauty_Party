@@ -1,9 +1,11 @@
 <dependencies>
   <packages>
     <package>androidx.annotation:annotation:1.0.0</package>
+    <package>androidx.annotation:annotation:1.2.0</package>
     <package>androidx.appcompat:appcompat:1.6.1</package>
     <package>androidx.browser:browser:1.4.0</package>
     <package>androidx.constraintlayout:constraintlayout:2.1.4</package>
+    <package>androidx.media3:media3-exoplayer:1.0.0-alpha01</package>
     <package>androidx.media3:media3-exoplayer:1.4.1</package>
     <package>androidx.media3:media3-ui:1.4.1</package>
     <package>androidx.recyclerview:recyclerview:1.1.0</package>
@@ -12,6 +14,7 @@
     <package>com.anythink.sdk:adapter-tpn-chartboost:9.11.0.1.1</package>
     <package>com.anythink.sdk:adapter-tpn-facebook:6.21.0.1.0</package>
     <package>com.anythink.sdk:adapter-tpn-inmobi:11.1.1.1.0</package>
+    <package>com.anythink.sdk:adapter-tpn-kwai:1.2.21.1.0</package>
     <package>com.anythink.sdk:adapter-tpn-mintegral:17.0.61.1.0</package>
     <package>com.anythink.sdk:adapter-tpn-pangle:7.8.5.9.1.0</package>
     <package>com.anythink.sdk:adapter-tpn-sdm:6.5.54.1.0</package>
@@ -32,6 +35,7 @@
     <package>com.google.android.gms:play-services-base:18.9.0</package>
     <package>com.google.android.gms:play-services-basement:18.1.0</package>
     <package>com.google.android.instantapps:instantapps:1.1.0</package>
+    <package>com.google.android.material:material:1.2.1</package>
     <package>com.google.firebase:firebase-analytics:23.0.0</package>
     <package>com.google.firebase:firebase-analytics-unity:13.6.0</package>
     <package>com.google.firebase:firebase-app-unity:13.6.0</package>
@@ -57,6 +61,9 @@
     <package>com.unity3d.ads:unity-ads:4.16.1</package>
     <package>com.vungle:vungle-ads:7.6.1</package>
     <package>com.yandex.android:mobileads:7.15.1</package>
+    <package>io.github.kwainetwork:adApi:1.2.21</package>
+    <package>io.github.kwainetwork:adImpl:1.2.21</package>
+    <package>org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.4.10</package>
     <package>org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3</package>
     <package>org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1</package>
   </packages>

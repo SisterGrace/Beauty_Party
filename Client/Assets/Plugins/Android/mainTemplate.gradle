@@ -20,10 +20,12 @@ dependencies {
     implementation 'androidx.media3:media3-exoplayer-smoothstreaming:1.4.1'
     implementation 'androidx.media3:media3-exoplayer-workmanager:1.4.1'
 // Android Resolver Dependencies Start
-    implementation 'androidx.annotation:annotation:1.0.0' // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/facebook/Editor/Dependencies.xml:5
-    implementation 'androidx.appcompat:appcompat:1.6.1' // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/Editor/Dependencies.xml:7
+    // implementation 'androidx.annotation:annotation:1.0.0' // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/facebook/Editor/Dependencies.xml:5
+    implementation 'androidx.annotation:annotation:1.2.0' // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/kwai/Editor/Dependencies.xml:9
+    implementation 'androidx.appcompat:appcompat:1.6.1' // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/kwai/Editor/Dependencies.xml:7
     implementation 'androidx.browser:browser:1.4.0' // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/Editor/Dependencies.xml:8
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4' // Assets/Editor/Dependencies.xml:8
+    // implementation 'androidx.media3:media3-exoplayer:1.0.0-alpha01' // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/kwai/Editor/Dependencies.xml:6
     implementation 'androidx.media3:media3-exoplayer:1.4.1' // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/chartboost/Editor/Dependencies.xml:13
     implementation 'androidx.media3:media3-ui:1.4.1' // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/chartboost/Editor/Dependencies.xml:14
     implementation 'androidx.recyclerview:recyclerview:1.1.0' // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/gtm/Editor/Dependencies.xml:8
@@ -32,6 +34,7 @@ dependencies {
     implementation 'com.anythink.sdk:adapter-tpn-chartboost:9.11.0.1.1' // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/chartboost/Editor/Dependencies.xml:8
     implementation 'com.anythink.sdk:adapter-tpn-facebook:6.21.0.1.0' // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/facebook/Editor/Dependencies.xml:3
     implementation 'com.anythink.sdk:adapter-tpn-inmobi:11.1.1.1.0' // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/inmobi/Editor/Dependencies.xml:3
+    implementation 'com.anythink.sdk:adapter-tpn-kwai:1.2.21.1.0' // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/kwai/Editor/Dependencies.xml:3
     implementation 'com.anythink.sdk:adapter-tpn-mintegral:17.0.61.1.0' // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/gtm/Editor/Dependencies.xml:6
     implementation 'com.anythink.sdk:adapter-tpn-pangle:7.8.5.9.1.0' // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/pangle/Editor/Dependencies.xml:6
     implementation 'com.anythink.sdk:adapter-tpn-sdm:6.5.54.1.0' // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/secmtp_base/sdm/Editor/Dependencies.xml:3
@@ -52,6 +55,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-base:18.9.0' // Assets/Firebase/Editor/AppDependencies.xml:17
     implementation 'com.google.android.gms:play-services-basement:18.1.0' // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/vungle/Editor/Dependencies.xml:5
     implementation 'com.google.android.instantapps:instantapps:1.1.0' // Packages/com.gameanalytics.sdk/Editor/Android/Dependencies.xml:3
+    implementation 'com.google.android.material:material:1.2.1' // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/kwai/Editor/Dependencies.xml:8
     implementation 'com.google.firebase:firebase-analytics:23.0.0' // Assets/Firebase/Editor/RemoteConfigDependencies.xml:15
     implementation 'com.google.firebase:firebase-analytics-unity:13.6.0' // Assets/Firebase/Editor/AnalyticsDependencies.xml:18
     implementation 'com.google.firebase:firebase-app-unity:13.6.0' // Assets/Firebase/Editor/AppDependencies.xml:22
@@ -77,6 +81,9 @@ dependencies {
     implementation 'com.unity3d.ads:unity-ads:4.16.1' // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/unityads/Editor/Dependencies.xml:4
     implementation 'com.vungle:vungle-ads:7.6.1' // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/vungle/Editor/Dependencies.xml:4
     implementation 'com.yandex.android:mobileads:7.15.1' // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/yandex/Editor/Dependencies.xml:4
+    implementation 'io.github.kwainetwork:adApi:1.2.21' // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/kwai/Editor/Dependencies.xml:4
+    implementation 'io.github.kwainetwork:adImpl:1.2.21' // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/kwai/Editor/Dependencies.xml:5
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.4.10' // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/kwai/Editor/Dependencies.xml:10
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3' // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/chartboost/Editor/Dependencies.xml:20
     implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1' // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/chartboost/Editor/Dependencies.xml:21
 // Android Resolver Dependencies End
