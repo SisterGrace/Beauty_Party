@@ -6,6 +6,5 @@
         <androidPackage spec="com.anythink.sdk:core-tpn:6.5.52"/>
         <androidPackage spec="androidx.appcompat:appcompat:1.6.1"/>
         <androidPackage spec="androidx.browser:browser:1.4.0"/>
-        <androidPackage spec="com.thinkup.sdk:tramini-plugin-tpn:6.5.71"/>
     </androidPackages>
 </dependencies>
