@@ -61,65 +61,49 @@ namespace RenderHeads.Media.AVProVideo.Editor
 			GradleMainTemplate( path );
 		}
 
-		private void GradleProperty( string path )
-		{
+        private void GradleProperty(string path)
+        {
 #if UNITY_2020_1_OR_NEWER || UNITY_2020_OR_NEWER
-			// When using Unity 2020.1 and above it has been seen that the build process overly optimises which causes issues in the ExoPlayer library.
-			// To overcome this issue, we need to add 'android.enableDexingArtifactTransform=false' to the gradle.properties.
-			// Note that this can be done by the developer at project level already.
+            // AVPro Video 官方脚本：原本针对旧版 Unity 写入已废弃的 android.enableDexingArtifactTransform，
+            // 现在强制改用新版 AGP 推荐的 android.useFullClasspathForDexingTransform。
 
-			Debug.Log( "[AVProVideo] Post-processing Android project: patching gradle.properties" );
+            Debug.Log("[AVProVideo] Post-processing Android project: patching gradle.properties (modified to use FullClasspathForDexingTransform)");
 
-			StringBuilder stringBuilder = new StringBuilder();
+            StringBuilder stringBuilder = new StringBuilder();
 
-			// Path to gradle.properties
-			string filePath = Path.Combine( path, "..", "gradle.properties" );
+            // Path to gradle.properties
+            string filePath = Path.Combine(path, "..", "gradle.properties");
 
-			if( File.Exists( filePath ) )
-			{
-				// Load in all the lines in the file
-				string[] allLines = File.ReadAllLines( filePath );
+            if (File.Exists(filePath))
+            {
+                // 加载现有文件内容
+                string[] allLines = File.ReadAllLines(filePath);
 
-				foreach( string line in allLines )
-				{
-					if( line.Length > 0 )
-					{
-#if UNITY_6000_0_OR_NEWER
-						// Add everything except useFullClasspathForDexingTransform and android.useAndroidX
-						if ( !line.Contains( "android.useFullClasspathForDexingTransform" ) && 
-							!line.Contains( "android.useAndroidX" ) )
-						{
-							stringBuilder.AppendLine( line );
-						}
-#else
-						// Add everything except enableDexingArtifactTransform and android.useAndroidX
-						if( !line.Contains( "android.enableDexingArtifactTransform" ) &&
-							!line.Contains( "android.useAndroidX" ) )
-						{
-							stringBuilder.AppendLine( line );
-						}
+                // 过滤掉已有的 android.useFullClasspathForDexingTransform 和 android.useAndroidX 行
+                foreach (string line in allLines)
+                {
+                    if (line.Length > 0)
+                    {
+                        if (!line.Contains("android.useFullClasspathForDexingTransform") &&
+                             !line.Contains("android.useAndroidX"))
+                        {
+                            stringBuilder.AppendLine(line);
+                        }
+                    }
+                }
+
+                // 写入新的兼容属性
+                stringBuilder.AppendLine("android.useFullClasspathForDexingTransform=true");
+                // 保留 useAndroidX
+                stringBuilder.AppendLine("android.useAndroidX=true");
+
+                // 写回文件
+                File.WriteAllText(filePath, stringBuilder.ToString());
+            }
 #endif
-					}
-				}
+        }
 
-#if UNITY_6000_0_OR_NEWER
-				// Add in line to set useFullClasspathForDexingTransform to true
-				stringBuilder.AppendLine( "android.useFullClasspathForDexingTransform=true" );
-#else
-				// Add in line to set enableDexingArtifactTransform to false
-				stringBuilder.AppendLine( "android.enableDexingArtifactTransform=false" );
-#endif
-
-				// Add in line to set useAndroidX to true
-				stringBuilder.AppendLine( "android.useAndroidX=true" );
-
-				// Write out the amended file
-				File.WriteAllText( filePath, stringBuilder.ToString() );
-			}
-#endif
-		}
-
-		private void GradleLauncherTemplate( string path )
+        private void GradleLauncherTemplate( string path )
 		{
 #if !UNITY_2020_1_OR_NEWER
 			Debug.Log( "[AVProVideo] Post-processing Android project: patching launcher build.gradle" );
