@@ -43,9 +43,6 @@ dependencyResolutionManagement {
             url "https://dl-maven-android.mintegral.com/repository/mbridge_android_sdk_oversea" // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/gtm/Editor/Dependencies.xml:5
         }
         maven {
-            url "https://android-sdk.is.com/" // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/ironsource/Editor/Dependencies.xml:5
-        }
-        maven {
             url "https://artifact.bytedance.com/repository/pangle" // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/pangle/Editor/Dependencies.xml:5
         }
         maven {
