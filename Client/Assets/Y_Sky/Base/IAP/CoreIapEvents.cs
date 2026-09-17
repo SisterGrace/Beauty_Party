@@ -11,6 +11,8 @@ namespace CoreLite
         public static void IAPButtonShow(string productId, string productName, Dictionary<string, object> eventData = null)
         {
             eventData ??= new Dictionary<string, object>();
+            var currency = "";
+            var price = "";
 #if IAP_ENABLE
             var productInfo = CoreSdkMgr.GetProductInfoById(productId);
             if (productInfo != null)
@@ -19,9 +21,6 @@ namespace CoreLite
                 price = productInfo.metadata.localizedPriceString;
             }
 #endif
-            var currency = "";
-            var price = "";
-            
 
             if (!float.TryParse(price, out var fPrice))
             {
