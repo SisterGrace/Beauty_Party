@@ -1,5 +1,5 @@
 using Config.common;
-using CoreLite;
+using Sky;
 using GameLogic;
 using Sky;
 using System.Collections;
@@ -9,6 +9,7 @@ using TK_Engine;
 using UnityEngine;
 using Config;
 using EventType = GameLogic.EventType;
+using SRDebugger;
 
 public partial class SROptions
 {
@@ -333,7 +334,7 @@ public partial class SROptions
     [Sort(001)]
     public void ShowInter1()
     {
-        CoreSdkMgr.ShowInterstitial("IV_Back", CoreLite.IvType.IV1, () =>
+        SkySdkMgr.ShowInterstitial("IV_Back", Sky.IvType.IV1, () =>
         {
         });
     }
@@ -342,7 +343,7 @@ public partial class SROptions
     [Sort(002)]
     public void ShowInter2()
     {
-        CoreSdkMgr.ShowInterstitial("IV_Fail", CoreLite.IvType.IV2, () =>
+        SkySdkMgr.ShowInterstitial("IV_Fail", Sky.IvType.IV2, () =>
         {
         });
     }

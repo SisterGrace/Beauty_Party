@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6958552448cf14469b7eb74a75cb9d2, type: 3}
+  m_Name: SkyGameConfigData
+  m_EditorClassIdentifier: 
+  analyticsConfig:
+    AdmobAppID_Android: ca-app-pub-6527369457594416~2568854984
+    AdmobAppID_iOS: 
+    GA_Game_key: 535a5cb4e17090c0dd693662ba562daa
+    GA_Secret_key: 4e2e1c6ba65fcfdb9b2d240f8ddafc7e43dfecda
+    reyun_ID: e97dbbdaee70a917
+  toponLocalConfig:
+    appId: h6a26574ee8226
+    appKey: a1f65a6e800bf199a17ddea4b6b26965d
+    interstitialPlacementId: n6a265a12489ea
+    rewardedPlacementId: n6a265a213fd14
+    bannerPlacementId: n6a2659bb25df9
+    splashPlacementId: n6a2659ec1e4cb
+  mtgLocalConfig:
+    appId: 
+    appKey: 
+    interstitialPlacementId: 
+    interstitialUnitId: 
+    rewardedPlacementId: 
+    rewardedUnitId: 
+  serverConfig:
+    BaseUrl: 
+    AsnUrl: 

@@ -7,7 +7,7 @@ using Config;
 using Sky;
 
 #if USE_UP2SDK
-using CoreLite;
+using Sky;
 #endif
 
 namespace GameLogic
@@ -133,7 +133,7 @@ namespace GameLogic
         }
 #if USE_UP2SDK && ENABLE_IAP
         //获取支付列表
-        private CoreProductListRequest.ProductListData _productListData;
+        private SkyProductListRequest.ProductListData _productListData;
 #endif
         #endregion
 
@@ -146,21 +146,20 @@ namespace GameLogic
             RechargeController.Instance.InitAllProduct();
 #if USE_UP2SDK
 #if ENABLE_IAP
-            CoreSdkMgr.RegisterPurchaseInitHandler(OnPurchaseInitLinstener);
-            CoreSdkMgr.RegisterPurchaseCompletionHandler(PurchaseCallback);
+            SkySdkMgr.RegisterPurchaseInitHandler(OnPurchaseInitLinstener);
+            SkySdkMgr.RegisterPurchaseCompletionHandler(PurchaseCallback);
 #endif
-            CoreSdkMgr.Instance.RegisterUserAttributionHandler(UserSourceListenerCallback);
-            CoreSdkMgr.GameConfig(GetAPPState);
-            CoreSdkMgr.RegisterFirebaseActivateHandler(GetRemoteConfigCall);
-            CoreSdkMgr.RegisterAsnUserHandler(SetUserASN);
+            SkySdkMgr.Instance.RegisterUserAttributionHandler(UserSourceListenerCallback);
+            SkySdkMgr.GameConfig(GetAPPState);
+            SkySdkMgr.RegisterFirebaseActivateHandler(GetRemoteConfigCall);
+            SkySdkMgr.RegisterAsnUserHandler(SetUserASN);
 #endif
-            SkyAnalyticsMgr.init();
             GameModule.Timer.AddTimer(tiems =>
             {
                 initSdkCallback?.Invoke();
             }, 0.5f);
 #if USE_UP2SDK 
-            CoreSdkMgr.InitSDK(() =>
+            SkySdkMgr.InitSDK(() =>
                 {
                     OnSplashClosed();
                 });

@@ -181,7 +181,9 @@
           "Value" : null,
           "Values" : [
             "CoreLite",
-            "Sky"
+            "Sky",
+            "TK_Engine",
+            "GameLogic"
           ]
         },
         {

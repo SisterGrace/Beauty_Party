@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using TK_Engine;
 #if USE_UP2SDK
-using CoreLite;
+using Sky;
 #endif
 
 namespace GameLogic
@@ -24,7 +24,7 @@ namespace GameLogic
                 LogCommonEvent(comEvent);
             }
 #if USE_UP2SDK
-            CoreSdkMgr.TrackEvent(_eventSort);
+            SkySdkMgr.TrackEvent(_eventSort);
 #endif
         }
 
@@ -43,7 +43,7 @@ namespace GameLogic
                 LogCommonEvent(comEvent);
             }
 #if USE_UP2SDK
-            CoreSdkMgr.TrackEvent(_eventSort, _key, _value);
+            SkySdkMgr.TrackEvent(_eventSort, _key, _value);
 #endif
         }
 
@@ -81,7 +81,7 @@ namespace GameLogic
                 LogCommonEvent(comEvent);
             }
 #if USE_UP2SDK
-            CoreSdkMgr.TrackEvent(_eventSort, _eventDic);
+            SkySdkMgr.TrackEvent(_eventSort, _eventDic);
 #endif
         }
 
@@ -98,7 +98,7 @@ namespace GameLogic
             Dictionary<string, object> eventDic = new();
             eventDic.Add("Level", _level);
 #if USE_UP2SDK
-            CoreSdkMgr.SetSuperProperties(eventDic);
+            SkySdkMgr.SetSuperProperties(eventDic);
 #endif
         }
 
@@ -117,7 +117,7 @@ namespace GameLogic
                 { "User_Current_Gold", _golds.ToString() }
             };
 #if USE_UP2SDK
-            CoreSdkMgr.UserSet(eventDic);
+            SkySdkMgr.UserSet(eventDic);
 #endif
         }
     }

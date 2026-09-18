@@ -1,7 +1,7 @@
 {
   "prefix": "Client/Assets/Y_Sky",
   "remote": "y_sky",
-  "branch": "main",
+  "branch": "V1.1.0",
   "squash": true,
   "message": "Update Y_Sky from remote"
 }
