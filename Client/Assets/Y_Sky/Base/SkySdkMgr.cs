@@ -186,11 +186,6 @@ namespace Sky
         /// <param name="_callback">int：int == 0 上报服务端成功/失败；msg 成功/失败信息</param>
         public static void LogCheckingOrder(SkyQueryOrder.Result req, Action<int, string> _callback)
         {
-			if (SkyIapH5Mgr.HasServerBackend)
-			{
-				SkyLogUtils.Debug("[无服务器模式] 跳过 LogCheckingOrder（无服务器）");
-				return;
-			}
 			if (!req.payment_method.Contains("stripe"))
             {
 #if IAP_ENABLE
@@ -199,8 +194,15 @@ namespace Sky
                 SkyIapIosOrderMgr.RemoveOrder(req.product_id);
 #endif
             }
-            SkyIapH5Mgr.Instance.ReportOrderReward(new SkyQueryOrder.Request(req.order_no, SkyPrefs.UserId), _callback);
-            SkyIapEvents.IAPCheckingOrder(req);
+			SkyIapEvents.IAPCheckingOrder(req);
+
+			if (!SkyIapH5Mgr.HasServerBackend)
+			{
+				SkyLogUtils.Debug("[无服务器模式] 跳过 LogCheckingOrder 服务端上报");
+				return;
+			}
+			SkyIapH5Mgr.Instance.ReportOrderReward(new SkyQueryOrder.Request(req.order_no, SkyPrefs.UserId), _callback);
+            
         }
 #endregion
 

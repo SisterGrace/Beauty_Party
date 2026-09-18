@@ -384,51 +384,69 @@ namespace Sky
             }
         }
 
-        /// <summary>
-        /// 处理支付成功
-        /// </summary>
-        private void HandlePaymentSuccess(SkyQueryOrder.ResponseData orderData)
-        {
-            SkyLogUtils.Debug("iaph5mgr" + "支付成功处理开始"+JsonUtility.ToJson(orderData));
-            SkyIapEvents.IAPClientFinish(orderData.product_name, 
-                orderData.product_id, 
-                orderData.order_no, 
-                orderData.transaction_id, 
-                orderData.currency, 
-                orderData.price.ToString(), 
-                orderData.game_extra_param,
-                "stripe_h5");
-            // 重置状态
-            MarkPurchasePendingCleared();
-            isQuerying = false;
-            currentRetryCount = 0;
+		/// <summary>
+		/// 处理支付成功
+		/// </summary>
+		private void HandlePaymentSuccess(SkyQueryOrder.ResponseData orderData)
+		{
+			SkyLogUtils.Debug("iaph5mgr" + "支付成功处理开始" + JsonUtility.ToJson(orderData));
+			SkyIapEvents.IAPClientFinish(orderData.product_name,
+				orderData.product_id,
+				orderData.order_no,
+				orderData.transaction_id,
+				orderData.currency,
+				orderData.price.ToString(),
+				orderData.game_extra_param,
+				"stripe_h5");
+			// 重置状态
+			MarkPurchasePendingCleared();
+			isQuerying = false;
+			currentRetryCount = 0;
 
-            var queryResult = new SkyQueryOrder.Result(orderData.order_no, orderData.pay_status, orderData.shipping_status,
-                orderData.product_name, orderData.transaction_id, orderData.pay_success_time,
-                orderData.game_extra_param, orderData.product_id, orderData.price, orderData.currency, orderData.quantity,
-                orderData.is_first_pay, orderData.payment_method);
+			// ✅ 修正：transactionId / paySuccessTime / gameExtraParam / productName 四个参数顺序对齐构造函数
+			var queryResult = new SkyQueryOrder.Result(
+				orderData.order_no,
+				orderData.pay_status,
+				orderData.shipping_status,
+				orderData.transaction_id,
+				orderData.pay_success_time,
+				orderData.game_extra_param,
+				orderData.product_name,
+				orderData.product_id,
+				orderData.price,
+				orderData.currency,
+				orderData.quantity,
+				orderData.is_first_pay,
+				orderData.payment_method);
 
-            var res = new SkyPurchase.Result(currentOrderReq,queryResult,true,false,orderData.payment_method.Contains("stripe") ? SkyPaymentType.H5 : SkyPaymentType.NativeApp);
-            SkySdkMgr.OnPurchaseComplete?.Invoke(res);
-            SkyIapEvents.IAPSuccess(orderData?.product_name, 
-                orderData?.product_id, 
-                orderData?.order_no,
-                orderData?.transaction_id,
-                orderData?.currency,
-                orderData?.price.ToString(),
-                orderData?.game_extra_param,
-                "consumable",
-                "production",
-                false,
-                "stripe_h5");
+			var res = new SkyPurchase.Result(
+				currentOrderReq,
+				queryResult,
+				true,
+				false,
+				orderData.payment_method.Contains("stripe") ? SkyPaymentType.H5 : SkyPaymentType.NativeApp);
+			SkySdkMgr.OnPurchaseComplete?.Invoke(res);
 
-            currentOrderId = "";
-            currentOrderReq = null;
+			SkyIapEvents.IAPSuccess(
+				orderData?.product_name,
+				orderData?.product_id,
+				orderData?.order_no,
+				orderData?.transaction_id,
+				orderData?.currency,
+				orderData?.price.ToString(),
+				orderData?.game_extra_param,
+				"consumable",
+				"production",
+				false,
+				"stripe_h5");
 
-            SkyLogUtils.Debug("iaph5mgr" + "支付成功处理完成");
-        }
+			currentOrderId = "";
+			currentOrderReq = null;
 
-        private void HandlePaymentFailure(SkyQueryOrder.ResponseData orderData)
+			SkyLogUtils.Debug("iaph5mgr" + "支付成功处理完成");
+		}
+
+		private void HandlePaymentFailure(SkyQueryOrder.ResponseData orderData)
         {
             SkyLogUtils.Debug("iaph5mgr" + $"支付失败，状态: {orderData.pay_status}");
             SkyIapEvents.IAPFail(currentOrderReq?.product_name, 
