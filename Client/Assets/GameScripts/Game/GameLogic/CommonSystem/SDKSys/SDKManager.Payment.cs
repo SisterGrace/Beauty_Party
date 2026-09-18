@@ -231,13 +231,6 @@ namespace GameLogic
             }
         }
 
-        // ============================================================
-        // 已删除 PurchaseCallback
-        // 原因：该方法从未被 SkySdkMgr.RegisterPurchaseCompletionHandler 注册，
-        //       新版 SDKMgr.cs 已经全局注册了购买完成回调（含 LogCheckingOrder、
-        //       GiveRewards、关闭 UIIAPLoading 等）。保留只会导致未来接入方
-        //       误注册后双倍发奖。
-        // ============================================================
 #endif
 
         /// <summary>
