@@ -1,0 +1,29 @@
+{
+    "name": "CoreLite",
+    "rootNamespace": "",
+    "references": [
+        "GUID:400f2260dd8d285419d1db99999109aa",
+        "GUID:85419d1db9999260dd8d29109aa400f2",
+        "GUID:059c931883a8a274690376c0592ea9a0",
+        "GUID:60bfecf5cb232594891bc622f40d6bed",
+        "GUID:94e1de2458b07d0bf1e9f13e6ae06443",
+        "GUID:e63a64384cc3ef04cac761c1ce76e9c2",
+        "GUID:d0bf1e9f644394e1de13e6ae02458b07",
+        "GUID:08d1c582746949b40ba6a45cdb776bdf",
+        "GUID:fe25561d224ed4743af4c60938a59d0b",
+        "GUID:70ea675efa2644cef98c7ece24158333",
+        "GUID:13b158477d5fe4f45b3824c3618d3aaf",
+        "GUID:f8c64bb88d959406689053ae3f31183d",
+        "GUID:6824e98e6ad23564a8009ba4d0c4da02",
+        "GUID:f94eac24328d7554ca600dd71c9a8f1b"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
