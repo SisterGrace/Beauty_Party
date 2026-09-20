@@ -286,6 +286,8 @@ namespace TK_Engine.Editor
         [MenuItem("TK_Engine/Quick Build/仅打Android AssetBundle")]
         public static void BuildAndroidAssetBundleOnly()
         {
+            // 先清理缓存，实现全量重建
+            CleanBuildCache();
             BuildInternal(BuildTarget.Android, Application.dataPath + "/../Builds/AndroidBundles", packageVersion: GetBuildPackageVersion());
             AssetDatabase.Refresh();
         }
@@ -578,5 +580,15 @@ namespace TK_Engine.Editor
         }
 
         #endregion
+
+        private static void CleanBuildCache()
+        {
+            string buildCachePath = Path.Combine(Application.dataPath, "../Library/BuildCache");
+            if (Directory.Exists(buildCachePath))
+            {
+                Debug.Log($"删除构建缓存: {buildCachePath}");
+                Directory.Delete(buildCachePath, true);
+            }
+        }
     }
 }
