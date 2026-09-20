@@ -123,7 +123,7 @@ namespace CoreLite
         public void ShowSplash(string placementId)
         {
             if (string.IsNullOrEmpty(placementId)) return;
-            ATSplashAd.Instance.showSplashAd(placementId, new Dictionary<string, object>());
+            ATSplashAd.Instance.showSplashAd(placementId, new Dictionary<string, string>());
             CoreLogUtils.Debug("[CoreLiteTpn] Show splash: " + placementId);
         }
 

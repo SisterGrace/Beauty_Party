@@ -27,7 +27,7 @@ namespace CoreLite
         /// 用户关闭 GDPR 弹窗后自动回调
         /// 此时可以安全地初始化 TopOn SDK
         /// </summary>
-        public void onConsentDismiss()
+        public void onConsentDismiss(ATConsentDismissInfo consentDismissInfo)
         {
             CoreLogUtils.Debug("[CoreLiteTpn] onConsentDismiss() - GDPR consent handled, initializing SDK...");
             var listener = new CoreTpnInitListener(_appId, _onSuccess, _onFail);

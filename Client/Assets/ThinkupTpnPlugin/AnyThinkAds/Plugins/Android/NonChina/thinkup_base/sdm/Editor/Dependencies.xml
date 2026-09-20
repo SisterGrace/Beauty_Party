@@ -1,0 +1,6 @@
+<dependencies>
+    <androidPackages>
+        <androidPackage spec="com.thinkup.sdk:adapter-tpn-sdm:6.5.75.1.2"/>
+        <androidPackage spec="com.smartdigimkttech.sdk:smartdigimkttech-sdk:6.5.75"/>
+    </androidPackages>
+</dependencies>

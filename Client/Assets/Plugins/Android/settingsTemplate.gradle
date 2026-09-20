@@ -28,22 +28,22 @@ dependencyResolutionManagement {
             url "https://developer.hihonor.com/repo/" // Assets/SolarEngine/Editor/SolarEngineDependencies.xml:18
         }
         maven {
-            url "https://jfrog.anythinktech.com/artifactory/overseas_sdk" // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/Editor/Dependencies.xml:5
+            url "https://jfrog.anythinktech.com/artifactory/overseas_sdk" // Assets/ThinkupTpnPlugin/AnyThinkAds/Plugins/Android/NonChina/Editor/Dependencies.xml:5
         }
         maven {
-            url "https://cboost.jfrog.io/artifactory/chartboost-ads" // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/chartboost/Editor/Dependencies.xml:7
+            url "https://cboost.jfrog.io/artifactory/chartboost-ads" // Assets/ThinkupTpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/chartboost/Editor/Dependencies.xml:7
         }
         maven {
-            url "https://cboost.jfrog.io/artifactory/chartboost-mediation" // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/chartboost/Editor/Dependencies.xml:7
+            url "https://cboost.jfrog.io/artifactory/chartboost-mediation" // Assets/ThinkupTpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/chartboost/Editor/Dependencies.xml:7
         }
         maven {
-            url "https://cboost.jfrog.io/artifactory/chartboost-core" // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/chartboost/Editor/Dependencies.xml:7
+            url "https://cboost.jfrog.io/artifactory/chartboost-core" // Assets/ThinkupTpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/chartboost/Editor/Dependencies.xml:7
         }
         maven {
-            url "https://dl-maven-android.mintegral.com/repository/mbridge_android_sdk_oversea" // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/gtm/Editor/Dependencies.xml:5
+            url "https://dl-maven-android.mintegral.com/repository/mbridge_android_sdk_oversea" // Assets/ThinkupTpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/gtm/Editor/Dependencies.xml:5
         }
         maven {
-            url "https://artifact.bytedance.com/repository/pangle" // Assets/TpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/pangle/Editor/Dependencies.xml:5
+            url "https://artifact.bytedance.com/repository/pangle" // Assets/ThinkupTpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/pangle/Editor/Dependencies.xml:5
         }
         maven {
             url "https://repo.dgtverse.cn/repository/maven-public/" // Assets/Editor/Dependencies.xml:8

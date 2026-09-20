@@ -35,6 +35,62 @@ namespace CoreLite
         public string ClientName => CorePlatformType.TPN.ToString();
         public CorePlatformType PlatformType => CorePlatformType.TPN;
 
+#if TOPON_TEST
+        // ================== TopOn SDK 版本切换开关 ==================
+        /// <summary>
+        /// TopOn SDK 混淆版本枚举
+        /// </summary>
+        public enum TpnSdkApiVersion
+        {
+            Secmtp,   // 对应 com.secmtp.sdk.* (海外版混淆)
+            Thinkup,  // 对应 com.thinkup.* (特定版本混淆)
+            AnyThink  // 对应 com.anythink.* (标准未混淆版，国内通常用这个)
+        }
+
+        /// <summary>
+        /// 【切换开关】在这里一键切换当前使用的 TopOn 版本
+        /// 打包前修改此处即可，无需再去代码里搜索替换字符串
+        /// </summary>
+        public static TpnSdkApiVersion CURRENT_TPN_API_VERSION = TpnSdkApiVersion.Thinkup;
+
+        // 获取核心类路径 (ATSDK / TUSDK)
+        private static string GetTpnSdkCoreApiClass()
+        {
+            switch (CURRENT_TPN_API_VERSION)
+            {
+                case TpnSdkApiVersion.Thinkup: return "com.thinkup.core.api.TUSDK";
+                case TpnSdkApiVersion.AnyThink: return "com.anythink.core.api.ATSDK";
+                case TpnSdkApiVersion.Secmtp:
+                default: return "com.secmtp.sdk.core.api.ATSDK";
+            }
+        }
+
+        // 获取配置构建器类路径
+        private static string GetTpnSdkDebuggerConfigBuilderClass()
+        {
+            switch (CURRENT_TPN_API_VERSION)
+            {
+                case TpnSdkApiVersion.Thinkup: return "com.thinkup.core.api.TUDebuggerConfig$Builder";
+                case TpnSdkApiVersion.AnyThink: return "com.anythink.core.api.ATDebuggerConfig$Builder";
+                case TpnSdkApiVersion.Secmtp:
+                default: return "com.secmtp.sdk.core.api.ATDebuggerConfig$Builder";
+            }
+        }
+
+        // 获取调试器 UI 类路径
+        private static string GetTpnSdkDebuggerUiClass()
+        {
+            switch (CURRENT_TPN_API_VERSION)
+            {
+                case TpnSdkApiVersion.Thinkup: return "com.thinkup.debug.api.TUDebuggerUITest";
+                case TpnSdkApiVersion.AnyThink: return "com.anythink.debug.api.ATDebuggerUITest";
+                case TpnSdkApiVersion.Secmtp:
+                default: return "com.secmtp.sdk.debug.api.ATDebuggerUITest";
+            }
+        }
+        // ===========================================================
+#endif
+
         public void Initialize()
         {
             if (_isInitialized) return;
@@ -66,13 +122,13 @@ namespace CoreLite
 #if UNITY_ANDROID || UNITY_IOS
             AnyThinkAds.Api.ATSDKAPI.setLogDebug(CoreLogUtils.Enabled);
 #if TOPON_TEST && UNITY_ANDROID
-            // 海外版 SDK 使用 secmtp 混淆，原始路径 com.anythink.core.api.* 不可用
+            // 海外版/特定版本 SDK 使用混淆，动态获取类路径
             try
             {
-                using (var atsdkClass = new AndroidJavaClass("com.secmtp.sdk.core.api.ATSDK"))
+                using (var atsdkClass = new AndroidJavaClass(GetTpnSdkCoreApiClass()))
                 {
                     atsdkClass.CallStatic("setNetworkLogDebug", true);
-                    CoreLogUtils.Debug("[CoreLiteTpn] setNetworkLogDebug ON (secmtp)");
+                    CoreLogUtils.Debug("[CoreLiteTpn] setNetworkLogDebug ON (" + CURRENT_TPN_API_VERSION + ")");
                 }
             }
             catch (System.Exception e)
@@ -135,7 +191,7 @@ namespace CoreLite
 #endif
 #if TOPON_TEST && UNITY_ANDROID
             // SDK 初始化成功后，调起 TopOn 测试工具 UI（链接包方式）
-            //ShowDebuggerUI();
+            ShowDebuggerUI();
 #endif
 
             // 开屏优先 load，其余并行
@@ -319,7 +375,7 @@ namespace CoreLite
                 {
                     using (var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
                     using (var activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"))
-                    using (var debuggerClass = new AndroidJavaClass("com.secmtp.sdk.debug.api.ATDebuggerUITest"))
+                    using (var debuggerClass = new AndroidJavaClass(GetTpnSdkDebuggerUiClass()))
                     {
                         debuggerClass.CallStatic("showDebuggerUI", activity);
                     }
@@ -348,12 +404,12 @@ namespace CoreLite
             {
                 using (var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
                 using (var activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"))
-                using (var atsdkClass = new AndroidJavaClass("com.secmtp.sdk.core.api.ATSDK"))
+                using (var atsdkClass = new AndroidJavaClass(GetTpnSdkCoreApiClass()))
                 {
                     // 使用配置的测试网络 ID
                     int adNetwork = (int)TEST_NETWORK;
 
-                    using (var builder = new AndroidJavaObject("com.secmtp.sdk.core.api.ATDebuggerConfig$Builder", adNetwork))
+                    using (var builder = new AndroidJavaObject(GetTpnSdkDebuggerConfigBuilderClass(), adNetwork))
                     {
                         var config = builder.Call<AndroidJavaObject>("build");
                         atsdkClass.CallStatic("setDebuggerConfig", activity, gaid, config);
@@ -384,12 +440,12 @@ namespace CoreLite
             {
                 using (var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
                 using (var activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"))
-                using (var atsdkClass = new AndroidJavaClass("com.secmtp.sdk.core.api.ATSDK"))
+                using (var atsdkClass = new AndroidJavaClass(GetTpnSdkCoreApiClass()))
                 {
                     // 使用配置的测试网络 ID
                     int adNetwork = (int)TEST_NETWORK;
 
-                    using (var builder = new AndroidJavaObject("com.secmtp.sdk.core.api.ATDebuggerConfig$Builder", adNetwork))
+                    using (var builder = new AndroidJavaObject(GetTpnSdkDebuggerConfigBuilderClass(), adNetwork))
                     {
                         var config = builder.Call<AndroidJavaObject>("build");
                         atsdkClass.CallStatic("setDebuggerConfig", activity, gaid, config);
@@ -497,7 +553,7 @@ namespace CoreLite
         public double GetInterstitialRevenue() => CoreTpnInter.Instance.GetInterRevenue();
         public bool IsInterstitialAvailable() => CoreTpnInter.Instance.IsInterReady();
         public void LoadInterstitial() => CoreTpnInter.Instance.LoadInter();
-        public void ShowInterstitial(string position=null)
+        public void ShowInterstitial(string position = null)
         {
             if (!IsInterstitialAvailable())
             {
@@ -508,18 +564,18 @@ namespace CoreLite
             var bestPlacement = CoreTpnInter.Instance.GetHighestPayingPlacement();
             if (string.IsNullOrEmpty(bestPlacement))
             {
-               /* CoreAnalyticsMgr.TrackEvent("IV_AchieveShow_Fail", new Dictionary<string, object>()
-                {
-                    { "Position", CoreAdsMgr.Instance._ivPos },
-                    { "ad_platform", CorePlatformType.TPN.ToString() },
-                    { "unitId", "" },
-                    { "show_fail_reason", "highest_paying_placement_not_found" }
-                });*/
+                /* CoreAnalyticsMgr.TrackEvent("IV_AchieveShow_Fail", new Dictionary<string, object>()
+                 {
+                     { "Position", CoreAdsMgr.Instance._ivPos },
+                     { "ad_platform", CorePlatformType.TPN.ToString() },
+                     { "unitId", "" },
+                     { "show_fail_reason", "highest_paying_placement_not_found" }
+                 });*/
                 CoreAdsMgr.Instance._ivCloseCallback?.Invoke();
                 LoadInterstitial();
                 return;
             }
-            
+
             // 获取广告信息用于 IV_AchieveShow 打点
             string adId = "";
             string adSource = "";
@@ -536,7 +592,7 @@ namespace CoreLite
                 }
             }
             catch { }
-            
+
             CoreAnalyticsMgr.TrackEvent("IV_AchieveShow", new Dictionary<string, object>
             {
                 { "Position", CoreAdsMgr.Instance._ivPos },
