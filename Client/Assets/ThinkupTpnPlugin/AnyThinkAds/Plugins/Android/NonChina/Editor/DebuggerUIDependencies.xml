@@ -1,0 +1,8 @@
+<!--<dependencies>
+    <androidPackages>
+        <repositories>
+            <repository>https://jfrog.anythinktech.com/artifactory/debugger</repository>
+        </repositories>
+        <androidPackage spec="com.thinkup.sdk:debugger-ui:1.1.6"/>
+    </androidPackages>
+</dependencies>-->

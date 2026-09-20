@@ -1,0 +1,10 @@
+<dependencies>
+    <androidPackages>
+        <repositories>
+            <repository>https://jfrog.anythinktech.com/artifactory/overseas_sdk</repository>
+        </repositories>
+        <androidPackage spec="com.thinkup.sdk:core-tpn:6.6.22.2"/>
+        <androidPackage spec="androidx.appcompat:appcompat:1.6.1"/>
+        <androidPackage spec="androidx.browser:browser:1.4.0"/>
+    </androidPackages>
+</dependencies>

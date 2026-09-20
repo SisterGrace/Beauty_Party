@@ -33,12 +33,9 @@ MonoBehaviour:
     - EasySave3.Runtime
     - GameMain
     - TK_Engine.Runtime
-    - ThinkingAnalytics
-    - CoreLite
     - GameAnalyticsSDK
     - HybridCLR.Editor
     - DoTween.runtime
-    - TPN
     - YooAsset.Editor
     - ParticleImage
     - UniTask
@@ -48,56 +45,53 @@ MonoBehaviour:
     - GameProto
     - IAPResolver
     - GameBase
-    - AVProVideo.Runtime
     - spine-csharp
+    - ThinkupTpnPlugin.Script.IntegrationManager.Editor
+    - AVProVideo.Demos
     - Coffee.UIParticle
+    - TPN
     - TK_Engine.Editor
+    - CoreLite
+    - AVProVideo.Editor
     - spine-unity
     - UniTask.Linq
     - StompyRobot.SRF
     - ThinkingSDK
     - AllIn1SpriteShaderAssembly
     - Assembly-CSharp-firstpass
+    - SkyEditor
     - NativeGallery.Editor
-    - AVProVideo.Demos
+    - AVProVideo.Runtime
     - GameAnalyticsSDK.Editor
     - FeishuBuildTool.Editor
     - EasySave3.Editor
-    - AdjustSdk.Scripts
     - Coffee.SoftMaskForUGUI.Editor
-    - AVProVideo.Extensions.Timeline
-    - TpnPlugin.Script.IntegrationManager.Editor
-    - AVProVideo.Extensions.UnityUI
-    - TpnPlugin.Script.Editor
     - NativeGallery.Runtime
-    - AVProVideo.Extensions.UnityUI.Editor
     - StompyRobot.SRDebugger.Editor
+    - ThinkupTpnPlugin.Script.Editor
     - Vibration.Runtime
+    - SkyTopOnAdEditor
     - Coffee.SoftMaskForUGUI
-    - AVProVideo.Editor
     - GUPS.Obfuscator
     - Coffee.UIParticle.Editor
-    - Purchasing.Common
+    - _AVProVideo.Extensions.VideoPlayer.Editor
     - UniTask.TextMeshPro
-    - _AVProVideo.Extensions.VideoPlayer
     - StompyRobot.SRF.Editor
     - Assembly-CSharp
     - ParticleImage.Editor
-    - SkyEditor
-    - SkyFirebaseEditor
-    - AdjustSdk.Editor
     - HybridCLR.Runtime
-    - AVProVideo.Extensions.VisualEffectGraph
-    - Up2SDK
+    - AVProVideo.Extensions.Timeline
     - UniTask.Addressables
     - GUPS.Editor
+    - SkyFirebaseEditor
     - Coffee.UnmaskForUGUI
     - UniTask.Editor
-    - Up2SDK.Editor
     - FirebaseMessagingActivityGenerator
-    - _AVProVideo.Extensions.VideoPlayer.Editor
+    - AVProVideo.Extensions.VisualEffectGraph
+    - AVProVideo.Extensions.UnityUI
     - UniTask.DOTween
-    - SkyTopOnAdEditor
+    - _AVProVideo.Extensions.VideoPlayer
+    - AVProVideo.Extensions.UnityUI.Editor
     showAdvancedSettings: 0
   addMgrToSceneAutomatically: 0
   autoUpdateReferences: 1
