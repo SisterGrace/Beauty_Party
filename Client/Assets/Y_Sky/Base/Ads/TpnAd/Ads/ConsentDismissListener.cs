@@ -28,7 +28,7 @@ namespace Sky
         /// 用户关闭 GDPR 弹窗后自动回调
         /// 此时可以安全地初始化 TopOn SDK
         /// </summary>
-        public void onConsentDismiss()
+        public void onConsentDismiss(ATConsentDismissInfo consentDismissInfo)
 
 		{
             SkyLogUtils.Debug("[SkyTpn] onConsentDismiss() - GDPR consent handled, initializing SDK...");

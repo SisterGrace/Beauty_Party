@@ -123,7 +123,7 @@ namespace Sky
         public void ShowSplash(string placementId)
         {
             if (string.IsNullOrEmpty(placementId)) return;
-            ATSplashAd.Instance.showSplashAd(placementId, new Dictionary<string, object>());
+            ATSplashAd.Instance.showSplashAd(placementId, new Dictionary<string, string>());
             SkyLogUtils.Debug("[SkyTpn] Show splash: " + placementId);
         }
 
