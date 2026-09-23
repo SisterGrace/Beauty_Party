@@ -21,6 +21,7 @@ namespace GameLogic
 		{
 			_LoadSw = new Stopwatch();
 			_LoadSw.Start();
+			Log.Info("loading开始");
 			value = 0.1f;
 			IsLoadSuccess = false;
 			
