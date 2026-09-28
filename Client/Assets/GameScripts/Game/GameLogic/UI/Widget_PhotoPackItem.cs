@@ -44,7 +44,7 @@ namespace GameLogic
         {
             _data = data;
             _packId = data.PackId;
-            _itemPhotoLoad.LoadUIImg(_data.PackfirstPic);
+            _itemPhotoLoad.RequestLoad(_data.PackfirstPic);
         }
 
         private void EnsureShrinkPicList()

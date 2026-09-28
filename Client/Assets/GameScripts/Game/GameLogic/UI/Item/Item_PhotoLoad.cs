@@ -95,7 +95,10 @@ namespace GameLogic
                 PhotoCount.gameObject.SetActive(false);
             }
         }
-
+        public void RequestLoad(int photoId)
+        {
+            PhotoLoadThrottler.RequestLoad(photoId, this);
+        }
         /// <summary>
         /// 自动检测所属页面
         /// </summary>

@@ -36,7 +36,7 @@ namespace GameLogic
 
                 // 按优先级顺序预加载
                 await PreloadShopPhotosAsync();           // 🔴 福利中心（最高优先级）
-                await PreloadGachaPhotosAsync();          // 🟠 抽卡
+                //await PreloadGachaPhotosAsync();          // 🟠 抽卡
                 //await PreloadEndlessTreasureAsync();      // 🟡 无尽寻宝
                 //await PreloadDreamPassAsync();            // 🟡 梦想通行证
 

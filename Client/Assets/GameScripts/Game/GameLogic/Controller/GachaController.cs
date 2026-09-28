@@ -163,7 +163,7 @@ namespace GameLogic
 			UserController.Instance.SetLuckyDrawCount++;
 
 			var photoCfg = ConfigLoader.Instance.Tables.TbCfgPhotos.Get(result.PhotoId);
-			SDKManager.Instance.LogCommonEvent(CommonEvent.ComLevelEvent);
+			//SDKManager.Instance.LogCommonEvent(CommonEvent.ComLevelEvent);
 		}
 
 		/// <summary>
