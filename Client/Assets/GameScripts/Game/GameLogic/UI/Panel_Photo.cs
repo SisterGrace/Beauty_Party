@@ -13,6 +13,9 @@ namespace GameLogic
 		private SwitchPageMgr _switchPage;
 	protected override void OnRefresh()
 	{
+		// ✅ 标记当前页面为活跃页面
+		ImgUtil.SetActivePage(this.GetType().Name);
+		
 		var switchPageInfo = ConfigLoader.Constant.PhotoTab;
 		_switchPage = new SwitchPageMgr(mTopsUI, mChildPageNode, this);
 		foreach (var item in switchPageInfo)
@@ -58,6 +61,9 @@ namespace GameLogic
 		}
 	protected override void Close()
 	{
+		// ✅ 清除活跃页面标记
+		ImgUtil.ClearActivePage(this.GetType().Name);
+		
             VideoAudioHelper.StopVideoAudioCheck(this.WindowName, true);
             base.Close();
 	}

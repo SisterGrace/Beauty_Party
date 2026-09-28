@@ -23,10 +23,13 @@ namespace GameLogic
 		private Widget_OneDiaProduct _adDiaProduct;
 		private List<CfgShop> _allShopCfgs;
 
-		protected override void OnRefresh()
-		{
-			_allShopCfgs = ConfigLoader.Instance.Tables.TbCfgShop.DataList;
-			UpdateInfo();
+	protected override void OnRefresh()
+	{
+		// ✅ 标记当前页面为活跃页面
+		ImgUtil.SetActivePage(this.GetType().Name);
+		
+		_allShopCfgs = ConfigLoader.Instance.Tables.TbCfgShop.DataList;
+		UpdateInfo();
 			//创建商品列表
 			CreatePruductList();
 			CreatPhotoList();
@@ -191,10 +194,13 @@ namespace GameLogic
 #endif
 		}
 
-		protected override void Close()
-		{
-			base.Close();
-		}
+	protected override void Close()
+	{
+		// ✅ 清除活跃页面标记
+		ImgUtil.ClearActivePage(this.GetType().Name);
+		
+		base.Close();
+	}
 
 		protected override void OnDestroy()
 		{

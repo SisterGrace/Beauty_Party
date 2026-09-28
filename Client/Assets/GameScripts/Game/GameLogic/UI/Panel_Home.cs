@@ -91,6 +91,21 @@ namespace GameLogic
 				SDKManager.Instance.Button_ShowBanner();
 			}
 			GameScene.Instance.LogEventHomeShow();
+			
+			// ✅ 启动后台预加载所有活动图片
+			StartPreloadAllActivities().Forget();
+		}
+
+		/// <summary>
+		/// 后台预加载所有活动图片
+		/// </summary>
+		private async UniTaskVoid StartPreloadAllActivities()
+		{
+			// 等待1秒，确保关卡必要资源加载完毕
+			await UniTask.Delay(1000);
+			
+			// 预加载所有活动图片（仅磁盘缓存，不占用内存）
+			await ActivityPhotoPreloadManager.Instance.PreloadAllActivitiesAsync();
 		}
 
 		protected override void RegisterEvent()

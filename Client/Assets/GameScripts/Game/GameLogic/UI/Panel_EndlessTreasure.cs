@@ -29,6 +29,9 @@ namespace GameLogic
         private int _curLoopTimes => UserController.Instance.GetOneActivityData(ActivityType.UntoldTreasure).LoopCount;
         protected override void OnRefresh()
         {
+            // ✅ 标记当前页面为活跃页面
+            ImgUtil.SetActivePage(this.GetType().Name);
+            
             if (userDatas.Length > 0)
             {
                 _activityData = (ActityData)userDatas[0];
@@ -196,6 +199,9 @@ namespace GameLogic
         }
         protected override void Close()
         {
+            // ✅ 清除活跃页面标记
+            ImgUtil.ClearActivePage(this.GetType().Name);
+            
             VideoAudioHelper.StopVideoAudioCheck(this.WindowName, restoreBGM: true);
             base.Close();
         }

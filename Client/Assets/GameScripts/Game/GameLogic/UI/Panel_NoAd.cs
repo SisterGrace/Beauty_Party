@@ -32,9 +32,12 @@ namespace GameLogic
 		{
 		}
 
-		protected override void Close()
-		{
-			base.Close();
-		}
+	protected override void Close()
+	{
+		// ✅ 清除活跃页面标记
+		ImgUtil.ClearActivePage(this.GetType().Name);
+		
+		base.Close();
+	}
 	}
 }

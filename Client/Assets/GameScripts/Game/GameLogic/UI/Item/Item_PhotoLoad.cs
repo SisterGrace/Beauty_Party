@@ -84,7 +84,35 @@ namespace GameLogic
         public void LoadUIImg(int id)
         {
             string url = PropsController.GetImgUrl(id);
-            LoadUIImg(url);
+            
+            // ✅ 自动检测所属页面
+            string pageSource = DetectPageSource();
+            
+            StartLoad(url, showLoading: true, pageSource);
+            
+            if (PhotoCount != null)
+            {
+                PhotoCount.gameObject.SetActive(false);
+            }
+        }
+
+        /// <summary>
+        /// 自动检测所属页面
+        /// </summary>
+        private string DetectPageSource()
+        {
+            // 向上查找父节点，直到找到 Panel_ 开头的节点
+            Transform parent = transform;
+            while (parent != null)
+            {
+                if (parent.name.StartsWith("Panel_"))
+                {
+                    return parent.name;
+                }
+                parent = parent.parent;
+            }
+            
+            return null; // 未找到页面标识
         }
 
         /// <summary>
@@ -108,6 +136,11 @@ namespace GameLogic
 
         private void StartLoad(string url, bool showLoading)
         {
+            StartLoad(url, showLoading, null);
+        }
+
+        private void StartLoad(string url, bool showLoading, string pageSource)
+        {
             CancelCurrentTask();
             DestroyCreatedSprite();
 
@@ -123,7 +156,7 @@ namespace GameLogic
             if (PhotoImg != null) PhotoImg.sprite = null;
 
             _cts = new CancellationTokenSource();
-            LoadImageAsync(url, _cts.Token).Forget();
+            LoadImageAsync(url, pageSource, _cts.Token).Forget();
         }
 
         private void CancelCurrentTask()
@@ -136,7 +169,7 @@ namespace GameLogic
             }
         }
 
-        private async UniTask LoadImageAsync(string url, CancellationToken token)
+        private async UniTask LoadImageAsync(string url, string pageSource, CancellationToken token)
         {
             for (int attempt = 0; attempt <= MaxRetryCount; attempt++)
             {
@@ -149,7 +182,14 @@ namespace GameLogic
                         if (gameObject == null || _currentLoadingUrl != url) return;
                     }
 
-                    Texture2D texture = await ImgUtil.GetTextureAsync(url, token);
+                    // ✅ 使用带优先级的加载方法
+                    Texture2D texture = await ImgUtil.GetTextureAsync(
+                        url,
+                        ImgUtil.DownloadPriority.Normal,
+                        pageSource,
+                        token
+                    );
+                    
                     if (gameObject == null || _currentLoadingUrl != url) return;
 
                     if (texture != null)

@@ -1,11 +1,12 @@
-using System.Collections;
-using System.Collections.Generic;
+using Config.common;
 using Config.config;
 using Cysharp.Threading.Tasks;
+using System.Collections;
+using System.Collections.Generic;
+using System.Threading;
+using TK_Engine;
 using UnityEngine;
 using Y_Base;
-using Config.common;
-using TK_Engine;
 
 namespace GameLogic
 {
@@ -234,7 +235,7 @@ namespace GameLogic
                     string imgurl = PropsController.GetImgUrl(cfg.ImageID, cfg.ImageType, cfg.ABGroup);
                     string videourl = PropsController.GetVideoUrl(cfg.ImageID, cfg.ABGroup, cfg.IsVideo);
                     //Log.Info($"[PhotoTrace] 预加载第{i+1}张: PhotoID={cfg.ID}, ImageID={cfg.ImageID}, ABGroup={cfg.ABGroup}, IsVideo={cfg.IsVideo}\n  → 图片URL: {imgurl}\n  → 视频URL: {videourl}");
-                    tasks[i] = ImgUtil.GetTextureAsync(imgurl);
+                    tasks[i] = ImgUtil.GetTextureAsync(imgurl, ImgUtil.DownloadPriority.Level, null, CancellationToken.None);
                 }
                 await UniTask.WhenAll(tasks);
             }
@@ -259,7 +260,7 @@ namespace GameLogic
             var cfg = ConfigLoader.Instance.Tables.TbCfgPhotos.Get(id); 
             Log.Info($"[PhotoTrace] 预加载用户当前照片: 来源=UserController.GetCurUserPhotoID, PhotoID={id}, ImageID={cfg.ImageID}, ABGroup={cfg.ABGroup}, IsVideo={cfg.IsVideo}");
             string imgurl = PropsController.GetImgUrl(cfg.ImageID, cfg.ImageType, cfg.ABGroup);
-            await ImgUtil.GetTextureAsync(imgurl);
+            await ImgUtil.GetTextureAsync(imgurl, ImgUtil.DownloadPriority.Level, null, CancellationToken.None);
         } 
         #endregion
 
@@ -447,7 +448,7 @@ namespace GameLogic
             {
                 var cfg = ConfigLoader.Instance.Tables.TbCfgPhotos.Get(dataInfo[i]);
                 string imgurl = PropsController.GetImgUrl(cfg.ImageID, cfg.ImageType, cfg.ABGroup);
-                await ImgUtil.GetTextureAsync(imgurl);
+                await ImgUtil.GetTextureAsync(imgurl, CancellationToken.None);
             }
         }
         /// <summary>
