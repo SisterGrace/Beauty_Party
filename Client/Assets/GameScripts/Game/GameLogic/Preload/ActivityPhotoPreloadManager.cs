@@ -66,7 +66,7 @@ namespace GameLogic
                 Debug.Log("[ActivityPreload] 预加载福利中心图片...");
 
                 var allShopCfgs = ConfigLoader.Instance.Tables.TbCfgShop.DataList;
-                var photoCfgs = allShopCfgs.FindAll(x => x.GoodType == mProductType.PhotoPack);
+                var photoCfgs = allShopCfgs.FindAll(x => x.GoodType == mProductType.PhotoPack|| x.GoodType == mProductType.GiftPack);
                 List<string> photoUrls = new List<string>();
 
                 int AbType = UserController.Instance.GetCurUserType;
