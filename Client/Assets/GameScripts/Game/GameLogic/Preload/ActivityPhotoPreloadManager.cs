@@ -68,9 +68,11 @@ namespace GameLogic
 
                 var allShopCfgs = ConfigLoader.Instance.Tables.TbCfgShop.DataList;
                 var photoCfgs = allShopCfgs.FindAll(x => x.GoodType == mProductType.PhotoPack || x.GoodType == mProductType.GiftPack);
-                List<string> photoUrls = new List<string>();
 
-                int AbType = UserController.Instance.GetCurUserType;
+                var photoUrls = new List<string>();
+                var photoUrlSet = new HashSet<string>();  // 用于快速去重
+
+                int abType = UserController.Instance.GetCurUserType;
 
                 foreach (var cfg in photoCfgs)
                 {
@@ -79,31 +81,43 @@ namespace GameLogic
 
                     var rewardList = ConfigLoader.Instance.Tables.TbCfgReward.Get(rechargeInfo.RewardId)?.Reward;
                     if (rewardList == null) continue;
-                    List<int> photoIds = new List<int>();
+
+                    int? targetPhotoId = null;
+
                     foreach (var reward in rewardList)
                     {
                         if (reward.Type == ERewardType.Photo)
                         {
-                            if (reward.ID > 0) photoIds.Add(reward.ID);
-                            if (reward.OtherID > 0) photoIds.Add(reward.OtherID);
+                            if (reward.ID > 0 && abType != 1)
+                            {
+                                targetPhotoId = reward.ID;
+                                break;
+                            }
+                            if (reward.OtherID > 0 && abType == 1)
+                            {
+                                targetPhotoId = reward.OtherID;
+                                break;
+                            }
                         }
                         else if (reward.Type == ERewardType.PhotoGroup)
                         {
                             var group = ConfigLoader.Instance.Tables.TbCfgPhotoGroupRew.Get(reward.ID);
-                            if(AbType!=1)
+                            if (group == null) continue;
+
+                            // 根据 AbType 选择 A 组或 B 组
+                            var photoRews = abType != 1 ? group.APhotoRews : group.BPhotoRews;
+                            if (photoRews != null && photoRews.Count > 0)
                             {
-                                photoIds.AddRange(group.APhotoRews);
-                            }else
-                            {
-                                photoIds.AddRange(group.BPhotoRews);
+                                targetPhotoId = photoRews[0];
+                                break;
                             }
                         }
                     }
-                    foreach (var photoId in photoIds)
+
+                    if (targetPhotoId.HasValue)
                     {
-                        int targetPhotoId =/* AbType == 1 ? photoId : */photoIds[0];
-                        string url = PropsController.GetImgUrl(targetPhotoId);
-                        if (!string.IsNullOrEmpty(url) && !photoUrls.Contains(url))
+                        string url = PropsController.GetImgUrl(targetPhotoId.Value);
+                        if (!string.IsNullOrEmpty(url) && photoUrlSet.Add(url))
                         {
                             photoUrls.Add(url);
                         }
