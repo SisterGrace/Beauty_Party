@@ -21,6 +21,7 @@ namespace GameLogic
 		{
 			_LoadSw = new Stopwatch();
 			_LoadSw.Start();
+			Log.Info("loading开始");
 			value = 0.1f;
 			IsLoadSuccess = false;
 			
@@ -96,7 +97,7 @@ namespace GameLogic
                 Close();
             }
 
-            // ===== 新增逻辑：等待 SDK 就绪后上报 =====
+           /* // ===== 新增逻辑：等待 SDK 就绪后上报 ===== ？？？这是个打点好像
             if (_isWaitingForSDK)
             {
                 _waitSDKTimer += Time.deltaTime;
@@ -117,7 +118,7 @@ namespace GameLogic
                     // 结束等待，避免重复上报
                     _isWaitingForSDK = false;
                 }
-            }
+            }*/
         }
 
         private void SetLoadNetTips(bool isShow)

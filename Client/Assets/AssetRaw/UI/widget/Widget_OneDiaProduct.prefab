@@ -335,7 +335,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62e4947d070cf41eb87bc6a9968c32a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Location: 0.799886
+  m_Location: 0.8778486
   m_Width: 0.175
   m_Softness: 0.893
   m_Brightness: 0.607
@@ -540,7 +540,6 @@ GameObject:
   - component: {fileID: 4220638343135889299}
   - component: {fileID: 6715642105815454355}
   - component: {fileID: 8155607531450765685}
-  - component: {fileID: 2872662802964805077}
   m_Layer: 5
   m_Name: diaBg
   m_TagString: Untagged
@@ -605,26 +604,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &2872662802964805077
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4650836381536270935}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 385b7d1277b6c4007a84c065696e0f8c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_ShowMaskGraphic: 1
-  m_DownSamplingRate: 1
-  m_Softness: 1
-  m_Alpha: 1
-  m_IgnoreParent: 0
-  m_PartOfParent: 0
-  m_IgnoreSelfGraphic: 0
-  m_IgnoreSelfStencil: 0
 --- !u!1 &4800403938965306043
 GameObject:
   m_ObjectHideFlags: 0

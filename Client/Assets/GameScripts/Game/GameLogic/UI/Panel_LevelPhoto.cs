@@ -192,7 +192,9 @@ namespace GameLogic
 			}
 			if (_isBossLevel)
 			{
-				if (_isVipBoos)
+                StartGame(info);//boss关卡不看视频直接进入
+                return;
+                if (_isVipBoos)
 				{
 					StartGame(info);
 				}
@@ -280,8 +282,10 @@ namespace GameLogic
 		{
 			if (_isBossLevel)
 			{
-				mCommon.SetActive(_isVipBoos);
-				mAD.SetActive(!_isVipBoos);
+				//mCommon.SetActive(_isVipBoos);
+				//mAD.SetActive(!_isVipBoos);
+				mCommon.SetActive(true);
+				mAD.SetActive(false);
 				mVIP.Hide();
 				if (!_isVipBoos)
 				{

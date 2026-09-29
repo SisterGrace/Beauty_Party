@@ -3,7 +3,7 @@ using Cysharp.Threading.Tasks;
 using TK_Engine;
 using UnityEngine.Events;
 #if USE_UP2SDK
-using CoreLite;
+using Sky;
 #endif
 
 namespace GameLogic
@@ -19,7 +19,7 @@ namespace GameLogic
         public static void SetRemoveAds()
         {
 #if USE_UP2SDK
-            CoreSdkMgr.SetRemoveAds();
+            SkySdkMgr.SetRemoveAds();
 #endif
         }
 
@@ -52,7 +52,7 @@ namespace GameLogic
 
             _currentIvCloseCallback = _closeCallback;
 #if USE_UP2SDK
-            CoreSdkMgr.ShowInterstitial(adPos.ToString(), (CoreLite.IvType)_IvType, () =>
+            SkySdkMgr.ShowInterstitial(adPos.ToString(), (Sky.IvType)_IvType, () =>
             {
                 PostToMainNextFrame(() =>
                 {
@@ -94,7 +94,7 @@ namespace GameLogic
             }
 
 #if USE_UP2SDK
-            CoreSdkMgr.ShowRewardedVideo(adPos,
+            SkySdkMgr.ShowRewardedVideo(adPos,
                 () => PostToMainNextFrame(() => OnRewardSuccess(rewardCallback)),
                 () => PostToMainNextFrame(() => showFailedCallback?.Invoke()));
 #else
@@ -139,7 +139,7 @@ namespace GameLogic
             }
             Log.Info("开始展示Banner");
 #if USE_UP2SDK
-            CoreSdkMgr.ShowBanner();
+            SkySdkMgr.ShowBanner();
 #endif
         }
 
@@ -147,14 +147,14 @@ namespace GameLogic
         {
             Log.Info("隐藏启动Banner1");
 #if USE_UP2SDK
-            CoreSdkMgr.HideBanner();
+            SkySdkMgr.HideBanner();
 #endif
             Log.Info("隐藏启动Banner2");
         }
 
         /// <summary>
         /// 强制触发H5广告，仅用于功能验证。
-        /// 新 SDK 已将 H5 竞价能力收编到 CoreSdkMgr.ShowInterstitial / ShowRewardedVideo 内部，
+        /// 新 SDK 已将 H5 竞价能力收编到 SkySdkMgr.ShowInterstitial / ShowRewardedVideo 内部，
         /// 这里不再做强制平台选择，按 H5CheckType 直接走对应类型的展示。
         /// </summary>
         public void ForceShowH5Ad()
@@ -168,14 +168,14 @@ namespace GameLogic
             switch (H5CheckInfo.H5CheckType)
             {
                 case 1:
-                    CoreSdkMgr.ShowRewardedVideo("RV_H5Check", null, () =>
+                    SkySdkMgr.ShowRewardedVideo("RV_H5Check", null, () =>
                     {
                         PostToMainNextFrame(() =>
                             GameEvent.Send(EventType.ShowTips, "uitips_zhuanpan", true));
                     });
                     break;
                 case 2:
-                    CoreSdkMgr.ShowInterstitialIgnoreFrequency("IV_H5Check", null);
+                    SkySdkMgr.ShowInterstitialIgnoreFrequency("IV_H5Check", null);
                     break;
                 default:
                     GameEvent.Send(EventType.ShowTips, "uitips_zhuanpan", true);

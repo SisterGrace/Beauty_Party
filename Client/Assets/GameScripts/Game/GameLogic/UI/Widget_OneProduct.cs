@@ -29,7 +29,7 @@ namespace GameLogic
             _mCfgRecharge = RechargeController.GetRechargeInfoByShop(data.Id);
             _mData = data;
             UpdatePackInfo(data);
-
+            Debug.Log($"[Product] SetItemData Id={data.Id} frame={Time.frameCount}");
         }
         protected override void OnUpdate()
         {
@@ -58,7 +58,7 @@ namespace GameLogic
             {
                 var groupCfg = ConfigLoader.Instance.Tables.TbCfgPhotoGroupRew.Get(photoRew.ID);
                 _rewPhotoIds = AbType == 1 ? groupCfg.BPhotoRews : groupCfg.APhotoRews;
-                _itemPhoto.LoadUIImg(_rewPhotoIds[0]);
+                _itemPhoto.RequestLoad(_rewPhotoIds[0]);
             }
             //展示道具奖励
             var propRew = _mData.rewardDatas.Find(x => x.Type != ERewardType.PhotoGroup && x.Type != ERewardType.Photo);

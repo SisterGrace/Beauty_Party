@@ -91,6 +91,36 @@ namespace GameLogic
 				SDKManager.Instance.Button_ShowBanner();
 			}
 			GameScene.Instance.LogEventHomeShow();
+            TriggerShopDataPreload().Forget();
+
+            // ✅ 启动后台预加载所有活动图片
+            StartPreloadAllActivities().Forget();
+
+		}
+        private async UniTaskVoid TriggerShopDataPreload()
+        {
+            try
+            {
+                // 等主界面动画、SDK 请求、首帧渲染都稳定
+                await UniTask.Delay(TimeSpan.FromSeconds(2));
+
+                await Panel_Shop.PreloadDataAsync();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[Panel_Home] 福利中心数据预热失败: {e.Message}");
+            }
+        }
+        /// <summary>
+        /// 后台预加载所有活动图片
+        /// </summary>
+        private async UniTaskVoid StartPreloadAllActivities()
+		{
+			// 等待1秒，确保关卡必要资源加载完毕
+			await UniTask.Delay(3000);
+			
+			// 预加载所有活动图片（仅磁盘缓存，不占用内存）
+			await ActivityPhotoPreloadManager.Instance.PreloadAllActivitiesAsync();
 		}
 
 		protected override void RegisterEvent()

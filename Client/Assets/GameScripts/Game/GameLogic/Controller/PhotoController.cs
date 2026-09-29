@@ -1,11 +1,12 @@
-using System.Collections;
-using System.Collections.Generic;
+using Config.common;
 using Config.config;
 using Cysharp.Threading.Tasks;
+using System.Collections;
+using System.Collections.Generic;
+using System.Threading;
+using TK_Engine;
 using UnityEngine;
 using Y_Base;
-using Config.common;
-using TK_Engine;
 
 namespace GameLogic
 {
@@ -18,10 +19,10 @@ namespace GameLogic
             int curId = UserController.Instance.GetCurUserPhotoID;
             Log.Info($"[PhotoTrace] InitPhoto: 预加载用户当前默认照片, curPhotoID={curId} (来源: UserController.GetCurUserPhotoID, 即用户上次使用/获得的照片)");
             
-            //预加载初始默认图
-            await PhotoPreloading(curId);
-            //预加载关卡图
-            PhotoPreloading(false, true);
+            //并行预加载：用户当前图 + 关卡图同时进行
+            var task1 = PhotoPreloading(curId);
+            var task2 = PhotoPreloading(false, true);
+            await UniTask.WhenAll(task1, task2);
             //预加载通行证奖励图,需要加载36张图
             //ActivityPhotoPreloading(ActivityType.DreamPass);
         }
@@ -225,15 +226,18 @@ namespace GameLogic
             {
                 var dataInfo = GetCurLevelPhotoIds;
                 if (dataInfo == null || dataInfo.Count == 0) return;
-                Log.Info($"[PhotoTrace] 最终确定的PhotoIds=[{string.Join(", ", dataInfo)}], 开始预加载...");
+                Log.Info($"[PhotoTrace] 最终确定的PhotoIds=[{string.Join(", ", dataInfo)}], 开始并行预加载...");
+                // 并行下载所有关卡图片
+                var tasks = new UniTask<Texture2D>[dataInfo.Count];
                 for (int i = 0; i < dataInfo.Count; i++)
                 {
                     var cfg = ConfigLoader.Instance.Tables.TbCfgPhotos.Get(dataInfo[i]);
                     string imgurl = PropsController.GetImgUrl(cfg.ImageID, cfg.ImageType, cfg.ABGroup);
                     string videourl = PropsController.GetVideoUrl(cfg.ImageID, cfg.ABGroup, cfg.IsVideo);
                     //Log.Info($"[PhotoTrace] 预加载第{i+1}张: PhotoID={cfg.ID}, ImageID={cfg.ImageID}, ABGroup={cfg.ABGroup}, IsVideo={cfg.IsVideo}\n  → 图片URL: {imgurl}\n  → 视频URL: {videourl}");
-                    await ImgUtil.GetTextureAsync(imgurl);
+                    tasks[i] = ImgUtil.GetTextureAsync(imgurl, ImgUtil.DownloadPriority.Level, null, CancellationToken.None);
                 }
+                await UniTask.WhenAll(tasks);
             }
         }
 
@@ -244,10 +248,8 @@ namespace GameLogic
         /// <returns></returns>
         public async UniTask PhotoPreloading(List<string> urls)
         {
-            for (int i = 0; i < urls.Count; ++i)
-            { 
-                await ImgUtil.GetTexturesAsync(urls[i]);
-            }
+            // 并行加载所有URL
+            await ImgUtil.GetTexturesAsync(urls.ToArray());
         }
         /// <summary>
         /// 通过一个id预加载图片
@@ -258,7 +260,7 @@ namespace GameLogic
             var cfg = ConfigLoader.Instance.Tables.TbCfgPhotos.Get(id); 
             Log.Info($"[PhotoTrace] 预加载用户当前照片: 来源=UserController.GetCurUserPhotoID, PhotoID={id}, ImageID={cfg.ImageID}, ABGroup={cfg.ABGroup}, IsVideo={cfg.IsVideo}");
             string imgurl = PropsController.GetImgUrl(cfg.ImageID, cfg.ImageType, cfg.ABGroup);
-            await ImgUtil.GetTextureAsync(imgurl);
+            await ImgUtil.GetTextureAsync(imgurl, ImgUtil.DownloadPriority.Level, null, CancellationToken.None);
         } 
         #endregion
 
@@ -446,7 +448,7 @@ namespace GameLogic
             {
                 var cfg = ConfigLoader.Instance.Tables.TbCfgPhotos.Get(dataInfo[i]);
                 string imgurl = PropsController.GetImgUrl(cfg.ImageID, cfg.ImageType, cfg.ABGroup);
-                await ImgUtil.GetTextureAsync(imgurl);
+                await ImgUtil.GetTextureAsync(imgurl, CancellationToken.None);
             }
         }
         /// <summary>

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -42,6 +43,17 @@ namespace Y_Base
             PermissionDenied
         }
 
+        /// <summary>
+        /// 下载优先级
+        /// </summary>
+        public enum DownloadPriority
+        {
+            CurrentPage = 0,    // 当前页面图片（最高优先级）
+            Level = 1,          // 关卡图片（高优先级）
+            Normal = 2,         // 普通加载（中等优先级）
+            ActivityPreload = 3 // 活动预加载（最低优先级）
+        }
+
         #endregion
 
         #region ==================== 常量配置 ====================
@@ -54,6 +66,9 @@ namespace Y_Base
 
         /// <summary>相册文件夹名称</summary>
         private const string GALLERY_FOLDER_NAME = "FantasyTile_Gallery";
+
+        /// <summary>最大并发下载数</summary>
+        private const int MAX_CONCURRENT_DOWNLOADS = 3;
 
         #endregion
 
@@ -94,6 +109,59 @@ namespace Y_Base
         [ThreadStatic]
         private static MD5 _md5Instance;
 
+        // ---- 优先级队列相关 ----
+        /// <summary>当前活跃页面</summary>
+        private static string _currentActivePage = null;
+        private static readonly object _activePageLock = new object();
+
+        /// <summary>下载队列（按优先级排序）</summary>
+        private static readonly List<DownloadTask> _downloadQueue = new List<DownloadTask>();
+        private static readonly object _queueLock = new object();
+
+        /// <summary>当前正在下载的任务</summary>
+        private static readonly Dictionary<string, DownloadTask> _activeDownloadTasks 
+            = new Dictionary<string, DownloadTask>();
+
+        /// <summary>队列处理器是否已启动</summary>
+        private static bool _queueProcessorStarted = false;
+
+        #endregion
+
+        #region ==================== 下载任务类 ====================
+
+        /// <summary>
+        /// 下载任务
+        /// </summary>
+        private class DownloadTask
+        {
+            public string Url;
+            public string CacheKey;
+            public string FilePath;
+            public DownloadPriority Priority;
+            public string PageSource;
+            public UniTaskCompletionSource<Texture2D> TaskSource;
+            public CancellationToken CancellationToken;
+            public bool IsPreloadOnly;
+
+            /// <summary>
+            /// 获取有效优先级（如果是当前页面，自动提升）
+            /// </summary>
+            public int GetEffectivePriority()
+            {
+                if (!string.IsNullOrEmpty(PageSource))
+                {
+                    lock (_activePageLock)
+                    {
+                        if (PageSource == _currentActivePage)
+                        {
+                            return (int)DownloadPriority.CurrentPage;
+                        }
+                    }
+                }
+                return (int)Priority;
+            }
+        }
+
         #endregion
 
         #region ==================== 初始化 ====================
@@ -108,6 +176,259 @@ namespace Y_Base
             }
 
             Debug.Log($"[ImgUtil] 初始化完成，缓存目录: {_cacheDirectory}");
+            
+            // 启动队列处理器
+            StartQueueProcessor();
+        }
+
+        #endregion
+
+        #region ==================== 优先级管理 ====================
+
+        /// <summary>
+        /// 设置当前活跃页面（在页面OnRefresh时调用）
+        /// </summary>
+        public static void SetActivePage(string pageName)
+        {
+            lock (_activePageLock)
+            {
+                _currentActivePage = pageName;
+                Debug.Log($"[ImgUtil] 当前活跃页面: {pageName}");
+            }
+            
+            // 触发队列重新排序
+            lock (_queueLock)
+            {
+                if (_downloadQueue.Count > 0)
+                {
+                    _downloadQueue.Sort((a, b) => a.GetEffectivePriority().CompareTo(b.GetEffectivePriority()));
+                }
+            }
+        }
+
+        /// <summary>
+        /// 清除当前活跃页面（在页面Close时调用）
+        /// </summary>
+        public static void ClearActivePage(string pageName)
+        {
+            lock (_activePageLock)
+            {
+                if (_currentActivePage == pageName)
+                {
+                    _currentActivePage = null;
+                    Debug.Log($"[ImgUtil] 清除活跃页面: {pageName}");
+                }
+            }
+        }
+
+        /// <summary>
+        /// 启动队列处理器
+        /// </summary>
+        private static void StartQueueProcessor()
+        {
+            if (_queueProcessorStarted) return;
+            _queueProcessorStarted = true;
+            
+            ProcessDownloadQueueAsync().Forget();
+            Debug.Log("[ImgUtil] 下载队列处理器已启动");
+        }
+
+        #endregion
+
+        #region ==================== 队列处理 ====================
+
+        /// <summary>
+        /// 处理下载队列（后台协程）
+        /// </summary>
+        private static async UniTaskVoid ProcessDownloadQueueAsync()
+        {
+            while (true)
+            {
+                await UniTask.Delay(100);
+
+                DownloadTask task = null;
+
+                lock (_queueLock)
+                {
+                    if (_downloadQueue.Count == 0) continue;
+
+                    int activeCount = _activeDownloadTasks.Count;
+                    bool canStartNew = activeCount < MAX_CONCURRENT_DOWNLOADS;
+
+                    if (_downloadQueue.Count > 0)
+                    {
+                        int firstPriority = _downloadQueue[0].GetEffectivePriority();
+                        if (firstPriority <= (int)DownloadPriority.Level)
+                        {
+                            canStartNew = true;
+                        }
+                    }
+
+                    if (canStartNew)
+                    {
+                        task = _downloadQueue[0];
+                        _downloadQueue.RemoveAt(0);
+                        _activeDownloadTasks[task.Url] = task;
+                    }
+                }
+
+                if (task != null)
+                {
+                    ExecuteDownloadTask(task).Forget();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 执行单个下载任务
+        /// </summary>
+        private static async UniTaskVoid ExecuteDownloadTask(DownloadTask task)
+        {
+            try
+            {
+                Texture2D result;
+
+                if (task.Priority == DownloadPriority.ActivityPreload || task.IsPreloadOnly)
+                {
+                    await DownloadWithPauseAsync(task);
+                    result = null;
+                }
+                else
+                {
+                    result = await DownloadNormalAsync(task);
+                }
+
+                task.TaskSource?.TrySetResult(result);
+            }
+            catch (OperationCanceledException)
+            {
+                task.TaskSource?.TrySetCanceled();
+            }
+            catch (Exception e)
+            {
+                task.TaskSource?.TrySetException(e);
+                Debug.LogError($"[ImgUtil] 下载失败: {task.Url} | {e.Message}");
+            }
+            finally
+            {
+                lock (_queueLock)
+                {
+                    _activeDownloadTasks.Remove(task.Url);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 可中断下载（用于低优先级任务）
+        /// </summary>
+        private static async UniTask DownloadWithPauseAsync(DownloadTask task)
+        {
+            using (UnityWebRequest request = UnityWebRequestTexture.GetTexture(task.Url))
+            {
+                var operation = request.SendWebRequest();
+
+                while (!operation.isDone)
+                {
+                    bool shouldPause = false;
+                    lock (_queueLock)
+                    {
+                        foreach (var activeTask in _activeDownloadTasks.Values)
+                        {
+                            if (activeTask.Url != task.Url &&
+                                activeTask.GetEffectivePriority() < task.GetEffectivePriority())
+                            {
+                                shouldPause = true;
+                                break;
+                            }
+                        }
+
+                        if (!shouldPause && _downloadQueue.Count > 0)
+                        {
+                            if (_downloadQueue[0].GetEffectivePriority() < task.GetEffectivePriority())
+                            {
+                                shouldPause = true;
+                            }
+                        }
+                    }
+
+                    if (shouldPause)
+                    {
+                        await UniTask.Delay(200, cancellationToken: task.CancellationToken);
+                    }
+                    else
+                    {
+                        await UniTask.Yield(task.CancellationToken);
+                    }
+                }
+
+                if (request.result == UnityWebRequest.Result.Success)
+                {
+                    byte[] imageData = request.downloadHandler.data;
+                    await SaveToDiskAtomicAsync(task.FilePath, imageData, task.CancellationToken);
+
+                    _urlToCacheKey[task.Url] = task.CacheKey;
+
+                    Debug.Log($"[ImgUtil] 预加载完成: {task.Url} | 大小: {imageData.Length / 1024}KB | 原始: {task.Priority} | 有效: {task.GetEffectivePriority()} | PageSource: {task.PageSource ?? "null"} | 当前页: {_currentActivePage ?? "null"}");
+                }
+                else
+                {
+                    throw new Exception(request.error);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 正常下载（用于高优先级任务）
+        /// </summary>
+        private static async UniTask<Texture2D> DownloadNormalAsync(DownloadTask task)
+        {
+            using (UnityWebRequest request = UnityWebRequestTexture.GetTexture(task.Url))
+            {
+                await request.SendWebRequest().WithCancellation(task.CancellationToken);
+
+                if (request.result == UnityWebRequest.Result.Success)
+                {
+                    byte[] imageData = request.downloadHandler.data;
+
+                    Texture2D texture = new Texture2D(2, 2);
+                    texture.LoadImage(imageData);
+
+                    AddToMemoryCache(task.CacheKey, texture);
+
+                    await SaveToDiskAtomicAsync(task.FilePath, imageData, task.CancellationToken);
+
+                    _urlToCacheKey[task.Url] = task.CacheKey;
+
+                    Debug.Log($"[ImgUtil] 下载完成: {task.Url} | 原始: {task.Priority} | 有效: {task.GetEffectivePriority()} | PageSource: {task.PageSource ?? "null"} | 当前页: {_currentActivePage ?? "null"}");
+
+                    return texture;
+                }
+                else
+                {
+                    throw new Exception(request.error);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 保存到磁盘（原子操作）
+        /// </summary>
+        private static async UniTask SaveToDiskAtomicAsync(string filePath, byte[] data, CancellationToken cancellationToken)
+        {
+            // 确保缓存目录存在
+            if (!Directory.Exists(_cacheDirectory))
+            {
+                Directory.CreateDirectory(_cacheDirectory);
+            }
+
+            string tempPath = filePath + ".tmp";
+            await File.WriteAllBytesAsync(tempPath, data, cancellationToken);
+
+            if (File.Exists(filePath))
+            {
+                File.Delete(filePath);
+            }
+            File.Move(tempPath, filePath);
         }
 
         #endregion
@@ -115,12 +436,13 @@ namespace Y_Base
         #region ==================== 公共API - 获取纹理 ====================
 
         /// <summary>
-        /// 异步获取图片（推荐使用）
+        /// 异步获取图片（带优先级和页面来源）
         /// </summary>
-        /// <param name="url">图片 URL</param>
-        /// <param name="cancellationToken">取消令牌</param>
-        /// <returns>加载的 Texture2D，失败返回 null</returns>
-        public static async UniTask<Texture2D> GetTextureAsync(string url, CancellationToken cancellationToken = default)
+        public static async UniTask<Texture2D> GetTextureAsync(
+            string url,
+            DownloadPriority priority = DownloadPriority.Normal,
+            string pageSource = null,
+            CancellationToken cancellationToken = default)
         {
             if (!ValidateCacheDirectory()) return null;
 
@@ -131,7 +453,6 @@ namespace Y_Base
             var cachedTexture = TryGetFromMemoryCache(cacheKey);
             if (cachedTexture != null)
             {
-                //Debug.Log($"[ImgUtil] 图片命中内存缓存: {url}");
                 return cachedTexture;
             }
 
@@ -139,17 +460,127 @@ namespace Y_Base
             var diskTexture = await TryLoadFromDiskCacheAsync(cacheKey, filePath, cancellationToken);
             if (diskTexture != null)
             {
-                //Debug.Log($"[ImgUtil] 图片命中磁盘缓存: {url} | 缓存路径: {filePath}");
                 return diskTexture;
             }
 
-            // 3. 从网络下载（使用原子操作防止重复下载）
-            //Debug.Log($"[ImgUtil] 图片从网络下载: {url} | 将缓存到: {filePath}");
-            return await DownloadWithDeduplicationAsync(url, cacheKey, filePath, cancellationToken);
+            // 3. 加入下载队列
+            var taskSource = new UniTaskCompletionSource<Texture2D>();
+            var downloadTask = new DownloadTask
+            {
+                Url = url,
+                CacheKey = cacheKey,
+                FilePath = filePath,
+                Priority = priority,
+                PageSource = pageSource,
+                TaskSource = taskSource,
+                CancellationToken = cancellationToken,
+                IsPreloadOnly = false
+            };
+
+            lock (_queueLock)
+            {
+                _downloadQueue.Add(downloadTask);
+                _downloadQueue.Sort((a, b) => a.GetEffectivePriority().CompareTo(b.GetEffectivePriority()));
+            }
+
+            return await taskSource.Task;
         }
 
         /// <summary>
-        /// 批量异步获取多个图片
+        /// 异步获取图片（兼容旧接口）
+        /// </summary>
+        public static async UniTask<Texture2D> GetTextureAsync(string url, CancellationToken cancellationToken = default)
+        {
+            return await GetTextureAsync(url, DownloadPriority.Normal, null, cancellationToken);
+        }
+
+        /// <summary>
+        /// 预加载到磁盘（仅磁盘缓存，不加载到内存）
+        /// </summary>
+        public static async UniTask<bool> PreloadToDiskOnly(
+            string url,
+            string pageSource = null,
+            CancellationToken cancellationToken = default)
+        {
+            if (!ValidateCacheDirectory()) return false;
+
+            string cacheKey = GetCacheKey(url);
+            string filePath = GetCacheFilePath(cacheKey);
+
+            // 如果已存在，直接返回
+            if (File.Exists(filePath))
+            {
+                return true;
+            }
+
+            try
+            {
+                var taskSource = new UniTaskCompletionSource<Texture2D>();
+                var downloadTask = new DownloadTask
+                {
+                    Url = url,
+                    CacheKey = cacheKey,
+                    FilePath = filePath,
+                    Priority = DownloadPriority.ActivityPreload,
+                    PageSource = pageSource,
+                    TaskSource = taskSource,
+                    CancellationToken = cancellationToken,
+                    IsPreloadOnly = true
+                };
+
+                lock (_queueLock)
+                {
+                    _downloadQueue.Add(downloadTask);
+                    _downloadQueue.Sort((a, b) => a.GetEffectivePriority().CompareTo(b.GetEffectivePriority()));
+                }
+
+                await taskSource.Task;
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 批量预加载到磁盘
+        /// </summary>
+        public static async UniTask<int> PreloadToDiskBatchAsync(
+            List<string> urls,
+            int maxConcurrent = 3,
+            CancellationToken cancellationToken = default)
+        {
+            if (urls == null || urls.Count == 0)
+            {
+                return 0;
+            }
+
+            int successCount = 0;
+
+            // 分批并发下载
+            for (int i = 0; i < urls.Count; i += maxConcurrent)
+            {
+                int batchSize = Mathf.Min(maxConcurrent, urls.Count - i);
+                var batch = urls.GetRange(i, batchSize);
+
+                var tasks = batch.Select(url => PreloadToDiskOnly(url, null, cancellationToken)).ToList();
+                var results = await UniTask.WhenAll(tasks);
+
+                successCount += results.Count(r => r);
+
+                // 每批次之间短暂延迟
+                if (i + maxConcurrent < urls.Count)
+                {
+                    await UniTask.Delay(100, cancellationToken: cancellationToken);
+                }
+            }
+
+            return successCount;
+        }
+
+        /// <summary>
+        /// 批量异步获取多个图片（原有方法保持不变）
         /// </summary>
         /// <param name="urls">图片 URL 数组</param>
         /// <returns>Texture2D 数组</returns>
@@ -159,7 +590,8 @@ namespace Y_Base
 
             for (int i = 0; i < urls.Length; i++)
             {
-                tasks[i] = GetTextureAsync(urls[i]);
+                // ✅ 明确指定使用旧接口（兼容版本）
+                tasks[i] = GetTextureAsync(urls[i], CancellationToken.None);
             }
 
             return await UniTask.WhenAll(tasks);
@@ -636,8 +1068,8 @@ namespace Y_Base
                 // 后台线程读取文件
                 byte[] fileData = await ReadFileAsync(filePath, cancellationToken);
 
-                // 原地解密（对称加密）
-                FileEncrypter.EncryptInPlace(fileData);
+                /*// 原地解密（对称加密）
+                FileEncrypter.EncryptInPlace(fileData);*/
 
                 // 主线程创建纹理
                 var texture = await CreateTextureFromBytesAsync(fileData);

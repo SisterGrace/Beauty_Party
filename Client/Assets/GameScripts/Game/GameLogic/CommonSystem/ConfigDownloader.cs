@@ -34,8 +34,8 @@ public class ConfigDownloader : MonoBehaviour
         //"config_tbconstant",
         //"config_tbcfgnormalcardinfo",
         //"config_tbcfglockcardinfo",
-       // "config_tbcfgfunctioncardinfo",
-       // "config_tbcfggamepropinfo",
+        //"config_tbcfgfunctioncardinfo",
+        //"config_tbcfggamepropinfo",
         "config_tbcfgreward",
         "config_tbcfgphotogrouprew",
         //"config_tbcfgguide",
@@ -54,6 +54,12 @@ public class ConfigDownloader : MonoBehaviour
     private string LocalConfigPath => Path.Combine(Application.persistentDataPath, "Configs");
     private string _cachedBaseUrl = null;
     private bool _urlReady = false;
+
+    // 单文件下载超时（秒），404 场景不需要等太久
+    private const int DownloadTimeoutSeconds = 3;
+
+    // 日志里单行最长字符数，避免 404 HTML 刷屏
+    private const int MaxLogLineLength = 120;
 
     /// <summary>
     /// 异步初始化：从 StreamingAssets 读取并解密 CDN URL
@@ -171,7 +177,7 @@ public class ConfigDownloader : MonoBehaviour
 
         using (UnityWebRequest req = UnityWebRequest.Get(remotePath))
         {
-            req.timeout = 6; // 单个文件最多等6秒
+            req.timeout = DownloadTimeoutSeconds;
             req.downloadHandler = new DownloadHandlerBuffer();
 
             try
@@ -180,13 +186,15 @@ public class ConfigDownloader : MonoBehaviour
             }
             catch (Exception e)
             {
-                Debug.LogWarning($"[ConfigDownloader] 下载 {fileName} 异常: {e.Message}");
+                // 只取第一行，避免 404 HTML 整页刷屏
+                Debug.LogWarning($"[ConfigDownloader] 下载 {fileName} 异常: {FirstLine(e.Message)}");
                 return false;
             }
 
+            // 失败时只打状态码，不打 req.error（可能整页 HTML）
             if (req.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogWarning($"[ConfigDownloader] 下载 {fileName} 失败: {req.error}，将使用包内备用文件");
+                Debug.LogWarning($"[ConfigDownloader] 下载 {fileName} 失败: HTTP {req.responseCode}");
                 return false;
             }
 
@@ -200,7 +208,7 @@ public class ConfigDownloader : MonoBehaviour
             }
             catch (Exception e)
             {
-                Debug.LogError($"[ConfigDownloader] 写入 {fileName} 失败: {e.Message}");
+                Debug.LogError($"[ConfigDownloader] 写入 {fileName} 失败: {FirstLine(e.Message)}");
                 // 清理临时文件
                 if (File.Exists(tempPath))
                 {
@@ -209,6 +217,20 @@ public class ConfigDownloader : MonoBehaviour
                 return false;
             }
         }
+    }
+
+    /// <summary>
+    /// 截取字符串第一行，并限制最大长度
+    /// </summary>
+    private static string FirstLine(string s)
+    {
+        if (string.IsNullOrEmpty(s)) return string.Empty;
+        int idx = s.IndexOf('\n');
+        if (idx >= 0) s = s.Substring(0, idx);
+        int idx2 = s.IndexOf('\r');
+        if (idx2 >= 0) s = s.Substring(0, idx2);
+        if (s.Length > MaxLogLineLength) s = s.Substring(0, MaxLogLineLength);
+        return s;
     }
 
     #endregion

@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 using TK_Engine;
 using UnityEngine;
 #if USE_UP2SDK
-using CoreLite;
+using Sky;
 #endif
 
 namespace GameLogic
@@ -35,7 +35,7 @@ namespace GameLogic
         public static int GetRemoteConfigInt(string key, int dValue)
         {
 #if USE_UP2SDK
-            return CoreSdkMgr.GetConfigInt(key, dValue);
+            return SkySdkMgr.GetConfigInt(key, dValue);
 #else
             return dValue;
 #endif
@@ -47,7 +47,7 @@ namespace GameLogic
         public static string GetRemoteConfigString(string key, string dValue)
         {
 #if USE_UP2SDK
-            return CoreSdkMgr.GetConfigStr(key, dValue);
+            return SkySdkMgr.GetConfigStr(key, dValue);
 #else
             return dValue;
 #endif
@@ -59,7 +59,7 @@ namespace GameLogic
         public static bool GetRemoteConfigBool(string key, bool dValue)
         {
 #if USE_UP2SDK
-            return CoreSdkMgr.GetConfigBool(key, dValue);
+            return SkySdkMgr.GetConfigBool(key, dValue);
 #else
             return dValue;
 #endif
@@ -143,7 +143,7 @@ namespace GameLogic
         /// <summary>
         /// 返回APP是否下架
         /// </summary>
-        public void GetAPPState(CoreGameConfig.AppStatus state, string msg)
+        public void GetAPPState(SkyGameConfig.AppStatus state, string msg)
         {
             Log.Info("CoreLite get game config appState:" + state + " msg:" + msg);
             IsRemovedApp = (int)state == 3;
@@ -157,7 +157,7 @@ namespace GameLogic
         public static string GetSDKVersion()
         {
 #if USE_UP2SDK
-            return CoreSdkMgr.GetSDKVersion();
+            return SkySdkMgr.GetSDKVersion();
 #else
             return string.Empty;
 #endif
@@ -183,7 +183,7 @@ namespace GameLogic
         public static string GetStoreCountryCode()
         {
 #if USE_UP2SDK
-            return CoreSdkMgr.GetStoreCountryCode();
+            return SkySdkMgr.GetStoreCountryCode();
 #else
             return string.Empty;
 #endif

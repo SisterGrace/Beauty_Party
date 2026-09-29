@@ -25,31 +25,34 @@ namespace GameLogic
 		//是否开启倒计时
 		private bool _isOpenCountDown = false;
 		 private float _timer = 1;
-		protected override void OnRefresh()
+	protected override void OnRefresh()
+	{
+		// ✅ 标记当前页面为活跃页面
+		ImgUtil.SetActivePage(this.GetType().Name);
+		
+		if (userDatas.Length > 0)
 		{
-			if (userDatas.Length > 0)
-			{
-				_activityData = (ActityData)userDatas[0];
-			}
-			_isOpenCountDown = _activityData.EndTime > 0;
-			if(!_isOpenCountDown)
-			{
-				mTimeCountdown.SetLanguage("uitips_startgift_time");
-			}
-			UserController.Instance.SetActivityIsEnter(ActivityType.NewPlayerPack);
-			var rechargeId = ConfigLoader.Instance.Tables.TbCfgActivity.GetByActType(ActivityType.NewPlayerPack).RechargeId;
-			_rechargeItem = RechargeController.GetRechargeInfo(rechargeId);
-			UpdateBuyButton(true);
-			var newPack = ConfigLoader.Instance.Tables.TbCfgReward.Get(_rechargeItem.RewardId).Reward;
-			_allRewardList = ConfigLoader.Instance.Tables.TbCfgReward.Get(newPack[0].ID).Reward;
-			_rewardList1 = _allRewardList.
-				FindAll(x => x.Type == ERewardType.Photo);
-			_rewardList2 = _allRewardList.
-				FindAll(x => x.Type != ERewardType.Photo);
-			CreateRewardItem();
-			//RechargeController.IAPBtnShowLogEvent(rechargeId: _rechargeItem.Id);
-			LoadStarterPackPhoto();
+			_activityData = (ActityData)userDatas[0];
 		}
+		_isOpenCountDown = _activityData.EndTime > 0;
+		if(!_isOpenCountDown)
+		{
+			mTimeCountdown.SetLanguage("uitips_startgift_time");
+		}
+		UserController.Instance.SetActivityIsEnter(ActivityType.NewPlayerPack);
+		var rechargeId = ConfigLoader.Instance.Tables.TbCfgActivity.GetByActType(ActivityType.NewPlayerPack).RechargeId;
+		_rechargeItem = RechargeController.GetRechargeInfo(rechargeId);
+		UpdateBuyButton(true);
+		var newPack = ConfigLoader.Instance.Tables.TbCfgReward.Get(_rechargeItem.RewardId).Reward;
+		_allRewardList = ConfigLoader.Instance.Tables.TbCfgReward.Get(newPack[0].ID).Reward;
+		_rewardList1 = _allRewardList.
+			FindAll(x => x.Type == ERewardType.Photo);
+		_rewardList2 = _allRewardList.
+			FindAll(x => x.Type != ERewardType.Photo);
+		CreateRewardItem();
+		//RechargeController.IAPBtnShowLogEvent(rechargeId: _rechargeItem.Id);
+		LoadStarterPackPhoto();
+	}
 
 		private void UpdateBuyButton(bool isLogEvent = false)
 		{
@@ -108,10 +111,13 @@ namespace GameLogic
 				_itemPhoto.LoadUIImg(allPhotoIds[0]);
 			}
 		}
-		protected override void Close()
-		{
-			base.Close();
-		}
+	protected override void Close()
+	{
+		// ✅ 清除活跃页面标记
+		ImgUtil.ClearActivePage(this.GetType().Name);
+		
+		base.Close();
+	}
 
 		protected override void OnDestroy()
 		{

@@ -1,5 +1,5 @@
 #if USE_UP2SDK
-using CoreLite;
+using Sky;
 #endif
 using TK_Engine;
 
@@ -23,7 +23,7 @@ namespace GameLogic
             /// 登录接口
             /// </summary>
             /// <param name="onComplete">bool:是否登录成功，string:登录失败原因，string:登录成功后的userid</param>
-            CoreSdkMgr.Login((result, msg, uId) =>
+            SkySdkMgr.Login((result, msg, uId) =>
             {
                 Log.Debug("login result: " + result + " msg: " + msg + " uId: " + uId);
                 if (result)
@@ -44,7 +44,7 @@ namespace GameLogic
         public static string GetUserId()
         {
 #if USE_UP2SDK
-            return CoreSdkMgr.GetCurrentUserId();
+            return SkySdkMgr.GetCurrentUserId();
 #else
             return string.Empty;
 #endif

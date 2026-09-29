@@ -21,7 +21,8 @@ namespace GameLogic
 			_mCfgRecharge = RechargeController.GetRechargeInfoByShop(data.Id);
 			_mRewList = data.RewardData;
 			InitData(data);
-		}
+            Debug.Log($"[OneDia] SetItemData Id={data.Id} frame={Time.frameCount}");
+        }
 		private void InitData(OneDiaProductInfo data)
 		{
 			//mDiaCount.text = data.Count.ToString();

@@ -66,6 +66,9 @@ namespace GameLogic
 
 	protected override void OnRefresh()
 	{
+		// ✅ 标记当前页面为活跃页面
+		ImgUtil.SetActivePage(this.GetType().Name);
+		
 		GameEvent.Send(EventType.SetGachaRedPoint, false, "");
 		RefreshCurrency();
 		GachaController.Instance.InitPhotoPacks();
@@ -463,6 +466,9 @@ namespace GameLogic
 		#endregion
 	protected override void Close()
 	{
+		// ✅ 清除活跃页面标记
+		ImgUtil.ClearActivePage(this.GetType().Name);
+		
             VideoAudioHelper.StopVideoAudioCheck(this.WindowName, restoreBGM: true);
             base.Close();
 	}

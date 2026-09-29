@@ -5,8 +5,7 @@ using TK_Engine;
 using UnityEngine;
 using UnityEngine.Purchasing;
 #if USE_UP2SDK && ENABLE_IAP
-using CoreLite;
-using static CoreLite.CoreLiteQueryOrder;
+using Sky;
 #endif
 
 namespace GameLogic
@@ -21,7 +20,9 @@ namespace GameLogic
         public void AddProducts(Dictionary<string, ProductType> products)
         {
 #if USE_UP2SDK && ENABLE_IAP
-            CoreSdkMgr.AddProductsStatic(products);
+            // 与 SDKMgr.cs 保持一致：走 SkySdkMgr.AddProducts（兼容初始化前/后）
+            // 原 AddProductsStatic 只会赋值 ProductDic，初始化后调用不会触发 FetchAdditionalProducts
+            SkySdkMgr.AddProducts(products);
 #endif
         }
 
@@ -40,7 +41,8 @@ namespace GameLogic
                 Log.Info($"在线参数判定的支付方式为：{MyPayType}");
                 // 上报内购按钮点击位置2
                 LogEvent("Game_IAP_BUTTON_CLICK", "Postion", 2);
-                var productInfo = CoreSdkMgr.GetProductInfoById(productId);
+
+                var productInfo = SkySdkMgr.GetProductInfoById(productId);
                 if (productInfo == null)
                 {
                     Log.Warning($"获取商品信息失败");
@@ -54,7 +56,7 @@ namespace GameLogic
                 var price = productInfo.metadata.localizedPrice;
                 var currencyCode = productInfo.metadata.isoCurrencyCode;
 
-                var req = new CoreLiteCreateOrder.Request(
+                var req = new SkyCreateOrder.Request(
                     enProductName,
                     productId,
                     productDesc,
@@ -64,7 +66,27 @@ namespace GameLogic
                     gameExtraParam,
                     "0");
                 Log.Info($"创建了一个订单：{req.product_name}---{req.product_id}---{req.product_desc}---{req.unit_price}---{req.quantity}---{req.game_extra_param}---此时支付方式为{MyPayType}");
-                CoreSdkMgr.CreatePaymentOrder(req, (succeedCreat, info, OrderData) =>
+
+                // ============================================================
+                // 无服务器模式：
+                //   SDK 内部（SkyIapH5Mgr.CreatePaymentOrder）会跳过服务器下单，
+                //   直接走 SkyIapNativeMgr.BuyProductByID(NativeApp)，
+                //   结果通过 SkySdkMgr.OnPurchaseComplete 全局回调派发。
+                //   传 null 回调（不会被触发），useSDKPayment 传 true。
+                // ============================================================
+                if (!SkyIapH5Mgr.HasServerBackend)
+                {
+                    Log.Info("[无服务器模式] 交由 SDK 直接发起原生支付");
+                    SkySdkMgr.CreatePaymentOrder(req, null, true);
+                    return;
+                }
+
+                // ============================================================
+                // 有服务器模式：
+                //   自定义支付方式判定，useSDKPayment = false，
+                //   由游戏根据返回的订单信息自行构造 SkyBuy.Request 并调起支付。
+                // ============================================================
+                SkySdkMgr.CreatePaymentOrder(req, (succeedCreat, info, OrderData) =>
                 {
                     try
                     {
@@ -85,9 +107,12 @@ namespace GameLogic
                                 h5Url = paymentData.h5_url;
                             }
                             Log.Info($"此时支付方式为：{MyPayType},此时所在国为：{PayCountry}，而此时订单信息支付方式:{OrderData.payment_list[0].type}");
-                            CoreLiteBuy.Request buyRequest = new CoreLiteBuy.Request(req, OrderData.order_no,
-                                (CoreIapH5Mgr.CoreLitePaymentType)MyPayType, h5Url);
-                            CoreSdkMgr.PurchaseProductById(buyRequest);
+
+                            var payType = MyPayType == 2
+                                ? SkyIapH5Mgr.SkyPaymentType.H5
+                                : SkyIapH5Mgr.SkyPaymentType.NativeApp;
+                            SkyBuy.Request buyRequest = new SkyBuy.Request(req, OrderData.order_no, payType, h5Url);
+                            SkySdkMgr.PurchaseProductById(buyRequest);
                         }
                         else
                         {
@@ -107,7 +132,6 @@ namespace GameLogic
                         GameEvent.Send(EventType.SetWaitingUIAndTips, false, "uitips_buy_tips3");
                         GameEvent.Send(EventType.ShowTips, "uitips_buy_tips1", true);
                         RechargeController.Instance.RemoveOneSendEvent(productId);
-
                     }
                 }, false);
             }
@@ -147,7 +171,7 @@ namespace GameLogic
                 float price = (float)rechargeInfo.Price;
                 if (!IsRemovedApp)
                 {
-                    PayCountry = CoreSdkMgr.GetStoreCountryCode();
+                    PayCountry = SkySdkMgr.GetStoreCountryCode();
                     if (string.IsNullOrEmpty(MyPayConfig.country_code))
                     {
                         Log.Warning("PayJudgment: country_code为空，回退为Google支付");
@@ -179,12 +203,10 @@ namespace GameLogic
                                 {
                                     LogEvent("IAP_Fail_Swith", "Fail_Reason", " daily_times");
                                 }
-
                                 if (GetPayTotalTimes >= MyPayConfig.Total_times)
                                 {
                                     LogEvent("IAP_Fail_Swith", "Fail_Reason", " totoal_times");
                                 }
-
                             }
                         }
                         else
@@ -209,70 +231,6 @@ namespace GameLogic
             }
         }
 
-        /// <summary>
-        /// 购买回调
-        /// </summary>
-        private void PurchaseCallback(CoreLitePurchase.Result result)
-        {
-            Debug.LogWarning(
-                $"购买成功：{result.create_order_request.product_id}----{result.purchase_result}-------{result.order_already_exists}---------{UserController.Instance.IsInit} ");
-            if (result.purchase_result)
-            {
-                var cfg = RechargeController.Instance.GetCfg(result.create_order_request.product_id);
-                GetIAPTotalCost += (float)cfg.Price;
-                RechargeController.Instance.SendReward(result.create_order_request.product_id);
-                
-               /* // 上报 SolarEngine 内购成功事件
-                Sky.SkySolarEngineEvents.TrackPurchaseEvent(
-                    payAmount: cfg.Price,
-                    currencyType: "USD",  // 根据实际货币类型调整（USD/CNY）
-                    payStatus: 1,  // 1=成功
-                    orderId: result.query_order_reuslt?.order_no ?? "",
-                    payType: result.payment_type == CoreIapH5Mgr.CoreLitePaymentType.H5 ? "h5" : "googleplay",
-                    productId: result.create_order_request.product_id,
-                    productName: cfg.product_name ?? "",
-                    productNum: 1
-                );*/
-                
-                CoreSdkMgr.LogCheckingOrder(result.query_order_reuslt, (status, info) =>
-                {
-                    Log.Info($"支付上报服务端结果：{status}-------{info}");
-                });
-            }
-            else
-            {
-                ReadFailOrderId(true);
-                Log.Info($"此时支付失败的方式为：{result.payment_type}");
-                
-               /* // 上报 SolarEngine 内购失败事件
-                if (result.create_order_request != null)
-                {
-                    var cfg = RechargeController.Instance.GetCfg(result.create_order_request.product_id);
-                    Sky.SkySolarEngineEvents.TrackPurchaseEvent(
-                        payAmount: cfg != null ? cfg.Price : 0,
-                        currencyType: "USD",
-                        payStatus: 2,  // 2=失败
-                        orderId: result.query_order_reuslt?.order_no ?? "",
-                        payType: result.payment_type == CoreIapH5Mgr.CoreLitePaymentType.H5 ? "h5" : "googleplay",
-                        productId: result.create_order_request.product_id,
-                        productName: cfg?.product_name ?? "",
-                        productNum: 1,
-                        failReason: "payment_failed"
-                    );
-                }*/
-                
-                if (result.payment_type == CoreIapH5Mgr.CoreLitePaymentType.H5)
-                {
-                    GetPayDailyTimes++;
-                    GetPayTotalTimes++;
-                }
-                if (result.create_order_request != null)
-                {
-                    RechargeController.Instance.RemoveOneSendEvent(result.create_order_request.product_id);
-                }
-            }
-            GameEvent.Send(EventType.SetWaitingUIAndTips, false, "uitips_buy_tips3");
-        }
 #endif
 
         /// <summary>
@@ -289,6 +247,47 @@ namespace GameLogic
                 Log.Debug("Iap init fail, errorMsg:" + errorMsg);
             }
         }
+        /// <summary>
+        /// 购买完成回调（由 SDKManager.Init 注册到 SkySdkMgr.RegisterPurchaseCompletionHandler）
+        /// </summary>
+        private void PurchaseCallback(SkyPurchase.Result result)
+        {
+            Debug.LogWarning(
+                $"购买结果：{result.create_order_request?.product_id}----{result.purchase_result}-------{result.order_already_exists}---------{UserController.Instance.IsInit}");
+
+            if (result.purchase_result)
+            {
+                if (result.create_order_request != null)
+                {
+                    var cfg = RechargeController.Instance.GetCfg(result.create_order_request.product_id);
+                    GetIAPTotalCost += (float)cfg.Price;
+                    RechargeController.Instance.SendReward(result.create_order_request.product_id);
+                }
+
+                SkySdkMgr.LogCheckingOrder(result.query_order_reuslt, (status, info) =>
+                {
+                    Log.Info($"支付上报服务端结果：{status}-------{info}");
+                });
+            }
+            else
+            {
+                ReadFailOrderId(true);
+                Log.Info($"此时支付失败的方式为：{result.payment_type}");
+
+                if (result.payment_type == SkyIapH5Mgr.SkyPaymentType.H5)
+                {
+                    GetPayDailyTimes++;
+                    GetPayTotalTimes++;
+                }
+                if (result.create_order_request != null)
+                {
+                    RechargeController.Instance.RemoveOneSendEvent(result.create_order_request.product_id);
+                }
+            }
+
+            // 关闭购买等待 UI
+            GameEvent.Send(EventType.SetWaitingUIAndTips, false, "uitips_buy_tips3");
+        }
 
         /// <summary>
         /// 补单操作
@@ -297,13 +296,20 @@ namespace GameLogic
         public void ReadFailOrderId(bool Resume = false)
         {
 #if USE_UP2SDK && ENABLE_IAP
-            var currentUid = CoreSdkMgr.GetCurrentUserId();
+            // 无服务器模式：没有服务端订单接口可查，跳过补单，避免无效请求
+            if (!SkyIapH5Mgr.HasServerBackend)
+            {
+                Log.Info("[无服务器模式] 跳过补单逻辑");
+                return;
+            }
+
+            var currentUid = SkySdkMgr.GetCurrentUserId();
             Log.Info($"开始补单操作，此时uid：{currentUid}");
             if (string.IsNullOrEmpty(currentUid))
             {
                 return;
             }
-            CoreSdkMgr.QueryOrderList(new CoreLiteQueryOrderList.Request(currentUid, 1, 0), (result, msg, orderList) =>
+            SkySdkMgr.QueryOrderList(new SkyQueryOrderList.Request(currentUid, 1, 0), (result, msg, orderList) =>
             {
                 Log.Debug("QueryOrderList result:" + result);
                 if (!result)
@@ -320,7 +326,6 @@ namespace GameLogic
                         Log.Info($"游戏初始化进行补单操作，此时补单商品id:{item.product_id}");
                         ProcessOrderItem(item, true);
                     }
-
                 }
                 else
                 {
@@ -347,7 +352,6 @@ namespace GameLogic
                         GameEvent.Send(EventType.ShowTips, "uitips_buy_tips1", true);
                     }
                 }
-
             });
 #endif
         }
@@ -356,17 +360,27 @@ namespace GameLogic
         /// <summary>
         /// 处理单个补单订单项：累加 IAP 金额、发放奖励、上报服务端
         /// </summary>
-        private void ProcessOrderItem(ResponseData item, bool skipAnimation)
+        private void ProcessOrderItem(SkyQueryOrder.ResponseData item, bool skipAnimation)
         {
-
             var recharge = RechargeController.GetRechargeInfo(item.product_id);
             GetIAPTotalCost += (float)recharge.Price;
             RechargeController.Instance.SendReward(item.product_id, skipAnimation, false);
-            CoreLiteQueryOrder.Result req = new CoreLiteQueryOrder.Result(
-                item.order_no, item.pay_status, item.shipping_status, item.transaction_id,
-                item.pay_success_time, item.game_extra_param, item.product_name, item.product_id,
-                item.price, item.currency, item.quantity, item.is_first_pay, item.payment_method);
-            CoreSdkMgr.LogCheckingOrder(req, (status, info) =>
+
+            SkyQueryOrder.Result req = new SkyQueryOrder.Result(
+                item.order_no,
+                item.pay_status,
+                item.shipping_status,
+                item.transaction_id,
+                item.pay_success_time,
+                item.game_extra_param,
+                item.product_name,
+                item.product_id,
+                item.price,
+                item.currency,
+                item.quantity,
+                item.is_first_pay,
+                item.payment_method);
+            SkySdkMgr.LogCheckingOrder(req, (status, info) =>
             {
                 Log.Info($"支付上报服务端结果：{status}-------{info}");
             });
@@ -396,7 +410,7 @@ namespace GameLogic
                 }
                 return GetFallbackPrice(productId);
             }
-            var price = CoreSdkMgr.GetLocalizedPriceById(productId);
+            var price = SkySdkMgr.GetLocalizedPriceById(productId);
             return string.IsNullOrEmpty(price) ? GetFallbackPrice(productId) : price;
 #else
             return GetFallbackPrice(productId);
@@ -415,7 +429,7 @@ namespace GameLogic
         public void GetProductListData()
         {
 #if USE_UP2SDK && ENABLE_IAP
-            CoreSdkMgr.GetProductList((result, msg, productList) =>
+            SkySdkMgr.GetProductList((result, msg, productList) =>
             {
                 Log.Debug("GetProductList result:" + result + " msg:" + msg + " productList:" + JsonUtility.ToJson(productList));
                 if (result)
@@ -436,7 +450,7 @@ namespace GameLogic
         public static Product GetProductById(string productId)
         {
 #if USE_UP2SDK && ENABLE_IAP
-            var productInfo = CoreSdkMgr.GetProductInfoById(productId);
+            var productInfo = SkySdkMgr.GetProductInfoById(productId);
             return productInfo;
 #else
             return null;

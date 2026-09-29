@@ -46,7 +46,7 @@ namespace GameMain
         /// </summary>
         private async UniTaskVoid GetStaticVersion()
         {
-            await UniTask.Delay(TimeSpan.FromSeconds(0.5f));
+            await UniTask.Yield();
 
             var operation = GameModule.Resource.UpdatePackageVersionAsync();
 

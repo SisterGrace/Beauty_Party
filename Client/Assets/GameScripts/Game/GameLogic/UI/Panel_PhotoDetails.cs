@@ -29,9 +29,10 @@ namespace GameLogic
 	private bool _isVideo;
 	//是否能免费下载
 	private bool _isFreeDownload;
+		string panel_name = "Panel_PhotoDetails";
 	protected override void OnRefresh()
 		{
-            
+            ImgUtil.SetActivePage(panel_name);
             mVideoNode.Hide();
 			mImgNode.Hide();
 			mSetBtns.Hide();
@@ -136,8 +137,12 @@ namespace GameLogic
 		{
 			try
 			{
-				Texture2D texture = await ImgUtil.GetTextureAsync(_PhotoItemInfo.Imgurl, cancellationTokenSource.Token);
-				if (texture != null)
+                Texture2D texture = await ImgUtil.GetTextureAsync(
+    _PhotoItemInfo.Imgurl,
+    ImgUtil.DownloadPriority.Normal,
+    panel_name,
+    cancellationTokenSource.Token);
+                if (texture != null)
 				{
 					_isLoading = false;
 					if (gameObject == null) return;
@@ -387,7 +392,8 @@ namespace GameLogic
 		}
 protected override void Close()
 {
-	VideoAudioHelper.CancelCheck();
+            ImgUtil.ClearActivePage(panel_name);
+            VideoAudioHelper.CancelCheck();
 	
 	// 如果是视频并且正在播放，不播放BGM（让视频继续播放）
 	// 如果没有视频或视频未播放，播放BGM
@@ -397,6 +403,7 @@ protected override void Close()
 	}
             VideoAudioHelper.StopVideoAudioCheck(this.WindowName, true);
             base.Close();
+
 
 }
 

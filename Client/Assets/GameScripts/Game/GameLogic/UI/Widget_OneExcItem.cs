@@ -34,10 +34,11 @@ namespace GameLogic
 				_rechargeInfo = RechargeController.GetRechargeInfoByShop(_data.Id);
 				_rewardList = ConfigLoader.Instance.Tables.TbCfgReward.Get(_rechargeInfo.RewardId).Reward;
 			}
-			//更新显示状态
-			UpdateView();
+            //更新显示状态
+            UpdateView();
+            Debug.Log($"[ExcItem] SetItemData Id={_data.Id} frame={Time.frameCount}");
 
-		}
+        }
 
 		private void UpdateView()
 		{
@@ -53,7 +54,7 @@ namespace GameLogic
 			mRedNot.SetActive(_data.IsUpdated && !_data.IsPurchased);
 			int AbType = UserController.Instance.GetCurUserType;
 			int curPhotoId = AbType==1?_data.PhotoIds[1]:_data.PhotoIds[0];
-			_itemPhoto.LoadUIImg(curPhotoId);
+			_itemPhoto.RequestLoad(curPhotoId);
 		}
 
 		private void UpdateDynamicView()
@@ -81,7 +82,7 @@ namespace GameLogic
 				
 				
 			}
-			_itemPhoto.LoadUIImg(_data.DynamicPhotoId);
+			_itemPhoto.RequestLoad(_data.DynamicPhotoId);
 		}
 
 		private void UpdateBuyButton(bool isLogEvent = false)

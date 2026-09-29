@@ -1,12 +1,15 @@
 using Config.common;
-using CoreLite;
+using Sky;
+using GameLogic;
 using Sky;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using TK_Engine;
 using UnityEngine;
+using Config;
 using EventType = GameLogic.EventType;
+using SRDebugger;
 
 public partial class SROptions
 {
@@ -208,23 +211,60 @@ public partial class SROptions
         GameEvent.Send(EventType.QuicklyEndPassport);
     }
 
-    private int _userType;
+    /* private int _userType;
 
-    [Category("A/B用户")]
-    [DisplayName("用户类型设置")]
-    [Sort(000)]
-    public int MyUserType
+     [Category("A/B用户")]
+     [DisplayName("用户类型设置")]
+     [Sort(000)]
+     public int MyUserType
+     {
+         get { return _userType; }
+         set { _userType = value; }
+     }
+
+     [Category("A/B用户")]
+     [DisplayName("用户类型设置")]
+     [Sort(001)]
+     public void SetUserType()
+     {
+         GameEvent.Send(EventType.SetUserType, MyUserType);
+     }*/
+    [Category("SDK")]
+    // 点击计数 & 解锁状态
+    private int _abUnlockClicks = 0;
+    private bool _abUnlocked = false;
+    private SROptions_AB _abOptions;
+    private float _lastClickTime = -10f;          // 上次点击时间
+    private const float INTERVAL_LIMIT = 1.3f;    // 允许的最大间隔（秒）
+
+    // 不显示
+    public string 解锁AB面进度
     {
-        get { return _userType; }
-        set { _userType = value; }
+        get => _abUnlocked ? "已解锁" : $"{_abUnlockClicks}/5";
     }
 
-    [Category("A/B用户")]
-    [DisplayName("用户类型设置")]
-    [Sort(001)]
-    public void SetUserType()
+    // 解锁按钮
+    [Category("SDK")]
+    public void TEST()
     {
-        GameEvent.Send(EventType.SetUserType, MyUserType);
+        if (_abUnlocked) return;
+
+        float now = Time.realtimeSinceStartup;
+        // 如果距离上次点击超过 1.5 秒，重置计数
+        if (now - _lastClickTime > INTERVAL_LIMIT)
+        {
+            _abUnlockClicks = 0;
+        }
+        _lastClickTime = now;
+
+        _abUnlockClicks++;
+        if (_abUnlockClicks >= 7)
+        {
+            _abUnlocked = true;
+            if (_abOptions == null) _abOptions = new SROptions_AB();
+            SRDebug.Instance.AddOptionContainer(_abOptions);
+            SRDebug.Instance?.ShowDebugPanel(true);
+        }
     }
     private string _testPhotoRewardJson = "";
 
@@ -273,7 +313,7 @@ public partial class SROptions
     }
 
     private bool _isASN;
-    [Category("A/B用户")]
+    [Category("SDK")]
     [DisplayName("ASN")]
     [Sort(002)]
     public bool IsASN
@@ -281,7 +321,7 @@ public partial class SROptions
         get { return _isASN; }
         set { _isASN = value; }
     }
-    [Category("A/B用户")]
+    [Category("SDK")]
     [DisplayName("设置ASN")]
     [Sort(003)]
     public void SetUserASN()
@@ -294,7 +334,7 @@ public partial class SROptions
     [Sort(001)]
     public void ShowInter1()
     {
-        CoreSdkMgr.ShowInterstitial("IV_Back", IvType.IV1, () =>
+        SkySdkMgr.ShowInterstitial("IV_Back", Sky.IvType.IV1, () =>
         {
         });
     }
@@ -303,7 +343,7 @@ public partial class SROptions
     [Sort(002)]
     public void ShowInter2()
     {
-        CoreSdkMgr.ShowInterstitial("IV_Fail", IvType.IV2, () =>
+        SkySdkMgr.ShowInterstitial("IV_Fail", Sky.IvType.IV2, () =>
         {
         });
     }
@@ -336,4 +376,29 @@ public partial class SROptions
         LogTool.DebugLog("[SolarEngine Test] 强制模拟为买量用户（非自然量）已生效！", LogTool.Color.green);
     }
 #endif*/
+}
+
+public class SROptions_AB
+{
+    EABUserType _type = (EABUserType)UserController.Instance.GetCurUserType;
+    [Category("SDK")]
+    public EABUserType AB面
+    {
+        get => _type;
+        set
+        {
+            if (value == _type) return;
+            _type = value;
+            GameEvent.Send(EventType.SetUserType, (int)_type);
+        }
+    }
+}
+namespace Config
+{
+    public enum EABUserType
+    {
+        A = 0,
+        B = 1,
+    }
+
 }
