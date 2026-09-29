@@ -36,6 +36,7 @@ namespace Sky
         public void SetPlacementIds(List<string> placementIds)
         {
             _placementIds = placementIds != null ? new List<string>(placementIds) : new List<string>();
+            RegisterRevenueListeners();
         }
 
         public void LoadReward()
@@ -113,7 +114,18 @@ namespace Sky
             ATRewardedVideo.Instance.showAd(placementId);
             SkyLogUtils.Debug("[SkyTpn] Show reward: " + placementId);
         }
+        private TpnRevenueListener _revenueListener;
 
+
+        private void RegisterRevenueListeners()
+        {
+            _revenueListener ??= new TpnRevenueListener();
+            foreach (var id in _placementIds)
+            {
+                if (string.IsNullOrEmpty(id)) continue;
+                ATRewardedVideo.Instance.client.setAdRevenueListener(id, _revenueListener);
+            }
+        }
         private void RegisterCallbacks()
         {
             ATRewardedVideo.Instance.client.onAdLoadEvent += OnAdLoad;
@@ -239,27 +251,29 @@ namespace Sky
                     PlatformName,
                     placementId
                 );
+                // 缓存业务上下文，供收入回调使用
+                TopOnRevenueReporter.SetRevenueContext(placementId, pos, formatNumber, positionNumber);
                 SkyAdsMgr.Instance._rvShowCallback?.Invoke();
-                if (revenue > 0)
-                {
-                    SkyAnalyticsMgr.TrackAdImpressionEvent(
-                        revenue, adSource, adId, placementId,
-                        format, PlatformName,
-                        pos,
-                        formatNumber,
-                        positionNumber,
-                        currency);  // 传递货币类型
-                }
+                /* if (revenue > 0)
+                 {
+                     SkyAnalyticsMgr.TrackAdImpressionEvent(//删掉成功展示的收入上报
+                         revenue, adSource, adId, placementId,
+                         format, PlatformName,
+                         pos,
+                         formatNumber,
+                         positionNumber,
+                         currency);  // 传递货币类型
+                 }*/
 #if UNITY_ANDROID
-                SkyAnalyticsMgr.TrackEvent("Up2SDK_ToponAdShow", new Dictionary<string, object>
-                {
-                    { "ad_platform", "Topon" },
-                    { "topon_firm_id", firmId },
-                    { "ads_type", "REWARD_VIDEO" },
-                    { "ad_id", placementId },
-                    { "ecpm", revenue * 1000 },
-                    { "show_id", "" }
-                });
+                /*   SkyAnalyticsMgr.TrackEvent("Up2SDK_ToponAdShow", new Dictionary<string, object>
+                   {
+                       { "ad_platform", "Topon" },
+                       { "topon_firm_id", firmId },
+                       { "ads_type", "REWARD_VIDEO" },
+                       { "ad_id", placementId },
+                       { "ecpm", revenue * 1000 },
+                       { "show_id", "" }
+                   });*/
 #if Up_2SDK
                 Up2SDKManager.Instance.OnToponAdShow(firmId, AdsType.Rewarded, placementId, revenue * 1000, "");
 #endif

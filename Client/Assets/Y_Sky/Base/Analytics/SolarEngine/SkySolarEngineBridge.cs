@@ -8,7 +8,23 @@ namespace Sky
     internal static class SkySolarEngineBridge
     {
         private const string ProxyClass = "com.unity3d.player.SolarEngineProxy";
-
+        public static string GetDistinctId()
+        {
+#if UNITY_ANDROID && !UNITY_EDITOR
+    try
+    {
+        using var proxy = new AndroidJavaClass(ProxyClass);
+        return proxy.CallStatic<string>("getDistinctId") ?? "";
+    }
+    catch (System.Exception e)
+    {
+        LogTool.Error("[SolarEngine] getDistinctId exception: " + e);
+        return "";
+    }
+#else
+            return "";
+#endif
+        }
         // 告知 Java 把归因/事件回调发给哪个 GameObject（SkySingleton 命名含命名空间）
         public static void SetUnityCallbackTarget(string gameObjectName)
         {
@@ -40,18 +56,18 @@ namespace Sky
 #endif
         }
 
-        public static void Initialize(string appKey, bool enableLog)
+        public static void Initialize(string appKey, bool enableLog, bool enableDebugModel)
         {
 #if UNITY_ANDROID && !UNITY_EDITOR
-            try
-            {
-                using var proxy = new AndroidJavaClass(ProxyClass);
-                proxy.CallStatic("initialize", appKey, enableLog);
-            }
-            catch (System.Exception e)
-            {
-                LogTool.Error("[SolarEngine] Initialize bridge exception: " + e);
-            }
+    try
+    {
+        using var proxy = new AndroidJavaClass(ProxyClass);
+        proxy.CallStatic("initialize", appKey, enableLog, enableDebugModel);
+    }
+    catch (System.Exception e)
+    {
+        LogTool.Error("[SolarEngine] Initialize bridge exception: " + e);
+    }
 #endif
         }
 

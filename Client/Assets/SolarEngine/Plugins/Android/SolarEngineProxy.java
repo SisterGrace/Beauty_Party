@@ -46,7 +46,14 @@ public final class SolarEngineProxy {
     private SolarEngineProxy() {
         throw new AssertionError("Utility class cannot be instantiated");
     }
-
+    public static String getDistinctId() {
+        try {
+            return SolarEngineManager.getInstance().getDistinctId();
+        } catch (Throwable t) {
+            Log.e(TAG, "getDistinctId failed", t);
+            return "";
+        }
+    }
     /**
      * Unity 端在创建单例后调用，告知 Java 把回调发回哪个 GameObject。
      * 避免在 Java 里硬编码 SkySingleton 生成的名字。
@@ -85,7 +92,7 @@ public final class SolarEngineProxy {
      * @param appKey    后台应用管理获取的 16 位 AppKey
      * @param enableLog 是否打开 SDK 本地调试日志
      */
-    public static void initialize(String appKey, boolean enableLog) {
+    public static void initialize(String appKey, boolean enableLog, boolean enableDebugModel) {
         if (TextUtils.isEmpty(appKey)) {
             Log.e(TAG, "initialize failed: appKey is empty");
             return;
@@ -99,6 +106,9 @@ public final class SolarEngineProxy {
             SolarEngineConfig.Builder builder = new SolarEngineConfig.Builder();
             if (enableLog) {
                 builder.logEnabled();
+            }
+            if (enableDebugModel) {
+                builder.isDebugModel(true);
             }
             // SDK 1.3.1.4：setOnAttributionListener 在 SolarEngineConfig 上而非 Builder 上，
             // 需要 build() 之后、initialize() 之前注入

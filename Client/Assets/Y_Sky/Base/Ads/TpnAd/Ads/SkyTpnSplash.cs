@@ -40,6 +40,7 @@ namespace Sky
         public void SetPlacementIds(List<string> placementIds)
         {
             _placementIds = placementIds != null ? new List<string>(placementIds) : new List<string>();
+            RegisterRevenueListeners();
         }
 
         public void LoadSplash()
@@ -126,7 +127,17 @@ namespace Sky
             ATSplashAd.Instance.showSplashAd(placementId, new Dictionary<string, string>());
             SkyLogUtils.Debug("[SkyTpn] Show splash: " + placementId);
         }
+        private TpnRevenueListener _revenueListener;
 
+        private void RegisterRevenueListeners()
+        {
+            _revenueListener ??= new TpnRevenueListener();
+            foreach (var id in _placementIds)
+            {
+                if (string.IsNullOrEmpty(id)) continue;
+                ATSplashAd.Instance.client.setAdRevenueListener(id, _revenueListener);
+            }
+        }
         private void RegisterCallbacks()
         {
             ATSplashAd.Instance.client.onAdLoadEvent += OnAdLoad;
@@ -208,6 +219,8 @@ namespace Sky
                 int formatNumber = SkyAdsPrefs.GetAndIncrementFormatPlayCount(format);
                 int positionNumber = SkyAdsPrefs.GetAndIncrementPositionPlayCount(format);
                 string launchType = SkySplashAdsMgr.Instance != null ? SkySplashAdsMgr.Instance.CurrentLaunchType : "unknown";
+                // 缓存业务上下文，供收入回调使用（Splash 的 pos 是启动类型）
+                TopOnRevenueReporter.SetRevenueContext(placementId, launchType, formatNumber, positionNumber);
                 SkySplashAdsMgr.TrackSplashEvent("SP_Show", new Dictionary<string, object>
                 {
                     //{ "launch_type", launchType },  // 多余参数，已注释
@@ -218,26 +231,26 @@ namespace Sky
                     //{ "unitId", placementId },  // 多余参数，已注释
                     //{ "revenue", revenue }  // 多余参数，已注释，统一用 ad_ecpm
                 });
-                if (revenue > 0)
-                {
-                    SkyAnalyticsMgr.TrackAdImpressionEvent(
-                        revenue, adSource, adId, placementId,
-                        format, PlatformName,
-                        launchType,
-                        formatNumber,
-                        positionNumber,
-                        currency);  // 传递货币类型
-                }
+                /* if (revenue > 0)
+                 {
+                     SkyAnalyticsMgr.TrackAdImpressionEvent(//删掉成功展示的收入上报
+                         revenue, adSource, adId, placementId,
+                         format, PlatformName,
+                         launchType,
+                         formatNumber,
+                         positionNumber,
+                         currency);  // 传递货币类型
+                 }*/
 #if UNITY_ANDROID
-                SkyAnalyticsMgr.TrackEvent("Up2SDK_ToponAdShow", new Dictionary<string, object>
-                {
-                    { "ad_platform", "Topon" },
-                    { "topon_firm_id", firmId },
-                    { "ads_type", "SPLASH" },
-                    { "ad_id", placementId },
-                    { "ecpm", revenue * 1000 },
-                    { "show_id", "" }
-                });
+                /*   SkyAnalyticsMgr.TrackEvent("Up2SDK_ToponAdShow", new Dictionary<string, object>
+                   {
+                       { "ad_platform", "Topon" },
+                       { "topon_firm_id", firmId },
+                       { "ads_type", "SPLASH" },
+                       { "ad_id", placementId },
+                       { "ecpm", revenue * 1000 },
+                       { "show_id", "" }
+                   });*/
 #if Up_2SDK
                 Up2SDKManager.Instance.OnToponAdShow(firmId, AdsType.Splash, placementId, revenue * 1000, "");
 #endif

@@ -57,7 +57,7 @@ namespace Sky
         /// 广告收益事件上报（适配 SolarEngine 预置事件 _appImp）
         /// 使用官方桥接方法 trackAdImpression
         /// </summary>
-        public static void TrackAdImpressionEvent(double revenue, string network, string unit, string format, string platform, string pos = "", int formatNumber = 0, int positionNumber = 0, string currency = "USD")
+        public static void TrackAdImpressionEvent(double revenue, string network, string unit, string format, string platform, string pos = "", int formatNumber = 0, int positionNumber = 0, string currency = "USD",string customMediationPlatform = null)
         {
             if (!SkySolarEngineMgr.Instance.TrackingEnable()) return;
             
@@ -76,8 +76,10 @@ namespace Sky
             }
 
             // 解析聚合平台!注意！！！目前没有其他聚合！！只解析topon即可！！如果有其他平台这里要重新写！！！
-            string mediationPlatform = platform.ToLower() == "tpn" ? "topon" : platform.ToLower();
-            
+            string mediationPlatform = !string.IsNullOrEmpty(customMediationPlatform)
+        ? customMediationPlatform
+        : (platform.ToLower() == "tpn" ? "topon" : platform.ToLower());
+
             // 映射广告类型
             int adType = 0;
             string formatLower = format.ToLower();
@@ -200,20 +202,15 @@ namespace Sky
         /// 从 network 参数解析广告平台名称
         /// network 格式: "Topon_2", "Topon_12" 等
         /// </summary>
-        private static string ParseAdNetworkPlatform(string network)
+        public static string ParseAdNetworkPlatform(string network)
         {
             if (string.IsNullOrEmpty(network)) return "";
-            
-            // 提取 firmId
-            if (network.StartsWith("Topon_"))
-            {
-                string firmIdStr = network.Substring(6);
-                if (int.TryParse(firmIdStr, out int firmId))
-                {
-                    return MapFirmIdToPlatform(firmId);
-                }
-            }
-            
+            // 已是平台名（如 "admob"），直接返回
+            if (!network.StartsWith("Topon_")) return network;
+
+            string firmIdStr = network.Substring(6);
+            if (int.TryParse(firmIdStr, out int firmId))
+                return MapFirmIdToPlatform(firmId);
             return "";
         }
 
@@ -221,7 +218,7 @@ namespace Sky
         /// 映射 TopOn firmId 到平台名称
         /// 参考：TopOn 官方文档 https://help.toponad.net/cn/docs/2KR6QU#TopOn_%E6%94%AF%E6%8C%81%E8%81%9A%E5%90%88%E4%BB%A5%E4%B8%8B%E5%B9%BF%E5%91%8A%E5%B9%B3%E5%8F%B0
         /// </summary>
-        private static string MapFirmIdToPlatform(int firmId)
+        public static string MapFirmIdToPlatform(int firmId)
         {
             switch (firmId)
             {
