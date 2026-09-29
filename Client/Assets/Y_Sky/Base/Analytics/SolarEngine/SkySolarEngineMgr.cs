@@ -11,7 +11,7 @@ namespace Sky
         /// <summary>
         /// 本地日志开关。上线前可关闭以减少 logcat 噪音。
         /// </summary>
-        private const bool EnableLog = true;
+        private const bool EnableLog = false;
 
         /// <summary>
         /// 后台 Debug 模式开关。开启后，只有在热力引擎后台 Debug 设备列表里的设备，
@@ -19,7 +19,7 @@ namespace Sky
         /// 
         /// ⚠️ 上线前务必置为 false！
         /// </summary>
-        private const bool EnableDebugModel = true;
+        private const bool EnableDebugModel = false;
         private const int ATTRIBUTION_TIMEOUT_SECONDS = 180;
 
         public bool IsInitialized { get; private set; }
