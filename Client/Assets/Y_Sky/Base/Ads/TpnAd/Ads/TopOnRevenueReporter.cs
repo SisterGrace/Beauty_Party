@@ -173,6 +173,11 @@ namespace Sky
 
         private static string MapChannelToMediation(string channelName)
         {
+            if (string.IsNullOrEmpty(channelName)) return null;
+
+            // 新增：如果配置里包含 topon 字样，正常归类为 topon
+            if (channelName.IndexOf("topon", System.StringComparison.OrdinalIgnoreCase) >= 0)
+                return "TPN";
             switch (channelName)
             {
                 case ChannelAppLovinMax: return MediationAPL;
