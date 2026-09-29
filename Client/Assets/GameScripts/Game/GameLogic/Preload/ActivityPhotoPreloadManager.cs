@@ -65,8 +65,9 @@ namespace GameLogic
             {
                 Debug.Log("[ActivityPreload] 预加载福利中心图片...");
 
+
                 var allShopCfgs = ConfigLoader.Instance.Tables.TbCfgShop.DataList;
-                var photoCfgs = allShopCfgs.FindAll(x => x.GoodType == mProductType.PhotoPack|| x.GoodType == mProductType.GiftPack);
+                var photoCfgs = allShopCfgs.FindAll(x => x.GoodType == mProductType.PhotoPack || x.GoodType == mProductType.GiftPack);
                 List<string> photoUrls = new List<string>();
 
                 int AbType = UserController.Instance.GetCurUserType;
@@ -78,11 +79,29 @@ namespace GameLogic
 
                     var rewardList = ConfigLoader.Instance.Tables.TbCfgReward.Get(rechargeInfo.RewardId)?.Reward;
                     if (rewardList == null) continue;
-
-                    List<int> currentPhotoIds = UserController.GetPhotoIdsFromRewardList(rewardList);
-                    foreach (var photoId in currentPhotoIds)
+                    List<int> photoIds = new List<int>();
+                    foreach (var reward in rewardList)
                     {
-                        int targetPhotoId = AbType == 1 ? photoId : currentPhotoIds[0];
+                        if (reward.Type == ERewardType.Photo)
+                        {
+                            if (reward.ID > 0) photoIds.Add(reward.ID);
+                            if (reward.OtherID > 0) photoIds.Add(reward.OtherID);
+                        }
+                        else if (reward.Type == ERewardType.PhotoGroup)
+                        {
+                            var group = ConfigLoader.Instance.Tables.TbCfgPhotoGroupRew.Get(reward.ID);
+                            if(AbType!=1)
+                            {
+                                photoIds.AddRange(group.APhotoRews);
+                            }else
+                            {
+                                photoIds.AddRange(group.BPhotoRews);
+                            }
+                        }
+                    }
+                    foreach (var photoId in photoIds)
+                    {
+                        int targetPhotoId =/* AbType == 1 ? photoId : */photoIds[0];
                         string url = PropsController.GetImgUrl(targetPhotoId);
                         if (!string.IsNullOrEmpty(url) && !photoUrls.Contains(url))
                         {
