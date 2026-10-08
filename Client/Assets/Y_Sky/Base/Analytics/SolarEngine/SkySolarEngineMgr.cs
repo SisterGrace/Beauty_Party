@@ -84,7 +84,14 @@ namespace Sky
         {
             if (SkySolarEnginePrefs.IsFinalized)
             {
-                LogTool.DebugLog("[SolarEngine] Attribution already finalized, skip timer");
+                LogTool.DebugLog(
+                    $"[SolarEngine] Attribution already finalized, skip timer. " +
+                    $"IsPaidUser={SkySolarEnginePrefs.IsPaidUser}, " +
+                    $"Network={SkySolarEnginePrefs.Network}, " +
+                    $"Campaign={SkySolarEnginePrefs.Campaign}, " +
+                    $"Adgroup={SkySolarEnginePrefs.Adgroup}, " +
+                    $"Creative={SkySolarEnginePrefs.Creative}, " +
+                    $"ClickLabel={SkySolarEnginePrefs.ClickLabel}");
                 return;
             }
 
@@ -329,7 +336,14 @@ namespace Sky
 
             if (SkySolarEnginePrefs.IsFinalized)
             {
-                LogTool.DebugLog("[SolarEngine] Attribution already finalized, ignore callback");
+                LogTool.DebugLog(
+                    $"[SolarEngine] Attribution already finalized, ignore callback. " +
+                    $"Current: IsPaidUser={SkySolarEnginePrefs.IsPaidUser}, " +
+                    $"Network={SkySolarEnginePrefs.Network}, " +
+                    $"Campaign={SkySolarEnginePrefs.Campaign}, " +
+                    $"Adgroup={SkySolarEnginePrefs.Adgroup}, " +
+                    $"Creative={SkySolarEnginePrefs.Creative}, " +
+                    $"ClickLabel={SkySolarEnginePrefs.ClickLabel}");
                 return;
             }
 
