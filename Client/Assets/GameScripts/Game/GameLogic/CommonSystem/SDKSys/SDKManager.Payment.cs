@@ -247,6 +247,7 @@ namespace GameLogic
                 Log.Debug("Iap init fail, errorMsg:" + errorMsg);
             }
         }
+#if IAP_ENABLE
         /// <summary>
         /// 购买完成回调（由 SDKManager.Init 注册到 SkySdkMgr.RegisterPurchaseCompletionHandler）
         /// </summary>
@@ -288,7 +289,7 @@ namespace GameLogic
             // 关闭购买等待 UI
             GameEvent.Send(EventType.SetWaitingUIAndTips, false, "uitips_buy_tips3");
         }
-
+#endif
         /// <summary>
         /// 补单操作
         /// </summary>
@@ -387,7 +388,7 @@ namespace GameLogic
         }
 #endif
 
-        #endregion
+#endregion
 
         #region 商品价格
 

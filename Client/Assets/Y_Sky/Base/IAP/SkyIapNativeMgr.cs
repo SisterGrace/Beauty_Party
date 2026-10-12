@@ -31,11 +31,11 @@ namespace Sky
         public void BuyProductByID(SkyBuy.Request req)
         {
 
-/*#if UNITY_EDITOR
-
-            var res = new SkyPurchase.Result(req.create_order_request, SkyIapH5Mgr.Instance.CreateFailQueryResultEntity(null), true, false, req.payment_type);
-            SkySdkMgr.OnPurchaseComplete?.Invoke(res);
-#else*/
+///*#if UNITY_EDITOR
+//
+//            var res = new SkyPurchase.Result(req.create_order_request, SkyIapH5Mgr.Instance.CreateFailQueryResultEntity(null), true, false, req.payment_type);
+//            SkySdkMgr.OnPurchaseComplete?.Invoke(res);
+//#else*/
             
             if (req.payment_type == SkyPaymentType.H5)
             {

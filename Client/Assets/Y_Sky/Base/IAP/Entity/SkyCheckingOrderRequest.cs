@@ -1,3 +1,4 @@
+#if IAP_ENABLE
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -27,3 +28,4 @@ namespace Sky
         }
     }
 }
+#endif

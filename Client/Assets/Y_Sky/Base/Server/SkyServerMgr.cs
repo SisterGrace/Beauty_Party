@@ -7,7 +7,9 @@ using UnityEngine;
 using System.Linq;
 using Newtonsoft.Json;
 using static Sky.SkyLoginEnum;
+#if IAP_ENABLE
 using static Sky.SkyIapH5Mgr;
+#endif
 using static Sky.SkyProductListRequest;
 using static Sky.SkyGameConfig;
 
@@ -21,7 +23,7 @@ namespace Sky
             Post(SkyConfigMgr.Instance.GetGameConfigUrl(), args, callback);
         }
         #endregion
-
+#if IAP_ENABLE
         #region  支付
         public void IapReport(Dictionary<string, object> args,Action<int, string, DataInfo> callback)
         {
@@ -55,7 +57,7 @@ namespace Sky
             Post(SkyConfigMgr.Instance.GetQueryOrderListUrl(),AddSSProperties(args),callback);
         }
         #endregion
-
+#endif
         #region 登录
         public void Login(Dictionary<string, object> args, Action<int, string, ServerBackLoginInfo> callback)
         {
@@ -67,7 +69,7 @@ namespace Sky
         {
             if(string.IsNullOrEmpty(SkyConfigMgr.Instance.GetSSAppId()) || string.IsNullOrEmpty(SkyConfigMgr.Instance.GetSSUrl())) return args;
             var ssProperties = new Dictionary<string, object>(){};
-            #if SSThinkingData
+#if SSThinkingData
             if (TDAnalytics.GetSuperProperties().Count > 0)
             {
                 ssProperties = ssProperties.Concat(TDAnalytics.GetSuperProperties()).ToDictionary(postParK => postParK.Key, PostParV => PostParV.Value);
@@ -77,7 +79,7 @@ namespace Sky
             {
                 ssProperties = ssProperties.Concat(TDAnalytics.GetPresetProperties().ToDictionary()).ToDictionary(postParK => postParK.Key, PostParV => PostParV.Value);
             }
-            #endif
+#endif
             args.AddIfNotExists("ss_super_properties", JsonConvert.SerializeObject(ssProperties));
             return args;
         }

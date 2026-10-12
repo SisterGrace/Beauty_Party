@@ -1,3 +1,4 @@
+#if IAP_ENABLE
 using System.Collections;
 using System.Collections.Generic;
 using Sky;
@@ -62,4 +63,4 @@ namespace Sky
     }
 
 }
-
+#endif

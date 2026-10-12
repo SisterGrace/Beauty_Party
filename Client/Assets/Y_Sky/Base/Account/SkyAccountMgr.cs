@@ -23,9 +23,13 @@ namespace Sky
 
         public async void Login(Action<bool, string, string> onComplete = null)
         {
+#if IAP_ENABLE
 			// ⭐ 无服务器模式：直接返回成功，用设备 ID 作为 UserId
 			if (!SkyIapH5Mgr.HasServerBackend)
-			{
+#else
+            if (true)//无服务器模式
+#endif
+            {
 				string localUserId = SkyPrefs.UserId;
 				if (string.IsNullOrEmpty(localUserId))
 				{
@@ -52,7 +56,7 @@ namespace Sky
                 _lastLoginTime = Time.time;
                 string deviceId = await SkyPrefs.GetOrCreateDeviceId();
                 SkyAdjustPrefs.DeviceId = deviceId;
-                #if SSThinkingData
+#if SSThinkingData
                 SkyThinkingDataMgr.Instance.SetSuperProperties(new Dictionary<string, object> { { "device_num", deviceId } });
 #endif
                 var loginRequest = CreateLoginRequest(deviceId);
