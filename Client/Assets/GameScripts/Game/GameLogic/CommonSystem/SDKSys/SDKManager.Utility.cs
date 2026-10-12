@@ -120,7 +120,7 @@ namespace GameLogic
             //Debug.Log("Application.OpenURL(ConfigLoader.Constant.PrivacyUrl)");
             Debug.Log(ConfigLoader.Constant.PrivacyUrl);
             //Application.OpenURL(ConfigLoader.Constant.PrivacyUrl);
-            Application.OpenURL("https://powerxg-yl.github.io/privacy-policy-GlamTileBeautyParty/");
+            Application.OpenURL("https://powerxg-yl.github.io/privacy-policy-fishiapps/");
         }
 
         /// 买量用户归因回调
