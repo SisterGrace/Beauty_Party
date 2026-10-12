@@ -14,7 +14,6 @@
     <package>com.chartboost:chartboost-mediation-sdk:5.3.0</package>
     <package>com.chartboost:chartboost-sdk:9.12.0</package>
     <package>com.facebook.android:audience-network-sdk:6.21.0</package>
-    <package>com.google.android.gms:play-services-ads:25.4.0</package>
     <package>com.google.android.gms:play-services-ads-identifier:18.0.1</package>
     <package>com.google.android.gms:play-services-ads-identifier:18.2.0</package>
     <package>com.google.android.gms:play-services-appset:16.0.2</package>
@@ -45,7 +44,6 @@
     <package>com.squareup.okhttp3:okhttp:4.12.0</package>
     <package>com.squareup.retrofit2:converter-scalars:2.9.0</package>
     <package>com.squareup.retrofit2:retrofit:2.9.0</package>
-    <package>com.thinkup.sdk:adapter-tpn-admob:25.4.0.1.1</package>
     <package>com.thinkup.sdk:adapter-tpn-bigo:5.9.0.1.1</package>
     <package>com.thinkup.sdk:adapter-tpn-chartboost:9.12.0.1.1</package>
     <package>com.thinkup.sdk:adapter-tpn-facebook:6.21.0.1.1</package>
@@ -82,7 +80,7 @@
   </files>
   <settings>
     <setting name="androidAbis" value="arm64-v8a,armeabi-v7a" />
-    <setting name="bundleId" value="com.glam.tile.beauty.party.dream.girl.puzzle" />
+    <setting name="bundleId" value="com.gorgeousgirl.match3.fishi" />
     <setting name="explodeAars" value="True" />
     <setting name="gradleBuildEnabled" value="True" />
     <setting name="gradlePropertiesTemplateEnabled" value="True" />

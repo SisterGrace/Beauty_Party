@@ -26,6 +26,12 @@ namespace Sky
             {
                 Debug.LogError("=== [调试] ID为空！请检查 SkyConfigMgr 是否加载了 nonchina 的 JSON 数据 ===");
             }
+            // ✅ 关键：没配 AdMob ID 就直接跳过，不碰 Manifest
+            if (string.IsNullOrEmpty(projectAdmobAppId))
+            {
+                Debug.Log("=== 未配置 AdMob ID，跳过 Manifest 修改 ===");
+                return;
+            }
             AddAdmobAppId(path);
 #endif
         }

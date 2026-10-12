@@ -34,7 +34,6 @@ dependencies {
     implementation 'com.chartboost:chartboost-mediation-sdk:5.3.0' // Assets/ThinkupTpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/chartboost/Editor/Dependencies.xml:10
     implementation 'com.chartboost:chartboost-sdk:9.12.0' // Assets/ThinkupTpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/chartboost/Editor/Dependencies.xml:9
     implementation 'com.facebook.android:audience-network-sdk:6.21.0' // Assets/ThinkupTpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/facebook/Editor/Dependencies.xml:4
-    implementation 'com.google.android.gms:play-services-ads:25.4.0' // Assets/ThinkupTpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/admob/Editor/Dependencies.xml:4
     // implementation 'com.google.android.gms:play-services-ads-identifier:18.0.1' // Assets/ThinkupTpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/vungle/Editor/Dependencies.xml:6
     implementation 'com.google.android.gms:play-services-ads-identifier:18.2.0' // Assets/ThinkupTpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/pangle/Editor/Dependencies.xml:8
     implementation 'com.google.android.gms:play-services-appset:16.0.2' // Packages/com.gameanalytics.sdk/Editor/Android/Dependencies.xml:4
@@ -65,7 +64,6 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:4.12.0' // Assets/ThinkupTpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/chartboost/Editor/Dependencies.xml:17
     implementation 'com.squareup.retrofit2:converter-scalars:2.9.0' // Assets/ThinkupTpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/chartboost/Editor/Dependencies.xml:18
     implementation 'com.squareup.retrofit2:retrofit:2.9.0' // Assets/ThinkupTpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/chartboost/Editor/Dependencies.xml:19
-    implementation 'com.thinkup.sdk:adapter-tpn-admob:25.4.0.1.1' // Assets/ThinkupTpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/admob/Editor/Dependencies.xml:3
     implementation 'com.thinkup.sdk:adapter-tpn-bigo:5.9.0.1.1' // Assets/ThinkupTpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/bigo/Editor/Dependencies.xml:3
     implementation 'com.thinkup.sdk:adapter-tpn-chartboost:9.12.0.1.1' // Assets/ThinkupTpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/chartboost/Editor/Dependencies.xml:8
     implementation 'com.thinkup.sdk:adapter-tpn-facebook:6.21.0.1.1' // Assets/ThinkupTpnPlugin/AnyThinkAds/Plugins/Android/NonChina/mediation/facebook/Editor/Dependencies.xml:3
