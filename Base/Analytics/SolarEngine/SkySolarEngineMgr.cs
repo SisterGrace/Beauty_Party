@@ -8,7 +8,18 @@ namespace Sky
 {
     public class SkySolarEngineMgr : SkySingleton<SkySolarEngineMgr>
     {
-        private const bool EnableLog = true;
+        /// <summary>
+        /// 本地日志开关。上线前可关闭以减少 logcat 噪音。
+        /// </summary>
+        private const bool EnableLog = false;
+
+        /// <summary>
+        /// 后台 Debug 模式开关。开启后，只有在热力引擎后台 Debug 设备列表里的设备，
+        /// 其数据才仅校验不入库；不在列表里的设备正常入库。
+        /// 
+        /// ⚠️ 上线前务必置为 false！
+        /// </summary>
+        private const bool EnableDebugModel = false;
         private const int ATTRIBUTION_TIMEOUT_SECONDS = 180;
 
         public bool IsInitialized { get; private set; }
@@ -52,7 +63,7 @@ namespace Sky
 
             SkySolarEngineBridge.SetUnityCallbackTarget(gameObject.name);
             SkySolarEngineBridge.PreInit(appKey);
-            SkySolarEngineBridge.Initialize(appKey, EnableLog);
+            SkySolarEngineBridge.Initialize(appKey, EnableLog, EnableDebugModel);
             IsInitialized = true;
             LogTool.DebugLog("[SolarEngine] Init triggered, appKey=" + appKey + ", log=" + EnableLog,
                 LogTool.Color.yellow);
@@ -60,6 +71,7 @@ namespace Sky
             StartAttributionTimer();
 
             AppLifecycleListener.Instance.Init();
+            LogTool.DebugLog("[SolarEngine] distinct_id = " + SkySolarEngineBridge.GetDistinctId(), LogTool.Color.yellow);
             Sky.SkyAnalyticsMgr.TrackEvent("track_init", new Dictionary<string, object>
             {
                 { "ad_network", SkySolarEnginePrefs.HasAttribution ? SkySolarEnginePrefs.Network : "" }
@@ -72,7 +84,14 @@ namespace Sky
         {
             if (SkySolarEnginePrefs.IsFinalized)
             {
-                LogTool.DebugLog("[SolarEngine] Attribution already finalized, skip timer");
+                LogTool.DebugLog(
+                    $"[SolarEngine] Attribution already finalized, skip timer. " +
+                    $"IsPaidUser={SkySolarEnginePrefs.IsPaidUser}, " +
+                    $"Network={SkySolarEnginePrefs.Network}, " +
+                    $"Campaign={SkySolarEnginePrefs.Campaign}, " +
+                    $"Adgroup={SkySolarEnginePrefs.Adgroup}, " +
+                    $"Creative={SkySolarEnginePrefs.Creative}, " +
+                    $"ClickLabel={SkySolarEnginePrefs.ClickLabel}");
                 return;
             }
 
@@ -159,7 +178,7 @@ namespace Sky
                 { "Pass_Time", passTimeSeconds },
                 { "ad_network", finalNetwork }
             });
-
+            ReportAdSpendOnce(finalNetwork);
             LogTool.DebugLog($"[SolarEngine] Finalized as PAID user: network={finalNetwork}");
         }
 
@@ -191,10 +210,21 @@ namespace Sky
                 { "Pass_Time", passTimeSeconds },
                 { "ad_network", "Organic" }
             });
-
+            ReportAdSpendOnce("Organic");
             LogTool.DebugLog("[SolarEngine] Finalized as ORGANIC user");
         }
+        private void ReportAdSpendOnce(string network)
+        {
+            if (SkySolarEnginePrefs.AdSpendReported) return;   // 只报一次
+            SkySolarEnginePrefs.AdSpendReported = true;
 
+            SkySolarEngineEvents.TrackEvent("track_ad_spend", new Dictionary<string, object>
+    {
+        { "ad_network", network ?? "" }
+    });
+
+            LogTool.DebugLog("[SolarEngine] track_ad_spend reported once, ad_network=" + network);
+        }
         #endregion
 
         #region 事件上报（不变）
@@ -306,7 +336,14 @@ namespace Sky
 
             if (SkySolarEnginePrefs.IsFinalized)
             {
-                LogTool.DebugLog("[SolarEngine] Attribution already finalized, ignore callback");
+                LogTool.DebugLog(
+                    $"[SolarEngine] Attribution already finalized, ignore callback. " +
+                    $"Current: IsPaidUser={SkySolarEnginePrefs.IsPaidUser}, " +
+                    $"Network={SkySolarEnginePrefs.Network}, " +
+                    $"Campaign={SkySolarEnginePrefs.Campaign}, " +
+                    $"Adgroup={SkySolarEnginePrefs.Adgroup}, " +
+                    $"Creative={SkySolarEnginePrefs.Creative}, " +
+                    $"ClickLabel={SkySolarEnginePrefs.ClickLabel}");
                 return;
             }
 

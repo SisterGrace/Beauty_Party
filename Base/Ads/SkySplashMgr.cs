@@ -8,7 +8,7 @@ namespace Sky
     public class SkySplashAdsMgr : SkySingleton<SkySplashAdsMgr>
     {
         public float _backgroundTime = 0;
-        private int _timeoutDuration = 5;
+        private int _timeoutDuration = 1;
         public Action OnSplashAdClose;
         private Coroutine _hotResumeCheckCo;
         /// <summary>激励/插屏等全屏关闭后，下一次 <see cref="CheckSplashAd"/>（热开）应忽略：避免系统随全屏广告触发的 OnApplicationPause(false) 被误判为从后台恢复。</summary>
@@ -86,10 +86,10 @@ namespace Sky
 
         public void SetSplash()
         {
-            _timeoutDuration = SkyPrefs.GetInt("Firstcold_Splash_Switch", 0) == 0 ? 0 : GetSplashConfig().loadtime;
+			_timeoutDuration = SkyPrefs.GetInt("Firstcold_Splash_Switch", 0) == 0 ? 0 : GetSplashConfig().loadtime;
             StartCoroutine(LoadSplashAdAdWithTimeout());
             SkyLogUtils.Debug(" [AppOpen]  加载开屏："+_timeoutDuration);
-        }
+		}
 
         private void OnApplicationPause(bool pauseStatus)
         {
@@ -113,17 +113,17 @@ namespace Sky
 
         private IEnumerator LoadSplashAdAdWithTimeout()
         {
-
-            SkyAdsMgr.Instance.LoadSplash();
+			
+			SkyAdsMgr.Instance.LoadSplash();
             float elapsedTime = 0f;
-            while (elapsedTime < _timeoutDuration && !SkyAdsMgr.Instance.IsSplashAvailable())
+			while (elapsedTime < _timeoutDuration && !SkyAdsMgr.Instance.IsSplashAvailable())
             {
                 yield return new WaitForSeconds(0.5f);
                 elapsedTime += 0.5f;
             }
-
-            CheckSplashAd(true);
-        }
+			
+			CheckSplashAd(true);
+		}
 
         private IEnumerator HotResumeCheckAfterDelay()
         {
@@ -332,7 +332,7 @@ namespace Sky
         }
 
         private static string SPLASH_CONFIG_KEY = "Splash_AD_RULES";
-        private static string SPLASH_CONFIG_DEFAULT = "[{\"firstcold_splash_switch\":0,\"cold_splash_switch\":1,\"hot_splash_switch\":1,\"hot_timegap\":30,\"loadtime\":5}]";
+        private static string SPLASH_CONFIG_DEFAULT = "[{\"firstcold_splash_switch\":0,\"cold_splash_switch\":1,\"hot_splash_switch\":1,\"hot_timegap\":30,\"loadtime\":1}]";
 
         public SplashConfig GetSplashConfig()
         {

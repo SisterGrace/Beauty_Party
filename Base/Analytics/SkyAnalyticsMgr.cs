@@ -129,32 +129,77 @@ namespace Sky
 #endif
         }
 
-#endregion
+        #endregion
         #region  广告事件上报
-        /// <param name="pos">广告展示点位，客户端根据实际位置上报</param>
-        /// <param name="formatNumber">第几次展示该格式的广告（1、2、3…），每个广告格式独立统计</param>
-        /// <param name="positionNumber">第几次展示该点位的广告（1、2、3…），每个广告触发点位独立统计</param>
-        public static void TrackAdImpressionEvent(double revenue, string network, string unit, string placement, string format, string platform, string pos = "", int formatNumber = 0, int positionNumber = 0, string currency = "USD")
+        /// <summary>
+        /// 广告展示收益上报（统一入口）。
+        /// 由 TopOn 专用收入回调 TopOnRevenueReporter 调用，分发给所有平台。
+        /// </summary>
+        /// <param name="revenue">单次展示收益</param>
+        /// <param name="network">广告平台名（如 "admob" / "applovin"），已由 TopOnRevenueReporter 映射好</param>
+        /// <param name="unit">三方广告位 ID（network_placement_id）</param>
+        /// <param name="placement">TopOn 广告位 ID</param>
+        /// <param name="format">广告类型（banner / inter / reward / splash）</param>
+        /// <param name="platform">聚合平台（"tpn"）</param>
+        /// <param name="pos">展示点位，默认空</param>
+        /// <param name="formatNumber">第几次展示该格式的广告</param>
+        /// <param name="positionNumber">第几次展示该点位的广告</param>
+        /// <param name="currency">货币单位，从 TopOn 回调取，取不到由调用方决定是否跳过</param>
+        /// <param name="customMediationPlatform">热力引擎自定义归类（"APL" / "IS"），null 时由 SkySolarEngineEvents 内部回退</param>
+        public static void TrackAdImpressionEvent(
+            double revenue,
+            string network,
+            string unit,
+            string placement,
+            string format,
+            string platform,
+            string pos = "",
+            int formatNumber = 0,
+            int positionNumber = 0,
+            string currency = "USD",
+            string customMediationPlatform = null)
         {
-            SkyLogUtils.Debug("TrackAdImpressionEvent"+" revenue:"+revenue+" network:"+network+" unit:"+unit+" placement:"+placement+" format:"+format+" platform:"+platform+" pos:"+pos+" format_number:"+formatNumber+" position_number:"+positionNumber+" currency:"+currency);
-            
-            // 上报买量消耗成本事件（热云）
-            SkyAnalyticsMgr.TrackEvent("track_ad_spend", new Dictionary<string, object>
-            {
-                { "ad_network", Sky.SkySolarEnginePrefs.HasAttribution ? Sky.SkySolarEnginePrefs.Network : "" }
-            });
-            
-            SkyFirebaseEvents.TrackAdImpressionEvent(revenue, network, unit, format, platform, pos, formatNumber, positionNumber);
-            Sky.SkyGAEvents.TrackAdImpressionEvent(revenue, network, unit, format, platform, pos, formatNumber, positionNumber);
-            Sky.SkySolarEngineEvents.TrackAdImpressionEvent(revenue, network, unit, format, platform, pos, formatNumber, positionNumber, currency);
+            SkyLogUtils.Debug("TrackAdImpressionEvent"
+                + " revenue:" + revenue
+                + " network:" + network
+                + " unit:" + unit
+                + " placement:" + placement
+                + " format:" + format
+                + " platform:" + platform
+                + " pos:" + pos
+                + " format_number:" + formatNumber
+                + " position_number:" + positionNumber
+                + " currency:" + currency
+                + " customMediationPlatform:" + customMediationPlatform);
+
+            // Firebase
+            SkyFirebaseEvents.TrackAdImpressionEvent(
+                revenue, network, unit, format, platform, pos, formatNumber, positionNumber);
+
+            // GA
+            Sky.SkyGAEvents.TrackAdImpressionEvent(
+                revenue, network, unit, format, platform, pos, formatNumber, positionNumber);
+
+            // 热力引擎：传 customMediationPlatform，让 APL / IS 归类生效
+            Sky.SkySolarEngineEvents.TrackAdImpressionEvent(
+                revenue, network, unit, format, platform, pos, formatNumber, positionNumber,
+                currency, customMediationPlatform);
+
 #if ADJUST
-            SkyAdjustEvents.TrackAdImpressionEvent(revenue, network, unit, placement);
+    // Adjust
+    SkyAdjustEvents.TrackAdImpressionEvent(revenue, network, unit, placement);
 #endif
+
 #if SSThinkingData
-            SkyThinkingDataEvents.TrackAdImpressionEvent(revenue, network, unit, format, platform, pos, formatNumber, positionNumber);
+    // ThinkingData
+    SkyThinkingDataEvents.TrackAdImpressionEvent(
+        revenue, network, unit, format, platform, pos, formatNumber, positionNumber);
 #endif
+
 #if USE_XMSDK
-            SkyXmSdkMgr.Instance.TrackAdImpression(revenue, format, platform, unit, network, placement);
+    // 小米 SDK
+    SkyXmSdkMgr.Instance.TrackAdImpression(
+        revenue, format, platform, unit, network, placement);
 #endif
         }
 

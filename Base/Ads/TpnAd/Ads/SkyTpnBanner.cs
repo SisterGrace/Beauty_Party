@@ -40,8 +40,8 @@ namespace Sky
         public void SetPlacementIds(List<string> placementIds)
         {
             _placementIds = placementIds != null ? new List<string>(placementIds) : new List<string>();
+            RegisterRevenueListeners();   // 新增
         }
-
         /// <summary>
         /// 设置 banner 展示位置：传入 ATBannerAdLoadingExtra.kATBannerAdShowingPisitionTop 或
         /// kATBannerAdShowingPisitionBottom。该值仅作用于下一次 ShowBanner。
@@ -197,7 +197,17 @@ namespace Sky
                 return false;
             }
         }
+        private TpnRevenueListener _revenueListener;
 
+        private void RegisterRevenueListeners()
+        {
+            _revenueListener ??= new TpnRevenueListener();
+            foreach (var id in _placementIds)
+            {
+                if (string.IsNullOrEmpty(id)) continue;
+                ATBannerAd.Instance.client.setAdRevenueListener(id, _revenueListener);
+            }
+        }
         private void RegisterCallbacks()
         {
             ATBannerAd.Instance.client.onAdLoadEvent += OnAdLoad;
@@ -269,24 +279,26 @@ namespace Sky
                 string format = SkyAdsType.Banner.ToString();
                 int formatNumber = SkyAdsPrefs.GetAndIncrementFormatPlayCount(format);
                 int positionNumber = SkyAdsPrefs.GetAndIncrementPositionPlayCount(format);
-               /* SkyAnalyticsMgr.TrackEvent("BN_Show", new Dictionary<string, object>
-                {
-                    { "ad_source", adSource },
-                    { "ad_id", adId },
-                    { "ad_platform", PlatformName },
-                    { "unitId", placementId },
-                    { "revenue", revenue }
-                });*/
-                if (revenue > 0)
-                {
-                    SkyAnalyticsMgr.TrackAdImpressionEvent(
-                        revenue, adSource, adId, placementId,
-                        format, PlatformName,
-                        "",
-                        formatNumber,
-                        positionNumber,
-                        currency);  // 传递货币类型
-                }
+                // 缓存业务上下文，供收入回调使用（Banner 的 pos 一直是空字符串）
+                TopOnRevenueReporter.SetRevenueContext(placementId, "", formatNumber, positionNumber);
+                /* SkyAnalyticsMgr.TrackEvent("BN_Show", new Dictionary<string, object>
+                 {
+                     { "ad_source", adSource },
+                     { "ad_id", adId },
+                     { "ad_platform", PlatformName },
+                     { "unitId", placementId },
+                     { "revenue", revenue }
+                 });*/
+                /* if (revenue > 0)//删掉原本成功回调里的上报
+                 {
+                     SkyAnalyticsMgr.TrackAdImpressionEvent(
+                         revenue, adSource, adId, placementId,
+                         format, PlatformName,
+                         "",
+                         formatNumber,
+                         positionNumber,
+                         currency);  // 传递货币类型
+                 }*/
 #if UNITY_ANDROID
                 /*SkyAnalyticsMgr.TrackEvent("Up2SDK_ToponAdShow", new Dictionary<string, object>
                 {

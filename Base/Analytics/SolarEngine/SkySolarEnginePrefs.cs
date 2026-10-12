@@ -65,5 +65,10 @@ namespace Sky
             get => CryptoPrefs.GetInt("se_elapsed_seconds", 0);
             set => CryptoPrefs.SetInt("se_elapsed_seconds", value);
         }
+        public static bool AdSpendReported
+        {
+            get => CryptoPrefs.GetBool("se_is_AdSpendReported", false);
+            set => CryptoPrefs.SetBool("se_is_AdSpendReported", value);
+        }
     }
 }
