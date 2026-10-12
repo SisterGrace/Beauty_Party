@@ -137,8 +137,8 @@ MonoBehaviour:
     FileName: assets_assetraw_uiraw_atlas_level_a367f9f045da383b01342dfade2becb0.bundle
     FileCRC32: 67971050
   - PackageName: DefaultPackage
-    FileName: assets_assetraw_uiraw_atlas_loading_141e1d2cb5bb0ddb2f218c64069f5d11.bundle
-    FileCRC32: f36111c8
+    FileName: assets_assetraw_uiraw_atlas_loading_d28e4a0d60aed90267ad0581d035e161.bundle
+    FileCRC32: 6e38580d
   - PackageName: DefaultPackage
     FileName: assets_assetraw_uiraw_atlas_newplayerpack_274ebedbf25933acad82fe9e3af03b31.bundle
     FileCRC32: 22a665ed
@@ -146,8 +146,8 @@ MonoBehaviour:
     FileName: assets_assetraw_uiraw_atlas_noad_33d4663695f2de9807001b0adc3541bd.bundle
     FileCRC32: a0d438d3
   - PackageName: DefaultPackage
-    FileName: assets_assetraw_uiraw_atlas_photos_7add4c068721068f72a4aedd8abb032e.bundle
-    FileCRC32: 688f7cdb
+    FileName: assets_assetraw_uiraw_atlas_photos_1e59fe736fec21ba718c169672a22990.bundle
+    FileCRC32: dc748778
   - PackageName: DefaultPackage
     FileName: assets_assetraw_uiraw_atlas_playgame_e8218ab6b1a3d886fd5d17297eaad7bf.bundle
     FileCRC32: 4e990822
@@ -161,8 +161,8 @@ MonoBehaviour:
     FileName: assets_assetraw_uiraw_raw_flytexture_bcef6f6eaeac79e6b4cb8557df73f942.bundle
     FileCRC32: 21662d0a
   - PackageName: DefaultPackage
-    FileName: assets_assetraw_uiraw_raw_uitexture_8c971201fc2d1d7a68b1226ad753fb59.bundle
-    FileCRC32: 4af1c3e1
+    FileName: assets_assetraw_uiraw_raw_uitexture_33d28d36991cfecfb6b9e11033b471d6.bundle
+    FileCRC32: ff569763
   - PackageName: DefaultPackage
     FileName: assets_assetraw_ui_panel_activatepass_b93c839461380cb4c4c2a826914009aa.bundle
     FileCRC32: 8a611f6f
@@ -539,8 +539,8 @@ MonoBehaviour:
     FileName: share_assets_plugins_textmesh pro_fonts_d43fc42d3c40fa902067c0b63cf065c8.bundle
     FileCRC32: 9d60f872
   - PackageName: DefaultPackage
-    FileName: share_assets_plugins_textmesh pro_resources_fonts & materials_9967ed418bf7350438206ffbb4fcf9f3.bundle
-    FileCRC32: 00137e5c
+    FileName: share_assets_plugins_textmesh pro_resources_fonts & materials_656a6a6d062cf8364ce5b88750d9329c.bundle
+    FileCRC32: cea03327
   - PackageName: DefaultPackage
     FileName: share_assets_plugins_textmesh pro_resources_sprite assets_c2a0ed5756c04195e55749849f27311a.bundle
     FileCRC32: f5870e5b
