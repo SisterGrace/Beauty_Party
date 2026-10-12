@@ -41,7 +41,7 @@ namespace Sky
                 }
 
                 // 依赖检查通过，开始拉取远程配置
-                FirebaseRemoteConfig.DefaultInstance.FetchAsync(TimeSpan.Zero)
+                FirebaseRemoteConfig.DefaultInstance.FetchAsync(TimeSpan.FromHours(12))
                     .ContinueWithOnMainThread(fetchTask =>
                     {
                         // 2. Fetch 任务异常（网络错误、超时等）

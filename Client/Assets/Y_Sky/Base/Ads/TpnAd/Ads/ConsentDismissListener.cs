@@ -28,10 +28,10 @@ namespace Sky
         /// 用户关闭 GDPR 弹窗后自动回调
         /// 此时可以安全地初始化 TopOn SDK
         /// </summary>
-        public void onConsentDismiss(ATConsentDismissInfo consentDismissInfo)
+        public void onConsentDismiss(AnyThinkAds.Api.ATConsentDismissInfo consentDismissInfo)
 
 		{
-            SkyLogUtils.Debug("[SkyTpn] onConsentDismiss() - GDPR consent handled, initializing SDK...");
+            SkyLogUtils.Debug($"[SkyTpn] onConsentDismiss() - GDPR consent handled (infoMsg='{consentDismissInfo?.infoMsg}', dismissType={consentDismissInfo?.dismissType}), initializing SDK...");
             var listener = new SkyTpnInitListener(_appId, _onSuccess, _onFail);
             AnyThinkAds.Api.ATSDKAPI.initSDK(_appId, _appKey, listener);
         }
