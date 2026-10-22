@@ -1,9 +1,7 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using TK_Engine;
-#if USE_UP2SDK
 using Sky;
-#endif
 
 namespace GameLogic
 {
@@ -16,7 +14,7 @@ namespace GameLogic
         private static int? _cachedLevel;
 
         /// <summary>
-        /// 当前关卡（首次读取走 ES3，之后走内存缓存；写入时同时更新缓存和 ES3）
+        /// 当前关卡（首次读取走 ES3，之后走内存缓存；写入时同时更新缓存、ES3 和公共属性）
         /// </summary>
         private static int CurrentLevel
         {
@@ -32,6 +30,13 @@ namespace GameLogic
             {
                 _cachedLevel = value;
                 ES3.Save(LevelKey, value);
+                
+                // 更新公共属性到 SkyAnalyticsMgr
+                var superProperties = new Dictionary<string, object>
+                {
+                    { "Level", value }
+                };
+                SkyAnalyticsMgr.SetSuperProperties(superProperties);
             }
         }
 
@@ -52,13 +57,7 @@ namespace GameLogic
             return;
 #endif
 
-#if USE_UP2SDK
-            var eventDic = new Dictionary<string, object>
-            {
-                { "Level", CurrentLevel }
-            };
-            SkySdkMgr.TrackEvent(_eventSort, eventDic);
-#endif
+            SkyAnalyticsMgr.TrackEvent(_eventSort);
         }
 
         /// <summary>
@@ -77,14 +76,7 @@ namespace GameLogic
             return;
 #endif
 
-#if USE_UP2SDK
-            var eventDic = new Dictionary<string, object>
-            {
-                { _key, _value },
-                { "Level", CurrentLevel }
-            };
-            SkySdkMgr.TrackEvent(_eventSort, eventDic);
-#endif
+            SkyAnalyticsMgr.TrackEvent(_eventSort, _key, _value);
         }
 
         /// <summary>
@@ -104,15 +96,12 @@ namespace GameLogic
             return;
 #endif
 
-#if USE_UP2SDK
             var eventDic = new Dictionary<string, object>
             {
                 { _key01, _value01 },
-                { _key02, _value02 },
-                { "Level", CurrentLevel }
+                { _key02, _value02 }
             };
-            SkySdkMgr.TrackEvent(_eventSort, eventDic);
-#endif
+            SkyAnalyticsMgr.TrackEvent(_eventSort, eventDic);
         }
 
         /// <summary>
@@ -132,12 +121,7 @@ namespace GameLogic
             return;
 #endif
 
-#if USE_UP2SDK
-            // 复制一份，避免修改调用方传入的字典
-            var finalDic = new Dictionary<string, object>(_eventDic);
-            finalDic["Level"] = CurrentLevel;
-            SkySdkMgr.TrackEvent(_eventSort, finalDic);
-#endif
+            SkyAnalyticsMgr.TrackEvent(_eventSort, _eventDic);
         }
 
         /// <summary>
@@ -150,13 +134,11 @@ namespace GameLogic
             Log.Info($"用户属性：当前金币数量={_golds}");
             return;
 #endif
-            Dictionary<string, object> eventDic = new()
+            var eventDic = new Dictionary<string, object>
             {
                 { "User_Current_Gold", _golds.ToString() }
             };
-#if USE_UP2SDK
-            SkySdkMgr.UserSet(eventDic);
-#endif
+            SkyAnalyticsMgr.UserSet(eventDic);
         }
     }
 
