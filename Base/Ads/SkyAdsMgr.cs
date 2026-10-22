@@ -231,7 +231,7 @@ namespace Sky
                 ivDidEnterFullscreen = true;
                 _adActive = true;
                 SkyInterstitialRules.Instance._videoStartTime = Time.realtimeSinceStartup;
-                SkyAnalyticsMgr.TrackEvent("IV_Show", eventValue);
+                //SkyAnalyticsMgr.TrackEvent("IV_Show", eventValue);
 #if LAUNCHER_AD
                 LauncherEvents.AdImpressionEvent(_adPos,"IV");
 #endif
@@ -378,7 +378,7 @@ namespace Sky
                 ivDidEnterFullscreen = true;
                 _adActive = true;
                 SkyInterstitialRules.Instance._videoStartTime = Time.realtimeSinceStartup;
-                SkyAnalyticsMgr.TrackEvent("IV_Show", eventValue);
+                //SkyAnalyticsMgr.TrackEvent("IV_Show", eventValue);
             };
 
             _ivCloseCallback = () =>

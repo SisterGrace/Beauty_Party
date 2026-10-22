@@ -5,7 +5,9 @@ using System.Text;
 using Sky;
 using UnityEngine;
 using UnityEngine.UI;
+#if IAP_ENABLE
 using static Sky.SkyIapH5Mgr;
+#endif
 using UnityEngine.Purchasing;
 
 public class SkyDemo : MonoBehaviour
@@ -34,7 +36,7 @@ public class SkyDemo : MonoBehaviour
         {
             SkyLogUtils.Debug("AsnUserReceived result:" + result);
         });
-
+#if IAP_ENABLE
         SkySdkMgr.RegisterPurchaseCompletionHandler((res) =>
         {
             // 购买成功
@@ -57,6 +59,7 @@ public class SkyDemo : MonoBehaviour
 
             SkyLogUtils.Debug("PurchaseCallback :"+ JsonUtility.ToJson(res));
         });
+#endif
 #if IAP_ENABLE
         SkySdkMgr.AddProductsStatic(new Dictionary<string, ProductType>()
         {
@@ -86,17 +89,19 @@ public class SkyDemo : MonoBehaviour
     string privacy = "";//"https://dtsg.grz14games.com";
     public void QueryProducts()
     {
+#if IAP_ENABLE
         SkySdkMgr.GetProductList((res,msg,orderList) =>
         {
             SkyLogUtils.Debug("GetProductList result:"+res+" msg:"+msg+" orderList:"+ JsonUtility.ToJson(orderList));
         });
+#endif
     }
 
     public void DeleteAll()
     {
         PlayerPrefs.DeleteAll();
     }
-
+#if IAP_ENABLE
     private void PurchaseCallback(SkyPurchase.Result res)
     {
         if (res.purchase_result)
@@ -115,7 +120,7 @@ public class SkyDemo : MonoBehaviour
 
         SkyLogUtils.Debug("PurchaseCallback :"+ JsonUtility.ToJson(res));
     }
-
+#endif
     // Update is called once per frame
     void Update()
     {
@@ -124,6 +129,7 @@ public class SkyDemo : MonoBehaviour
 
     public void Buy()
     {
+#if IAP_ENABLE
         var pricacy =  SkySdkMgr.GetConfigStr("PictureURL");
         SkyLogUtils.Debug("在线参数 PictureURL："+pricacy);
 #if UNITY_ANDROID
@@ -137,6 +143,7 @@ public class SkyDemo : MonoBehaviour
             SkyLogUtils.Debug("CreatePaymentOrder result:"+res+" msg:"+msg+" paymentInfos:"+ JsonUtility.ToJson(paymentInfos));
             
         });
+#endif
     }
 
     public void GetUserInfo()

@@ -8,10 +8,10 @@ namespace Sky
     public static class SkySolarEngineEvents
     {
         // 热云预置事件名（参考官方文档）
-        public const string AppStart = "_appStart";
-        public const string AppLogin = "_appLogin";
-        public const string AppPur   = "_appPur";
-        public const string AppReg   = "_appReg";
+        //public const string AppStart = "_appStart";
+        //public const string AppLogin = "_appLogin";
+        //public const string AppPur   = "_appPur";
+        //public const string AppReg   = "_appReg";
 
         #region 自定义事件
         public static void TrackEvent(string eventName)

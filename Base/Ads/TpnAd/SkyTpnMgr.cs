@@ -137,7 +137,7 @@ namespace Sky
             }
 
             //SetUMPAndAdDebugMode("CECC96A68B641E880BC8530704249FE9", "2d04bdd5-eb09-4df0-9293-250ab4990c5b");//不能两个一起测试，只能一个一个测试
-            SetTopOnDebugMode("d67a4a34-8695-49c7-9249-9d50acec3044");
+            SetTopOnDebugMode("2d04bdd5-eb09-4df0-9293-250ab4990c5b");
 
 #endif
 #if ADMOB_TEST && UNITY_ANDROID

@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using static Sky.SkyGameConfig;
+#if IAP_ENABLE
 using static Sky.SkyIapH5Mgr;
+#endif
 using static Sky.SkyProductListRequest;
 using UnityEngine;
 using UnityEngine.Purchasing;
@@ -103,12 +105,17 @@ namespace Sky
 #endif
         }
 
-        #region  支付相关
-        /// <summary>
-        /// 获取支付列表
-        /// </summary>
-        /// <param name="callback">bool 成功/失败; msg: 错误信息; List<ProductListData>: 支付列表</param>
-        public static void GetProductList(Action<bool, string, ProductListData> callback) => SkyIapH5Mgr.Instance.GetProductList(callback);
+		#region  支付相关
+#if IAP_ENABLE
+		/// <summary>
+		/// 同步支付次数到热力引擎（由 SkyIapEvents.IAPSuccess 调用）。
+		/// </summary>
+		public static void RecordPayTimes(int payTimes) => SkySolarEngineMgr.Instance.RecordPayTimes(payTimes);
+		/// <summary>
+		/// 获取支付列表
+		/// </summary>
+		/// <param name="callback">bool 成功/失败; msg: 错误信息; List<ProductListData>: 支付列表</param>
+		public static void GetProductList(Action<bool, string, ProductListData> callback) => SkyIapH5Mgr.Instance.GetProductList(callback);
 
         /// <summary>
         /// iOS为三位码，Android为2位码。iOS：CHN/USA，Android：CN/US
@@ -132,7 +139,7 @@ namespace Sky
         /// <param name="callback">回调: bool 成功/失败; msg: 错误信息; List&lt;OrderListData&gt;: 订单列表</param>
         public static void QueryOrderList(SkyQueryOrderList.Request req, Action<bool, string, SkyQueryOrder.OrderListData> callback)
             => SkyIapH5Mgr.Instance.QueryOrderList(req, callback);
-#if IAP_ENABLE
+
         /// <summary>
         /// 根据商品ID获取商品信息
         /// </summary>
@@ -158,14 +165,14 @@ namespace Sky
         /// 初始化前静态添加商品ID
         /// </summary>
         public static void AddProductsStatic(Dictionary<string, ProductType> products) => SkyIapNativeMgr.Instance.ProductDic = products;
-#endif
+
         /// <summary>
         /// 支付回调
         /// </summary>
         public static Action<SkyPurchase.Result> OnPurchaseComplete;
 
         public static void RegisterPurchaseCompletionHandler(Action<SkyPurchase.Result> _action) => OnPurchaseComplete = _action;
-
+#endif
         /// <summary>
         /// 内购是否初始化成功
         /// </summary>
@@ -194,6 +201,7 @@ namespace Sky
                 SkyIapIosOrderMgr.RemoveOrder(req.product_id);
 #endif
             }
+#if IAP_ENABLE
 			SkyIapEvents.IAPCheckingOrder(req);
 
 			if (!SkyIapH5Mgr.HasServerBackend)
@@ -202,7 +210,7 @@ namespace Sky
 				return;
 			}
 			SkyIapH5Mgr.Instance.ReportOrderReward(new SkyQueryOrder.Request(req.order_no, SkyPrefs.UserId), _callback);
-            
+#endif
         }
 #endregion
 

@@ -210,26 +210,30 @@ namespace Sky
 #endif
         }
 
-#endregion
+		#endregion
 
-        #region  公共事件属性/用户属性
-        public static void UserSet(Dictionary<string, object> dic,bool setOnce = false)
-        {
+		#region  公共事件属性/用户属性
+		public static void UserSet(Dictionary<string, object> dic, bool setOnce = false)
+		{
 #if SSThinkingData
-            SkyThinkingDataMgr.Instance.UserSet(dic, setOnce);
+    SkyThinkingDataMgr.Instance.UserSet(dic, setOnce);
 #endif
-        }
+			// 【新增】转发到热力引擎（用户属性）
+			SkySolarEngineMgr.Instance.UserSet(dic, setOnce);
+		}
 
-        public static void SetSuperProperties(Dictionary<string, object> superProperties)
-        {
+		public static void SetSuperProperties(Dictionary<string, object> superProperties)
+		{
 #if SSThinkingData
-            SkyThinkingDataMgr.Instance.SetSuperProperties(superProperties);
+    SkyThinkingDataMgr.Instance.SetSuperProperties(superProperties);
 #endif
-        }
-#endregion
+			// 【新增】转发到热力引擎（公共事件属性）
+			SkySolarEngineMgr.Instance.SetSuperProperties(superProperties);
+		}
+		#endregion
 
-        #region  登录/登出
-        public static void SetLoginAccount(string account)
+		#region  登录/登出
+		public static void SetLoginAccount(string account)
         {
 #if SSThinkingData
             SkyThinkingDataMgr.Instance.SetLoginAccount(account);
