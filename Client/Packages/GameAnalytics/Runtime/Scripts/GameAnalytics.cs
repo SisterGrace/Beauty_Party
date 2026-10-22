@@ -44,7 +44,7 @@ namespace GameAnalyticsSDK
 
         #endregion
 
-        private static bool _hasInitializeBeenCalled;
+        public static bool _hasInitializeBeenCalled;
 
         public static event EventHandler<bool> onInitialize;
         public static bool Initialized { get{ return _hasInitializeBeenCalled; } }
