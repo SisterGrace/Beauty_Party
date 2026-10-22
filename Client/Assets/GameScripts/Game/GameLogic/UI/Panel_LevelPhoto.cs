@@ -32,6 +32,13 @@ namespace GameLogic
 		if (!SDKManager.Instance.GetLevelChooseReported)
 		{
 			SDKManager.Instance.GetLevelChooseReported = true;
+			
+			// 设置图片公共属性，然后上报 Level_Choose
+			// 此时图片列表已构建完成，从第一个图片设置公共属性
+			if (_levelPhotoList != null && _levelPhotoList.datas != null && _levelPhotoList.datas.Count > 0)
+			{
+				SDKManager.Instance.SetLevelPictureProperties(_levelPhotoList.datas[0]);
+			}
 			SDKManager.Instance.LogEvent("Level_Choose", CommonEvent.ComLevelEvent);
 		}
 		// 静音主页视频，播放背景音乐
@@ -287,29 +294,44 @@ namespace GameLogic
 				mCommon.SetActive(true);
 				mAD.SetActive(false);
 				mVIP.Hide();
-				if (!_isVipBoos)
+			if (!_isVipBoos)
+			{
+				//设置AD按钮事件上报事件
+				//RV按钮上报:看视频解锁Boss关卡
+				// 设置图片公共属性（用于 RV_Button_Show 埋点）
+				if (_levelPhotoList != null && _levelPhotoList.datas != null && _levelPhotoList.datas.Count > 0)
 				{
-					//设置AD按钮事件上报事件
-					//RV按钮上报:看视频解锁Boss关卡
-					SDKManager.Instance.LogEvent("RV_Button_Show", "Position", HCRVPositionName.RV_CrushLevel.ToString());
+					SDKManager.Instance.SetLevelPictureProperties(_levelPhotoList.datas[0]);
 				}
+				SDKManager.Instance.LogEvent("RV_Button_Show", "Position", HCRVPositionName.RV_CrushLevel.ToString());
+			}
 				return;
 			}
 			_currentSelectIndex = index;
 			mCommon.SetActive(index == 0);
 			mAD.SetActive(index == 1 || index == 2);
 			mVIP.Hide();
-			if (index == 1)
+		if (index == 1)
+		{
+			//设置AD按钮事件上报事件
+			//RV按钮上报：看视频挑战精选关卡
+			// 设置图片公共属性（用于 RV_Button_Show 埋点）
+			if (_levelPhotoList != null && _levelPhotoList.datas != null && _levelPhotoList.datas.Count > 1)
 			{
-				//设置AD按钮事件上报事件
-				//RV按钮上报：看视频挑战精选关卡
-				SDKManager.Instance.LogEvent("RV_Button_Show", "Position", HCRVPositionName.RV_LevelSelect.ToString());
+				SDKManager.Instance.SetLevelPictureProperties(_levelPhotoList.datas[1]);
 			}
-			else if (index == 2)
+			SDKManager.Instance.LogEvent("RV_Button_Show", "Position", HCRVPositionName.RV_LevelSelect.ToString());
+		}
+		else if (index == 2)
+		{
+			//RV按钮上报：看视频挑战第三个精选关卡
+			// 设置图片公共属性（用于 RV_Button_Show 埋点）
+			if (_levelPhotoList != null && _levelPhotoList.datas != null && _levelPhotoList.datas.Count > 2)
 			{
-				//RV按钮上报：看视频挑战第三个精选关卡
-				SDKManager.Instance.LogEvent("RV_Button_Show", "Position", HCRVPositionName.RV_LevelSelect_2.ToString());
+				SDKManager.Instance.SetLevelPictureProperties(_levelPhotoList.datas[2]);
 			}
+			SDKManager.Instance.LogEvent("RV_Button_Show", "Position", HCRVPositionName.RV_LevelSelect_2.ToString());
+		}
 		}
 	protected override void Close()
 	{

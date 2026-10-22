@@ -159,6 +159,23 @@ namespace GameLogic
             if (!_isLogEvent_HomeShow)
             {
                 _isLogEvent_HomeShow = true;
+                
+                // 设置主页当前展示图片的公共属性（用于 Home_Show 埋点）
+                int curPhotoId = UserController.Instance.GetCurUserPhotoID;
+                if (curPhotoId > 0)
+                {
+                    var cfg = ConfigLoader.Instance.Tables.TbCfgPhotos.Get(curPhotoId);
+                    if (cfg != null)
+                    {
+                        SDKManager.Instance.SetPictureProperties(
+                            pictureId: curPhotoId,
+                            pictureType: 0,
+                            getType: 0,
+                            cardId: 0
+                        );
+                    }
+                }
+                
                 SDKManager.Instance.LogEvent("Home_Show");
             }
         }

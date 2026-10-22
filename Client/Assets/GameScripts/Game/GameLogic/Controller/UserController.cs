@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using TK_Engine;
+using UnityEditor.Sprites;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Y_Base;
@@ -1496,6 +1497,17 @@ namespace GameLogic
 
             var cfg = ConfigLoader.Instance.Tables.TbCfgPhotos.Get(id);
             if (cfg == null) return;
+            
+            // 设置图片公共属性（用于 Picture_Unlock 埋点）
+            // Picture_ID 设置为当前解锁的图片ID
+            // Picture_Type / Get_Type / Card_ID 暂时设为0（由调用方按需设置）
+            SDKManager.Instance.SetPictureProperties(
+                pictureId: id,
+                pictureType: 0,  // 使用配置表的 ContentRating 作为类型
+                getType: 0,
+                cardId: 0
+            );
+            
             //解锁一张图上报
             SDKManager.Instance.LogEvent("Picture_Unlock", CommonEvent.ComLevelEvent);
             int abType = cfg.ABGroup;
@@ -1517,6 +1529,15 @@ namespace GameLogic
             {
                 int picClick = isLike ? 1 : 2;
                 var cfg = ConfigLoader.Instance.Tables.TbCfgPhotos.Get(id);
+                
+                // 设置图片公共属性（用于 Picture_Preferences 埋点）
+                SDKManager.Instance.SetPictureProperties(
+                    pictureId: id,
+                    pictureType:0,
+                    getType: 0,
+                    cardId: 0
+                );
+                
                 SDKManager.Instance.LogEvent("Picture_Preferences", "Picture_Click", picClick, CommonEvent.ComLevelEvent);
                 phData.IsLike = isLike;
                 if (isUpdateLock)

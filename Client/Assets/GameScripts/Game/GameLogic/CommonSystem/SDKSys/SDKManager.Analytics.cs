@@ -9,9 +9,17 @@ namespace GameLogic
     {
         // ES3 存储的 Key
         private const string LevelKey = "SDK_Current_Level";
+        private const string PictureIdKey = "SDK_Picture_ID";
+        private const string PictureTypeKey = "SDK_Picture_Type";
+        private const string GetTypeKey = "SDK_Get_Type";
+        private const string CardIdKey = "SDK_Card_ID";
 
         // 内存缓存，避免每次打点都读 ES3
         private static int? _cachedLevel;
+        private static int? _cachedPictureId;
+        private static int? _cachedPictureType;
+        private static int? _cachedGetType;
+        private static int? _cachedCardId;
 
         /// <summary>
         /// 当前关卡（首次读取走 ES3，之后走内存缓存；写入时同时更新缓存、ES3 和公共属性）
@@ -30,14 +38,175 @@ namespace GameLogic
             {
                 _cachedLevel = value;
                 ES3.Save(LevelKey, value);
-                
-                // 更新公共属性到 SkyAnalyticsMgr
-                var superProperties = new Dictionary<string, object>
-                {
-                    { "Level", value }
-                };
-                SkyAnalyticsMgr.SetSuperProperties(superProperties);
+                UpdateAllSuperProperties();
             }
+        }
+
+        /// <summary>
+        /// 图片ID（Picture_ID）
+        /// </summary>
+        private static int CurrentPictureId
+        {
+            get
+            {
+                if (_cachedPictureId == null)
+                {
+                    _cachedPictureId = ES3.Load(PictureIdKey, 0);
+                }
+                return _cachedPictureId.Value;
+            }
+            set
+            {
+                _cachedPictureId = value;
+                ES3.Save(PictureIdKey, value);
+                UpdateAllSuperProperties();
+            }
+        }
+
+        /// <summary>
+        /// 图片类型（Picture_Type）：1=免费图片, 2=激励视频图片, 3=VIP图片
+        /// </summary>
+        private static int CurrentPictureType
+        {
+            get
+            {
+                if (_cachedPictureType == null)
+                {
+                    _cachedPictureType = ES3.Load(PictureTypeKey, 0);
+                }
+                return _cachedPictureType.Value;
+            }
+            set
+            {
+                _cachedPictureType = value;
+                ES3.Save(PictureTypeKey, value);
+                UpdateAllSuperProperties();
+            }
+        }
+
+        /// <summary>
+        /// 获得类型（Get_Type）：1=普通关卡1号位, 2=普通关卡2号位, 3=普通关卡3号位/Boss关, 4=金币卡包, 6=付费卡包, 7=无尽宝藏, 8=礼品包, 9=黄金狂潮, 10=梦想通行证, 11=新手礼包, 12=商城礼包
+        /// </summary>
+        private static int CurrentGetType
+        {
+            get
+            {
+                if (_cachedGetType == null)
+                {
+                    _cachedGetType = ES3.Load(GetTypeKey, 0);
+                }
+                return _cachedGetType.Value;
+            }
+            set
+            {
+                _cachedGetType = value;
+                ES3.Save(GetTypeKey, value);
+                UpdateAllSuperProperties();
+            }
+        }
+
+        /// <summary>
+        /// 卡包ID（Card_ID）：如果没有卡包ID，则为0
+        /// </summary>
+        private static int CurrentCardId
+        {
+            get
+            {
+                if (_cachedCardId == null)
+                {
+                    _cachedCardId = ES3.Load(CardIdKey, 0);
+                }
+                return _cachedCardId.Value;
+            }
+            set
+            {
+                _cachedCardId = value;
+                ES3.Save(CardIdKey, value);
+                UpdateAllSuperProperties();
+            }
+        }
+
+        /// <summary>
+        /// 统一更新所有公共属性到 SkyAnalyticsMgr
+        /// </summary>
+        private static void UpdateAllSuperProperties()
+        {
+            var superProperties = new Dictionary<string, object>
+            {
+                { "Level", CurrentLevel }
+            };
+
+            // Picture_ID: 0 视为无效值，不上报
+            if (CurrentPictureId != 0)
+            {
+                superProperties["Picture_ID"] = CurrentPictureId;
+            }
+
+            // Picture_Type: 0 视为无效值，不上报
+            if (CurrentPictureType != 0)
+            {
+                superProperties["Picture_Type"] = CurrentPictureType;
+            }
+
+            // Get_Type: 0 视为无效值，不上报
+            if (CurrentGetType != 0)
+            {
+                superProperties["Get_Type"] = CurrentGetType;
+            }
+
+            // Card_ID: 0 视为无卡包ID，上报为 null
+            if (CurrentCardId != 0)
+            {
+                superProperties["Card_ID"] = CurrentCardId;
+            }
+            else
+            {
+                superProperties["Card_ID"] = null;
+            }
+
+            SkyAnalyticsMgr.SetSuperProperties(superProperties);
+        }
+
+        /// <summary>
+        /// 设置图片相关公共属性
+        /// </summary>
+        /// <param name="pictureId">图片ID</param>
+        /// <param name="pictureType">图片类型：1=免费图片, 2=激励视频图片, 3=VIP图片</param>
+        /// <param name="getType">获得类型：1=普通关卡1号位, 2=普通关卡2号位, 3=普通关卡3号位/Boss关, 4=金币卡包, 6=付费卡包, 7=无尽宝藏, 8=礼品包, 9=黄金狂潮, 10=梦想通行证, 11=新手礼包, 12=商城礼包</param>
+        /// <param name="cardId">卡包ID，如果没有卡包ID传0</param>
+        public void SetPictureProperties(int pictureId, int pictureType, int getType, int cardId = 0)
+        {
+            CurrentPictureId = pictureId;
+            CurrentPictureType = pictureType;
+            CurrentGetType = getType;
+            CurrentCardId = cardId;
+        }
+
+        /// <summary>
+        /// 清除图片相关公共属性（用于图片事件结束后重置）
+        /// </summary>
+        public void ClearPictureProperties()
+        {
+            CurrentPictureId = 0;
+            CurrentPictureType = 0;
+            CurrentGetType = 0;
+            CurrentCardId = 0;
+        }
+
+        /// <summary>
+        /// 根据关卡选择的图片信息设置图片公共属性（Picture_ID / Picture_Type / Get_Type / Card_ID）
+        /// 在 Level_Enter / Level_Choose / Level_Success 等关卡事件上报前调用，
+        /// 保证这几个事件带上当前关卡所选的图片信息。
+        /// </summary>
+        /// <param name="photoInfo">当前关卡选择的图片信息</param>
+        public void SetLevelPictureProperties(OneSelectPhotoInfo photoInfo)
+        {
+            if (photoInfo.Id == 0) return;
+
+            // Boss关固定为 3 号位，普通关卡按索引为 1/2/3 号位
+            int getType = photoInfo.BoosLevel ? 3 : (photoInfo.Index + 1);
+            //SetPictureProperties(photoInfo.Id, photoInfo.Picture_Type, getType, 0);
+            SetPictureProperties(photoInfo.Id, 0, 0, 0);
         }
 
         /// <summary>

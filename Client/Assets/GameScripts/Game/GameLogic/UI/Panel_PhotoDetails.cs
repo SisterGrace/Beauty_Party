@@ -316,6 +316,16 @@ namespace GameLogic
 				{
 					UserController.Instance.UserConsume(ERewardType.Currency, 0, 300);
 				} */
+				
+				// 设置图片公共属性（用于 Picture_Download 埋点）
+				var cfg = ConfigLoader.Instance.Tables.TbCfgPhotos.Get(_PhotoItemInfo.Id);
+				SDKManager.Instance.SetPictureProperties(
+					pictureId: _PhotoItemInfo.Id,
+					pictureType: 0,
+					getType: 0,
+					cardId: 0
+				);
+				
 				//图片下载成功上报
 				SDKManager.Instance.LogEvent("Picture_Download", "Picture_ID", _PhotoItemInfo.Id,
 					CommonEvent.ComLevelEvent);
@@ -364,6 +374,15 @@ namespace GameLogic
 						} */
 
 						var cfg = ConfigLoader.Instance.Tables.TbCfgPhotos.Get(_PhotoItemInfo.Id);
+						
+						// 设置图片公共属性（用于 Picture_Download 埋点）
+						SDKManager.Instance.SetPictureProperties(
+							pictureId: _PhotoItemInfo.Id,
+							pictureType: 0,
+							getType: 0,
+							cardId: 0
+						);
+						
 						//图片下载成功上报
 						SDKManager.Instance.LogEvent("Picture_Download", "Picture_ID", _PhotoItemInfo.Id,
 							CommonEvent.ComLevelEvent);

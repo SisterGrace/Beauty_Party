@@ -156,13 +156,27 @@ namespace GameLogic
 			}
 			else
 			{
+				/*// 获取卡包配置，判断是金币卡包还是付费卡包
+				var gachaCfg = ConfigLoader.Instance.Tables.TbCfgGacha.GetOrDefault(packId);
+				int getType = (gachaCfg != null && gachaCfg.VIPLock) ? 6 : 4; // 6=付费卡包, 4=金币卡包
+				
+				// 获取图片配置，判断图片类型
+				var photoCfg = ConfigLoader.Instance.Tables.TbCfgPhotos.Get(result.PhotoId);
+				int pictureType = 1; // 默认为免费图片
+				// TODO: 需要根据实际业务逻辑判断是免费(1)、激励视频(2)还是VIP(3)图片
+				// 这里暂时根据 VIPLock 推测，实际可能需要其他字段
+				if (gachaCfg != null && gachaCfg.VIPLock)
+				{
+					pictureType = 3; // VIP卡包的图=VIP图片
+				}*/
+				
 				UserController.Instance.AddUserPhotoData(result.PhotoId, 1);
 				_ownedPhotos.Add(result.PhotoId);
 			}
 
 			UserController.Instance.SetLuckyDrawCount++;
 
-			var photoCfg = ConfigLoader.Instance.Tables.TbCfgPhotos.Get(result.PhotoId);
+			//var photoCfg = ConfigLoader.Instance.Tables.TbCfgPhotos.Get(result.PhotoId);
 			//SDKManager.Instance.LogCommonEvent(CommonEvent.ComLevelEvent);
 		}
 

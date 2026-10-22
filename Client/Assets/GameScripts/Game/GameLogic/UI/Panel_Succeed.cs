@@ -49,14 +49,18 @@ namespace GameLogic
 		private bool _dowaloadComplete;
 		protected override void OnRefresh()
 		{
-			_isAnim = false;
-			_isLike = false;
-			_dowaloadComplete = false;
-			UpdateInfo();
-			
-			//关卡成功上报
-			SDKManager.Instance.LogEvent("Level_Success",CommonEvent.ComLevelEvent);
-			//关卡结束
+		_isAnim = false;
+		_isLike = false;
+		_dowaloadComplete = false;
+		UpdateInfo();
+		
+		// 设置图片公共属性，然后上报 Level_Success
+		_selectPhotoInfo = LevelController.Instance.CurLevelSelectPhotoInfo;
+		SDKManager.Instance.SetLevelPictureProperties(_selectPhotoInfo);
+		
+		//关卡成功上报
+		SDKManager.Instance.LogEvent("Level_Success",CommonEvent.ComLevelEvent);
+		//关卡结束
 			SDKManager.Instance.LogEvent("Level_End",new Dictionary<string, object>()
 			{
 				{"Level_Time",LevelController.Instance.GetGameTime(TimeUtil.GetTimeStamp())},
@@ -268,6 +272,16 @@ private void SetLikeIcon()
 					//更新按钮显示
 					UpdateDownloadBtnStatus(true);
 				}
+				
+				// 设置图片公共属性（用于 Picture_Download 埋点）
+				var cfg = ConfigLoader.Instance.Tables.TbCfgPhotos.Get(_selectPhotoInfo.Id);
+				SDKManager.Instance.SetPictureProperties(
+					pictureId: _selectPhotoInfo.Id,
+					pictureType: 0,
+					getType: 0,
+					cardId: 0
+				);
+				
 				//图片和视频下载成功上报
 				SDKManager.Instance.LogEvent("Picture_Download", "Picture_ID", _selectPhotoInfo.Id,
 					new CommonEvent(UserController.Instance.Level-1));
@@ -310,6 +324,16 @@ private void SetLikeIcon()
 							//更新按钮显示
 							UpdateDownloadBtnStatus(true);
 						}
+						
+						// 设置图片公共属性（用于 Picture_Download 埋点）
+						var cfg = ConfigLoader.Instance.Tables.TbCfgPhotos.Get(_selectPhotoInfo.Id);
+						SDKManager.Instance.SetPictureProperties(
+							pictureId: _selectPhotoInfo.Id,
+							pictureType:0,
+							getType: 0,
+							cardId: 0
+						);
+						
 						//图片下载成功上报
 						SDKManager.Instance.LogEvent("Picture_Download", "Picture_ID", _selectPhotoInfo.Id,
 							new CommonEvent(UserController.Instance.Level-1));

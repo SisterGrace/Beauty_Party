@@ -601,6 +601,16 @@ namespace GameLogic
             if (isWin)
             {
                 UserController.Instance.Level++;
+                
+                // 设置图片公共属性（用于埋点）
+                int getType = CurLevelSelectPhotoInfo.BoosLevel ? 3 : (CurLevelSelectPhotoInfo.Index + 1); // Boss关=3号位，普通关=1/2/3号位
+                SDKManager.Instance.SetPictureProperties(
+                    pictureId: CurLevelSelectPhotoInfo.Id,
+                    pictureType: 0,
+                    getType: 0,
+                    cardId: 0  // 关卡获得没有卡包ID
+                );
+                
                 //添加图片
                 UserController.Instance.AddUserPhotoData(CurLevelSelectPhotoInfo.Id, 0, isisDownload);
                 SDKManager.Instance.GetLevelChooseReported = false;

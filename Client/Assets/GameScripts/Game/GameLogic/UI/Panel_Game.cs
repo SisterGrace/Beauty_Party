@@ -72,7 +72,11 @@ namespace GameLogic
 		//mLevelName.gameObject.Hide();
 		_isPropAnim = false;
 		GamePanelShow();
+		
+		// 设置图片公共属性，然后上报 Level_Enter
+		SDKManager.Instance.SetLevelPictureProperties(_selectPhotoInfo);
 		SDKManager.Instance.LogEvent("Level_Enter",CommonEvent.ComLevelEvent);
+		
 		// 静音主页视频，播放背景音乐
 		VideoAudioHelper.SwitchToPage(this.WindowName);
 		AudioManager.Play(TK_Engine.AudioType.Music, AudioDef.BGM1, false, true);
