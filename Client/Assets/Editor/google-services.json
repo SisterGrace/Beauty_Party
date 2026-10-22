@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "15261539171",
+    "project_id": "gorgeous-girl-match-3",
+    "storage_bucket": "gorgeous-girl-match-3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:15261539171:android:d7ac826997d06c8add5156",
+        "android_client_info": {
+          "package_name": "com.gorgeousgirl.match3.fishi"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBGBO71VmmExcwzu2t1CXg30R1LMEsKNkk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
