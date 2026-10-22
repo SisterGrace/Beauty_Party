@@ -221,7 +221,7 @@ namespace Sky
                 string launchType = SkySplashAdsMgr.Instance != null ? SkySplashAdsMgr.Instance.CurrentLaunchType : "unknown";
                 // 缓存业务上下文，供收入回调使用（Splash 的 pos 是启动类型）
                 TopOnRevenueReporter.SetRevenueContext(placementId, launchType, formatNumber, positionNumber);
-                SkySplashAdsMgr.TrackSplashEvent("SP_Show", new Dictionary<string, object>
+               /* SkySplashAdsMgr.TrackSplashEvent("SP_Show", new Dictionary<string, object>
                 {
                     //{ "launch_type", launchType },  // 多余参数，已注释
                     { "ad_platform", PlatformName },
@@ -230,7 +230,7 @@ namespace Sky
                     { "ad_ecpm", revenue*1000 }
                     //{ "unitId", placementId },  // 多余参数，已注释
                     //{ "revenue", revenue }  // 多余参数，已注释，统一用 ad_ecpm
-                });
+                });*/
                 /* if (revenue > 0)
                  {
                      SkyAnalyticsMgr.TrackAdImpressionEvent(//删掉成功展示的收入上报

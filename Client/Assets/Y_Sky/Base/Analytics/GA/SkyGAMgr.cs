@@ -31,7 +31,7 @@ namespace Sky
 			LogTool.DebugLog("GA_gameKey=" + gamekey + "GA_secretKey=" + secretkey + " Application.version=" + Application.version, LogTool.Color.yellow);
 			//GameAnalytics.Initialize();
 			GA_Wrapper.SetBuild(Application.version);
-			try { GA_Wrapper.Initialize(gamekey, secretkey); }
+			try { GA_Wrapper.Initialize(gamekey, secretkey); GameAnalytics._hasInitializeBeenCalled = true; }
 			catch (Exception e) { LogTool.DebugLog("GA_Wrapper.Initialize 异常，可能是缺少Setting.assets文件: " + e.ToString()); }
 			//LogTool.DebugLog("GA_gameKey=" + gamekey + "GA_secretKey=" + secretkey + " Application.version=" + Application.version, LogTool.Color.yellow);
 			_isInitialized = true;

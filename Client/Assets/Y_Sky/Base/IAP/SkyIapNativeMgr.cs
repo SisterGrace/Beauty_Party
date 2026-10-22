@@ -1021,8 +1021,8 @@ namespace Sky
 
             // IDetailedStoreListener 时 Unity IAP 会直接调用本两参数重载，不会走单参数重载，故在此补上埋点与回调
             SkyAnalyticsMgr.TrackEvent("Purchase_Init_Fail", new Dictionary<string, object> { { "fail_reason", error.ToString() }, { "message", message ?? "" } });
-            SkySdkMgr.OnPurchaseInitComplete?.Invoke(false, string.IsNullOrEmpty(message) ? error.ToString() : message);
-        }
+			SkySdkMgr.OnPurchaseInitComplete?.Invoke(false, $"ErrorEnum: {error.ToString()}, Msg: {message}");
+		}
 
         public void OnPurchaseFailed(Product product, PurchaseFailureReason failureDescription)
         {

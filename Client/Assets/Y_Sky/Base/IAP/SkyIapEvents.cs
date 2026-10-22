@@ -222,11 +222,14 @@ namespace Sky
                 {
                     { "user_first_pay_time", DateTime.Now }
                 },true);
+				SkyPrefs.SetInt("PAY_TIME", payTimes);
 
-            }
+				// 【新增】同步到热力引擎的公共属性 pay_times
+				SkySdkMgr.RecordPayTimes(payTimes);
+			}
 
-            SkyPrefs.SetInt("PAY_TIME", payTimes);
-        }
+           
+		}
 
         public static void IAPFail(string productName, string productID, string orderID, 
             string orderNo,string currency, string price,

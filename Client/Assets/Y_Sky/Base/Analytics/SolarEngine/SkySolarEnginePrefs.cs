@@ -5,7 +5,12 @@ namespace Sky
 {
     public static class SkySolarEnginePrefs
     {
-        public static bool HasAttribution
+		public static int PayTimes
+		{
+			get => CryptoPrefs.GetInt("se_pay_times", 0);
+			set => CryptoPrefs.SetInt("se_pay_times", value);
+		}
+		public static bool HasAttribution
         {
             get => CryptoPrefs.GetBool("se_has_attribution", false);
             set => CryptoPrefs.SetBool("se_has_attribution", value);

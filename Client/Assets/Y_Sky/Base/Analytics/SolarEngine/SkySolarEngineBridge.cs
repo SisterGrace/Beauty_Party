@@ -8,7 +8,49 @@ namespace Sky
     internal static class SkySolarEngineBridge
     {
         private const string ProxyClass = "com.unity3d.player.SolarEngineProxy";
-        public static string GetDistinctId()
+		public static void SetSuperProperties(string propsJson)
+		{
+#if UNITY_ANDROID && !UNITY_EDITOR
+            try
+            {
+                using var proxy = new AndroidJavaClass(ProxyClass);
+                proxy.CallStatic("setSuperProperties", propsJson ?? "{}");
+            }
+            catch (System.Exception e)
+            {
+                LogTool.Error("[SolarEngine] SetSuperProperties exception: " + e);
+            }
+#endif
+		}
+		public static void UserUpdate(string propsJson)
+		{
+#if UNITY_ANDROID && !UNITY_EDITOR
+            try
+            {
+                using var proxy = new AndroidJavaClass(ProxyClass);
+                proxy.CallStatic("userUpdate", propsJson ?? "{}");
+            }
+            catch (System.Exception e)
+            {
+                LogTool.Error("[SolarEngine] UserUpdate exception: " + e);
+            }
+#endif
+		}
+		public static void UserInit(string propsJson)
+		{
+#if UNITY_ANDROID && !UNITY_EDITOR
+            try
+            {
+                using var proxy = new AndroidJavaClass(ProxyClass);
+                proxy.CallStatic("userInit", propsJson ?? "{}");
+            }
+            catch (System.Exception e)
+            {
+                LogTool.Error("[SolarEngine] UserInit exception: " + e);
+            }
+#endif
+		}
+		public static string GetDistinctId()
         {
 #if UNITY_ANDROID && !UNITY_EDITOR
     try

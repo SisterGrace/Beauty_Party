@@ -105,13 +105,17 @@ namespace Sky
 #endif
         }
 
-        #region  支付相关
+		#region  支付相关
 #if IAP_ENABLE
-        /// <summary>
-        /// 获取支付列表
-        /// </summary>
-        /// <param name="callback">bool 成功/失败; msg: 错误信息; List<ProductListData>: 支付列表</param>
-        public static void GetProductList(Action<bool, string, ProductListData> callback) => SkyIapH5Mgr.Instance.GetProductList(callback);
+		/// <summary>
+		/// 同步支付次数到热力引擎（由 SkyIapEvents.IAPSuccess 调用）。
+		/// </summary>
+		public static void RecordPayTimes(int payTimes) => SkySolarEngineMgr.Instance.RecordPayTimes(payTimes);
+		/// <summary>
+		/// 获取支付列表
+		/// </summary>
+		/// <param name="callback">bool 成功/失败; msg: 错误信息; List<ProductListData>: 支付列表</param>
+		public static void GetProductList(Action<bool, string, ProductListData> callback) => SkyIapH5Mgr.Instance.GetProductList(callback);
 
         /// <summary>
         /// iOS为三位码，Android为2位码。iOS：CHN/USA，Android：CN/US
