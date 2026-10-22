@@ -33,7 +33,7 @@ namespace Sky
             eventData.AddIfNotExists("product_id", productId);
             eventData.AddIfNotExists("Currency", currency);
             eventData.AddIfNotExists("Price", fPrice);
-            SkyAnalyticsMgr.TrackEvent("IAP_Button_Show", eventData);
+            //SkyAnalyticsMgr.TrackEvent("IAP_Button_Show", eventData);
         }
         // 创建订单上报
         public static void IAPCreateOrder(string productName, string productDesc,string productID, string currency, string price, string gameExtra)
@@ -135,13 +135,13 @@ namespace Sky
                 fPrice = 0.0f;
             }
 
-            SkyAnalyticsMgr.TrackEvent("IAP_Button_Show", new Dictionary<string, object>
+           /* SkyAnalyticsMgr.TrackEvent("IAP_Button_Show", new Dictionary<string, object>
             {
                 { "IAP", productName },
                 { "product_id", productID },
                 { "Currency", currency },
                 { "Price", fPrice }
-            });
+            });*/
         }
 
         public static void IAPBtnClick(string eventName, string productName, string productID, string currency, string price,

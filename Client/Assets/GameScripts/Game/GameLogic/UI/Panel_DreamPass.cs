@@ -35,7 +35,7 @@ namespace GameLogic
 		_isOpenCountDown = _activityData.EndTime > 0;
 		CreatPassItemList();
 		UpdataInfo();
-		SDKManager.Instance.LogEvent("Pass_Show");
+		//SDKManager.Instance.LogEvent("Pass_Show");
 		// 静音主页视频，播放背景音乐
 		VideoAudioHelper.SwitchToPage(this.WindowName);
 		AudioManager.Play(TK_Engine.AudioType.Music, AudioDef.BGM1, false, true);

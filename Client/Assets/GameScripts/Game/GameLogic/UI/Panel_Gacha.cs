@@ -74,7 +74,7 @@ namespace GameLogic
 		GachaController.Instance.InitPhotoPacks();
 		CreatePhotoPackList();
 		InitCarouselEffect();
-		SDKManager.Instance.LogEvent("Draw_Show");
+		//SDKManager.Instance.LogEvent("Draw_Show");
 		_isHomePanel = GameModule.UI.HasWindow<Panel_Home>();
 		if (_isHomePanel)
 		{

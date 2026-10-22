@@ -109,6 +109,7 @@ namespace GameLogic
 
         private void OnTriggerGuideSDKEvent(int guideId)
         {
+            return;
             switch (guideId)
             {
                 case 101:

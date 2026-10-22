@@ -60,7 +60,7 @@ namespace GameLogic
 					{"Level_Time",LevelController.Instance.GetGameTime(TimeUtil.GetTimeStamp())},
 					{"End_Type",2}
 				},CommonEvent.ComLevelEvent);
-				SDKManager.Instance.LogEvent("Level_Fail",CommonEvent.ComLevelEvent);
+				//SDKManager.Instance.LogEvent("Level_Fail",CommonEvent.ComLevelEvent);
 				GameModule.UI.CloseUI<Panel_Game>();
 				GameModule.UI.ShowUI<Panel_Home>();
 				if (!_isGetFailPack)

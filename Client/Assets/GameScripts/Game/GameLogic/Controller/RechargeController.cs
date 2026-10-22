@@ -555,7 +555,7 @@ namespace GameLogic
             {
                 rechargeInfo = GetRechargeInfo(rechargeId);
             }
-            SDKManager.Instance.LogEvent("IAP_Button_Show", "IAP", rechargeInfo.EventID);
+            //SDKManager.Instance.LogEvent("IAP_Button_Show", "IAP", rechargeInfo.EventID);
         }
     }
 

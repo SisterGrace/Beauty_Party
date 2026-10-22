@@ -51,7 +51,7 @@ namespace GameLogic
             }
             _itemPos.Swap(2, 3);
             GameEvent.Send(TKEventType.MainHomeAnim,false);
-            SDKManager.Instance.LogEvent("Endless_Show");
+            //SDKManager.Instance.LogEvent("Endless_Show");
             // 静音主页视频，播放背景音乐
             VideoAudioHelper.SwitchToPage(this.WindowName);
             AudioManager.Play(TK_Engine.AudioType.Music, AudioDef.BGM1, false, true);

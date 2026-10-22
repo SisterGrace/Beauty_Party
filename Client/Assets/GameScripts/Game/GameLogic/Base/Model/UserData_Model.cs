@@ -239,10 +239,10 @@ namespace GameLogic
                     if (!BuyCount.Contains(passCfgs[i].Id))
                     {
                         BuyCount.Add(passCfgs[i].Id);
-                        SDKManager.Instance.LogEvent("Pass_Level_Unlock", new Dictionary<string, object>()
+                        /*SDKManager.Instance.LogEvent("Pass_Level_Unlock", new Dictionary<string, object>()
                         {
                             { "Pass_Level", passCfgs[i].Id }
-                        });
+                        });*/
                     }
                 }
                 if (level <= passCfgs[i].NeedKeyCount)

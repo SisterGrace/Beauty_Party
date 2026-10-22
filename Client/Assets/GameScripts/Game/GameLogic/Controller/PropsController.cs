@@ -101,7 +101,7 @@ namespace GameLogic
 
                 if (isConsume)
                 {
-                    SDKManager.Instance.LogEvent("Use_Prop", "Prop_Name", type.ToString(), "IS_Frist_Prop", propInfo.IsFirst);
+                    //SDKManager.Instance.LogEvent("Use_Prop", "Prop_Name", type.ToString(), "IS_Frist_Prop", propInfo.IsFirst);
                     callback?.Invoke();
                     //对于非助推器道具，次数减一
                     int reduceNum = -1;
@@ -197,7 +197,7 @@ namespace GameLogic
             foreach (var item in _boosterProps)
             {
                 reduceNum = -item.Num;
-                SDKManager.Instance.LogEvent("Use_Prop", "Prop_Name", item.Type.ToString(), "IS_Frist_Prop", GetCurPropsInfo(item.Type).IsFree);
+                //SDKManager.Instance.LogEvent("Use_Prop", "Prop_Name", item.Type.ToString(), "IS_Frist_Prop", GetCurPropsInfo(item.Type).IsFree);
                 UserController.Instance.SetOneProp(item.Type, reduceNum);
             }
         }
