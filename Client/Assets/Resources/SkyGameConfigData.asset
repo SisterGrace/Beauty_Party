@@ -13,18 +13,18 @@ MonoBehaviour:
   m_Name: SkyGameConfigData
   m_EditorClassIdentifier: 
   analyticsConfig:
-    AdmobAppID_Android: 
+    AdmobAppID_Android: ca-app-pub-6527369457594416~1861247045
     AdmobAppID_iOS: 
-    GA_Game_key: 
-    GA_Secret_key: 
-    reyun_ID: 
+    GA_Game_key: bd97383a8f42ee93fd30a0093ded10f0
+    GA_Secret_key: 1dfba76184172ea9b559808fa4e988cd5a919ba7
+    reyun_ID: bc7259b9af5c41ad
   toponLocalConfig:
-    appId: 
-    appKey: 
-    interstitialPlacementId: 
-    rewardedPlacementId: 
-    bannerPlacementId: 
-    splashPlacementId: 
+    appId: h6ad1953091a52
+    appKey: afa7efd20cfb52ef6f296fb0f62170b74
+    interstitialPlacementId: n1hnn3orri60s
+    rewardedPlacementId: n1hnn3orri5ru4
+    bannerPlacementId: n1hnn3orri5md4
+    splashPlacementId: n1hnn3orri5b56
   mtgLocalConfig:
     appId: 
     appKey: 
