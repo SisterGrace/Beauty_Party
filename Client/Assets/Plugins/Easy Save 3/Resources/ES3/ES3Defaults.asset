@@ -31,6 +31,7 @@ MonoBehaviour:
     assemblyNames:
     - GameLogic
     - EasySave3.Runtime
+    - CoreLite
     - GameMain
     - TK_Engine.Runtime
     - GameAnalyticsSDK
@@ -51,7 +52,6 @@ MonoBehaviour:
     - Coffee.UIParticle
     - TPN
     - TK_Engine.Editor
-    - CoreLite
     - AVProVideo.Editor
     - spine-unity
     - UniTask.Linq
@@ -59,7 +59,6 @@ MonoBehaviour:
     - ThinkingSDK
     - AllIn1SpriteShaderAssembly
     - Assembly-CSharp-firstpass
-    - SkyEditor
     - NativeGallery.Editor
     - AVProVideo.Runtime
     - GameAnalyticsSDK.Editor
@@ -70,7 +69,6 @@ MonoBehaviour:
     - StompyRobot.SRDebugger.Editor
     - ThinkupTpnPlugin.Script.Editor
     - Vibration.Runtime
-    - SkyTopOnAdEditor
     - Coffee.SoftMaskForUGUI
     - GUPS.Obfuscator
     - Coffee.UIParticle.Editor
@@ -83,11 +81,12 @@ MonoBehaviour:
     - AVProVideo.Extensions.Timeline
     - UniTask.Addressables
     - GUPS.Editor
-    - SkyFirebaseEditor
     - Coffee.UnmaskForUGUI
     - UniTask.Editor
     - FirebaseMessagingActivityGenerator
+    - SkyFirebaseEditor
     - AVProVideo.Extensions.VisualEffectGraph
+    - SkyTopOnAdEditor
     - AVProVideo.Extensions.UnityUI
     - UniTask.DOTween
     - _AVProVideo.Extensions.VideoPlayer
