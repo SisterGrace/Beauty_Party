@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: SkyGameConfigData
   m_EditorClassIdentifier: 
   analyticsConfig:
-    AdmobAppID_Android: ca-app-pub-6527369457594416~1861247045
+    AdmobAppID_Android: ca-app-pub-3940256099942544~3347511713
     AdmobAppID_iOS: 
     GA_Game_key: bd97383a8f42ee93fd30a0093ded10f0
     GA_Secret_key: 1dfba76184172ea9b559808fa4e988cd5a919ba7
@@ -32,6 +32,11 @@ MonoBehaviour:
     interstitialUnitId: 
     rewardedPlacementId: 
     rewardedUnitId: 
+  admobLocalConfig:
+    rewardedUnitIds: ca-app-pub-3940256099942544/5224354917
+    interstitialUnitIds: ca-app-pub-3940256099942544/1033173712
+    splashUnitIds: ca-app-pub-3940256099942544/9257395921
+    bannerUnitId: ca-app-pub-3940256099942544/6300978111
   serverConfig:
     BaseUrl: 
     AsnUrl: 
