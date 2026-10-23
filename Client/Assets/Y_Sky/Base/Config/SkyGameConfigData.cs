@@ -68,6 +68,23 @@ public class SkyMtgLocalConfig
 }
 
 /// <summary>
+/// AdMob 广告位 ID 配置，由宿主在 SkyGameConfigData 资源中填写。
+/// 支持多广告位（逗号或分号分隔），用于与 TopOn 并行竞价。
+/// </summary>
+[Serializable]
+public class SkyAdmobLocalConfig
+{
+    [Header("激励视频广告位（多广告位用逗号分隔）")]
+    public string rewardedUnitIds = "";
+    [Header("插屏广告位（多广告位用逗号分隔）")]
+    public string interstitialUnitIds = "";
+    [Header("开屏广告位（多广告位用逗号分隔）")]
+    public string splashUnitIds = "";
+    [Header("Banner 广告位")]
+    public string bannerUnitId = "";
+}
+
+/// <summary>
 /// UP2（FineRoas）SDK 的 Application 启动参数，由宿主在 SkyGameConfigData 资源中填写；
 /// 构建 Android 时会写入 AndroidManifest 的 meta-data，供 Up2Application 在 attachBaseContext 阶段读取。
 /// </summary>
@@ -92,6 +109,8 @@ public class SkyGameConfigData : ScriptableObject
     public SkyToponLocalConfig toponLocalConfig = new SkyToponLocalConfig();
     [Header("MTG（Mintegral）— 本地广告参数")]
     public SkyMtgLocalConfig mtgLocalConfig = new SkyMtgLocalConfig();
+    [Header("AdMob — 本地广告参数")]
+    public SkyAdmobLocalConfig admobLocalConfig = new SkyAdmobLocalConfig();
     [Space(10)]
     [Header("服务器配置")]
     public ServerConfig serverConfig;
@@ -196,5 +215,70 @@ public class SkyGameConfigData : ScriptableObject
     public string GetGA_secretKey()
     {
         return analyticsConfig.GA_Secret_key;
+    }
+
+    /// <summary>
+    /// 获取 AdMob 激励视频广告位列表（解析逗号/分号分隔的字符串）
+    /// </summary>
+    public List<string> GetAdmobRewardedUnits()
+    {
+        if (string.IsNullOrEmpty(admobLocalConfig.rewardedUnitIds))
+            return new List<string>();
+        
+        var separators = new char[] { ',', ';', '，', '；' }; // 支持中英文分隔符
+        var units = new List<string>();
+        foreach (var id in admobLocalConfig.rewardedUnitIds.Split(separators))
+        {
+            var trimmed = id.Trim();
+            if (!string.IsNullOrEmpty(trimmed))
+                units.Add(trimmed);
+        }
+        return units;
+    }
+
+    /// <summary>
+    /// 获取 AdMob 插屏广告位列表（解析逗号/分号分隔的字符串）
+    /// </summary>
+    public List<string> GetAdmobInterstitialUnits()
+    {
+        if (string.IsNullOrEmpty(admobLocalConfig.interstitialUnitIds))
+            return new List<string>();
+        
+        var separators = new char[] { ',', ';', '，', '；' };
+        var units = new List<string>();
+        foreach (var id in admobLocalConfig.interstitialUnitIds.Split(separators))
+        {
+            var trimmed = id.Trim();
+            if (!string.IsNullOrEmpty(trimmed))
+                units.Add(trimmed);
+        }
+        return units;
+    }
+
+    /// <summary>
+    /// 获取 AdMob 开屏广告位列表（解析逗号/分号分隔的字符串）
+    /// </summary>
+    public List<string> GetAdmobSplashUnits()
+    {
+        if (string.IsNullOrEmpty(admobLocalConfig.splashUnitIds))
+            return new List<string>();
+        
+        var separators = new char[] { ',', ';', '，', '；' };
+        var units = new List<string>();
+        foreach (var id in admobLocalConfig.splashUnitIds.Split(separators))
+        {
+            var trimmed = id.Trim();
+            if (!string.IsNullOrEmpty(trimmed))
+                units.Add(trimmed);
+        }
+        return units;
+    }
+
+    /// <summary>
+    /// 获取 AdMob Banner 广告位（单个）
+    /// </summary>
+    public string GetAdmobBannerUnit()
+    {
+        return admobLocalConfig.bannerUnitId?.Trim() ?? "";
     }
 }

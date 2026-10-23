@@ -30,10 +30,20 @@
         "com.google.external-dependency-manager": "1.2.168"
       }
     },
-    "com.google.external-dependency-manager": {
-      "version": "file:../GA/com.google.external-dependency-manager-1.2.187.tgz",
+    "com.google.ads.mobile": {
+      "version": "11.6.0",
       "depth": 0,
-      "source": "local-tarball",
+      "source": "registry",
+      "dependencies": {
+        "com.unity.external-dependency-manager": "2.1.0",
+        "com.unity.modules.androidjni": "1.0.0"
+      },
+      "url": "https://package.openupm.com"
+    },
+    "com.google.external-dependency-manager": {
+      "version": "file:com.google.external-dependency-manager",
+      "depth": 0,
+      "source": "embedded",
       "dependencies": {}
     },
     "com.tuyoogame.yooasset": {
@@ -79,6 +89,15 @@
       "depth": 2,
       "source": "registry",
       "dependencies": {},
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.external-dependency-manager": {
+      "version": "2.1.0",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.modules.uielements": "1.0.0"
+      },
       "url": "https://packages.unity.com"
     },
     "com.unity.feature.development": {

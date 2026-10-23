@@ -5,6 +5,8 @@
     <package>androidx.appcompat:appcompat:1.6.1</package>
     <package>androidx.browser:browser:1.4.0</package>
     <package>androidx.constraintlayout:constraintlayout:2.1.4</package>
+    <package>androidx.fragment:fragment:1.7.1</package>
+    <package>androidx.lifecycle:lifecycle-process:2.6.2</package>
     <package>androidx.media3:media3-exoplayer:1.4.1</package>
     <package>androidx.media3:media3-ui:1.4.1</package>
     <package>androidx.recyclerview:recyclerview:1.1.0</package>
@@ -14,6 +16,7 @@
     <package>com.chartboost:chartboost-mediation-sdk:5.3.0</package>
     <package>com.chartboost:chartboost-sdk:9.12.0</package>
     <package>com.facebook.android:audience-network-sdk:6.21.0</package>
+    <package>com.google.android.gms:play-services-ads:25.5.0</package>
     <package>com.google.android.gms:play-services-ads-identifier:18.0.1</package>
     <package>com.google.android.gms:play-services-ads-identifier:18.2.0</package>
     <package>com.google.android.gms:play-services-appset:16.0.2</package>
@@ -21,6 +24,7 @@
     <package>com.google.android.gms:play-services-basement:18.1.0</package>
     <package>com.google.android.instantapps:instantapps:1.1.0</package>
     <package>com.google.android.material:material:1.2.1</package>
+    <package>com.google.android.ump:user-messaging-platform:4.0.0</package>
     <package>com.google.firebase:firebase-analytics:23.0.0</package>
     <package>com.google.firebase:firebase-analytics-unity:13.6.0</package>
     <package>com.google.firebase:firebase-app-unity:13.6.0</package>
@@ -81,15 +85,11 @@
   <settings>
     <setting name="androidAbis" value="arm64-v8a,armeabi-v7a" />
     <setting name="bundleId" value="com.gorgeousgirl.match3.fishi" />
-    <setting name="explodeAars" value="True" />
     <setting name="gradleBuildEnabled" value="True" />
     <setting name="gradlePropertiesTemplateEnabled" value="True" />
     <setting name="gradleTemplateEnabled" value="True" />
-    <setting name="installAndroidPackages" value="True" />
     <setting name="localMavenRepoDir" value="Assets/GeneratedLocalRepo" />
-    <setting name="packageDir" value="Assets/Plugins/Android" />
     <setting name="patchAndroidManifest" value="True" />
-    <setting name="patchMainTemplateGradle" value="True" />
     <setting name="projectExportEnabled" value="False" />
     <setting name="useFullCustomMavenRepoPathWhenExport" value="True" />
     <setting name="useFullCustomMavenRepoPathWhenNotExport" value="False" />

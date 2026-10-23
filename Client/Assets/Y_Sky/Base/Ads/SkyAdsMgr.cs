@@ -11,6 +11,7 @@ namespace Sky
         public bool _adActive = false;
         public string _rvPos = "";
         public string _ivPos = "";
+        public string _spPos = ""; // 开屏广告位置
         public string _nativePos = "";
         public string _nativeFullscreenPos = "";
         public string _nativeSmallPos = "";
@@ -20,6 +21,7 @@ namespace Sky
         public Action<Dictionary<string, object>> _rvCloseCallback;
         public Action<Dictionary<string, object>> _rvShowFailCallback;
         public Action _ivCloseCallback;
+        public Action _spCloseCallback; // 开屏关闭回调
         public Action _nativeFullscreenCloseCallback;
         private List<ISkyAdService> _adNetworks = new List<ISkyAdService>();
 
@@ -55,6 +57,10 @@ namespace Sky
 #if TPN_AD
             _adNetworks.Add(SkyTpnMgr.Instance);
 #endif
+#if ADMOB_AD
+            // 与 TopOn 并行竞价：AdMob 直连，不经过 TopOn 适配器
+            _adNetworks.Add(SkyAdmobMgr.Instance);
+#endif
 #if LAUNCHER_AD  // 新增
             _adNetworks.Add(SkyLauncherMgr.Instance);
 #endif
@@ -71,6 +77,12 @@ namespace Sky
                 if (network is SkyTpnMgr tpnMgr)
                 {
                     tpnMgr.ReloadAdUnits();
+                }
+#endif
+#if ADMOB_AD
+                if (network is SkyAdmobMgr admobMgr)
+                {
+                    admobMgr.ReloadAdUnits();
                 }
 #endif
                 // 如果有其他平台，在此扩展
@@ -638,6 +650,8 @@ namespace Sky
         private List<SkyAdsBidResult> SelectBestAds(SkyAdsType type)
         {
             var results = new List<SkyAdsBidResult>();
+            ISkyAdService admobClient = null;
+            bool admobAvailable = false;
 
             foreach (var client in _adNetworks)
             {
@@ -690,6 +704,17 @@ namespace Sky
                     continue;
 
                 SkyLogUtils.Debug($" [ads] Get {client.ClientName} {type} price: {revenue}");
+
+#if ADMOB_AD
+                // AdMob 在 Load 阶段拿不到 eCPM，revenue 是「上一次展示」的价格，没有记录时为 0
+                if (client.PlatformType == SkyPlatformType.Admob)
+                {
+                    admobClient = client;
+                    admobAvailable = true;
+                    SkyLogUtils.Debug($" [ads] AdMob {type} 使用上一次展示 eCPM: {revenue}（无历史记录则为 0）");
+                }
+#endif
+
                 results.Add(new SkyAdsBidResult
                 {
                     ClientName = client.ClientName,
@@ -707,6 +732,37 @@ namespace Sky
                 var bestAd = results[0];
                 SkyLogUtils.Info($" [ads] Best {type} ad: {bestAd.ClientName}, Revenue: {bestAd.Revenue}");
             }
+
+#if ADMOB_AD
+            // AdMob 首次可用但还没有任何展示记录（价格未知），先让它展示一次拿到基准价，
+            // 之后所有平台统一按「上一次展示 eCPM」正常竞价。
+            bool admobPriceUnknown = admobAvailable &&
+                ((type == SkyAdsType.Rewarded && !SkyAdmobEcpmCache.Instance.HasRewardedRecord) ||
+                 (type == SkyAdsType.Interstitial && !SkyAdmobEcpmCache.Instance.HasInterstitialRecord) ||
+                 (type == SkyAdsType.Splash && !SkyAdmobEcpmCache.Instance.HasSplashRecord) ||
+                 (type == SkyAdsType.Banner && !SkyAdmobEcpmCache.Instance.HasBannerRecord));
+            if (admobPriceUnknown)
+            {
+                SkyLogUtils.Debug($" [ads] AdMob {type} 暂无历史展示价格，本次强制优先展示 AdMob 以获取基准 eCPM");
+                SkyAnalyticsMgr.TrackEvent($"{type}_Bidding_ForceAdmobFirst", new Dictionary<string, object>
+                {
+                    { "reason", "no_last_show_record" },
+                    { "candidates_count", results.Count },
+                    { "candidates", string.Join(",", results.ConvertAll(r => $"{r.ClientName}:{r.Revenue}")) }
+                });
+                return new List<SkyAdsBidResult>
+                {
+                    new SkyAdsBidResult
+                    {
+                        ClientName = admobClient.ClientName,
+                        Revenue = 0,
+                        Client = admobClient,
+                        AdType = type,
+                        PlatformType = SkyPlatformType.Admob
+                    }
+                };
+            }
+#endif
 
             return results;
         }
@@ -738,6 +794,11 @@ namespace Sky
                 case SkyPlatformType.TPN:
                     RefreshTpnAds(adType);
                     break;
+#if ADMOB_AD
+                case SkyPlatformType.Admob:
+                    RefreshAdmobAds(adType);
+                    break;
+#endif
                 case SkyPlatformType.Mintegral:
                     RefreshMtgAds(adType);
                     break;
@@ -745,6 +806,23 @@ namespace Sky
                     break;
             }
         }
+
+#if ADMOB_AD
+        private void RefreshAdmobAds(SkyAdsType adType)
+        {
+            switch (adType)
+            {
+                case SkyAdsType.Rewarded:
+                    SkyAdmobMgr.Instance.LoadRewarded();
+                    break;
+                case SkyAdsType.Interstitial:
+                    SkyAdmobMgr.Instance.LoadInterstitial();
+                    break;
+                default:
+                    break;
+            }
+        }
+#endif
 
 
         private void RefreshTpnAds(SkyAdsType adType)

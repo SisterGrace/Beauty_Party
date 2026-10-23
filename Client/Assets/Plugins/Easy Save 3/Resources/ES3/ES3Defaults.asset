@@ -61,6 +61,7 @@ MonoBehaviour:
     - Assembly-CSharp-firstpass
     - NativeGallery.Editor
     - AVProVideo.Runtime
+    - GoogleMobileAds.Editor
     - GameAnalyticsSDK.Editor
     - FeishuBuildTool.Editor
     - EasySave3.Editor
