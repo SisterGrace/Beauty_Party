@@ -129,28 +129,28 @@ namespace Sky
 #endif
         }
 
-        #endregion
-        #region  广告事件上报
-        /// <summary>
-        /// 广告展示收益上报（统一入口）。
-        /// 由 TopOn 专用收入回调 TopOnRevenueReporter 调用，分发给所有平台。
-        /// </summary>
-        /// <param name="revenue">单次展示收益</param>
-        /// <param name="network">广告平台名（如 "admob" / "applovin"），已由 TopOnRevenueReporter 映射好</param>
-        /// <param name="unit">三方广告位 ID（network_placement_id）</param>
-        /// <param name="placement">TopOn 广告位 ID</param>
-        /// <param name="format">广告类型（banner / inter / reward / splash）</param>
-        /// <param name="platform">聚合平台（"tpn"）</param>
-        /// <param name="pos">展示点位，默认空</param>
-        /// <param name="formatNumber">第几次展示该格式的广告</param>
-        /// <param name="positionNumber">第几次展示该点位的广告</param>
-        /// <param name="currency">货币单位，从 TopOn 回调取，取不到由调用方决定是否跳过</param>
-        /// <param name="customMediationPlatform">热力引擎自定义归类（"APL" / "IS"），null 时由 SkySolarEngineEvents 内部回退</param>
-        public static void TrackAdImpressionEvent(
+		#endregion
+		#region  广告事件上报
+		/// <summary>
+		/// 广告展示收益上报（统一入口）。
+		/// 由 TopOn 专用收入回调 TopOnRevenueReporter 调用，分发给所有平台。
+		/// </summary>
+		/// <param name="revenue">单次展示收益</param>
+		/// <param name="network">广告平台名（如 "admob" / "applovin"），已由 TopOnRevenueReporter 映射好</param>//这个也是热力引擎后台的变现平台
+		/// <param name="unit">三方广告位 ID（network_placement_id，placementID 下各个平台的 ID ）</param>
+		/// <param name="placementID">TopOn 广告位 ID</param>
+		/// <param name="format">广告类型（banner / inter / reward / splash）</param>
+		/// <param name="platform">聚合平台（"topon"）</param>
+		/// <param name="pos">展示点位，默认空</param>
+		/// <param name="formatNumber">第几次展示该格式的广告</param>
+		/// <param name="positionNumber">第几次展示该点位的广告</param>
+		/// <param name="currency">货币单位，从 TopOn 回调取，取不到由调用方决定是否跳过</param>
+		/// <param name="customMediationPlatform">热力引擎自定义归类（"APL" / "IS"），null 时由 SkySolarEngineEvents 内部回退</param>
+		public static void TrackAdImpressionEvent(
             double revenue,
             string network,
             string unit,
-            string placement,
+            string placementID,
             string format,
             string platform,
             string pos = "",
@@ -163,8 +163,8 @@ namespace Sky
                 + " revenue:" + revenue
                 + " network:" + network
                 + " unit:" + unit
-                + " placement:" + placement
-                + " format:" + format
+                + " placement:" + placementID
+				+ " format:" + format
                 + " platform:" + platform
                 + " pos:" + pos
                 + " format_number:" + formatNumber

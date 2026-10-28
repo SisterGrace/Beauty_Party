@@ -181,7 +181,7 @@ namespace Sky
 			Loom.QueueOnMainThread(_ =>
 			{
 				var placementId = e?.placementId ?? "";
-				SkyLogUtils.Debug("TPN OnAdLoad: " + JsonUtility.ToJson(e.callbackInfo) + " placementId: " + placementId + " s:" + ATRewardedVideo.Instance.checkAdStatus(placementId));
+				//SkyLogUtils.Debug("TPN OnAdLoad: " + JsonUtility.ToJson(e.callbackInfo) + " placementId: " + placementId + " s:" + ATRewardedVideo.Instance.checkAdStatus(placementId));
 				if (!_placementIds.Contains(placementId)) return;
 				float loadTime = Mathf.Ceil(Time.realtimeSinceStartup - (_startLoadTimes.TryGetValue(placementId, out var t) ? t : 0));
 				double revenue = 0;
@@ -194,6 +194,8 @@ namespace Sky
 					if (status?.adInfo != null)
 					{
 						revenue = status.adInfo.publisher_revenue;
+						// 货币转换保险：checkAdStatus 不返回 currency，默认按 USD 处理
+						revenue = SkyCurrencyConverter.ToUSD(revenue, "USD");
 						_placementRevenue[placementId] = revenue;
 						adId = status.adInfo.network_placement_id;
 						source = "Topon_" + status.adInfo.network_firm_id.ToString();
@@ -202,10 +204,11 @@ namespace Sky
 				}
 				catch { }
 
-				SkyLogUtils.Debug("tpn onadload " + source + " adid:" + adId + " firm:" + e.callbackInfo.network_firm_id + " revenue:" + revenue);
+				//SkyLogUtils.Debug("tpn onadload " + source + " adid:" + adId + " firm:" + e.callbackInfo.network_firm_id + " revenue:" + revenue);
 				SkyAdsEvents.LogLoadedEvent(adId, source, PlatformName, loadTime, AdLoadType.Reward, placementId, revenue);
 				_retryAttempts[placementId] = 0;
-				SkyLogUtils.Debug("[SkyTpn] Reward OnAdLoad: " + placementId);
+				//SkyLogUtils.Debug("[SkyTpn] Reward OnAdLoad: " + placementId);
+				SkyLogUtils.Info($"[AdsMgr] [TPN 加载成功] {placementId} | 来源: {source} | adId: {adId} | 单次收益: {revenue:F6}");
 			}, null);
 		}
 
@@ -233,8 +236,12 @@ namespace Sky
 				string adId = e?.callbackInfo?.network_placement_id ?? "";
 				double revenue = e?.callbackInfo?.publisher_revenue ?? 0;
 				string currency = e?.callbackInfo?.currency ?? "USD";
+				
+				// 货币转换保险：回调中有 currency 字段，进行转换后存入
+				double revenueInUsd = SkyCurrencyConverter.ToUSD(revenue, currency);
+				
 				SkyLogUtils.Debug("tpn OnAdVideoStart " + JsonUtility.ToJson(e.callbackInfo) + " placementId: " + placementId);
-				if (!_placementRevenue.ContainsKey(placementId)) _placementRevenue[placementId] = revenue;
+				_placementRevenue[placementId] = revenueInUsd;
 				string pos = SkyAdsMgr.Instance._rvPos ?? "";
 				string format = SkyAdsType.Rewarded.ToString();
 				int formatNumber = SkyAdsPrefs.GetAndIncrementFormatPlayCount(format);

@@ -374,41 +374,61 @@ namespace Sky
                 return GetAdmobTestUnits(adType);
             }
 
-            if (_config == null)
+            // 【新逻辑】如果开启在线下发，优先使用在线配置
+            if (_enableOnlineAdUnits && _config != null)
             {
-                return new List<string>();
+                switch (adType)
+                {
+                    case SkyAdsType.Rewarded:
+                        if (_configDict.ContainsKey("admob_rewarded_units"))
+                            return _config.admob_rewarded_units ?? new List<string>();
+                        break;
+                    case SkyAdsType.Interstitial:
+                        if (_configDict.ContainsKey("admob_interstitial_units"))
+                            return _config.admob_interstitial_units ?? new List<string>();
+                        break;
+                    case SkyAdsType.Banner:
+                        if (_configDict.ContainsKey("admob_banner_units"))
+                            return _config.admob_banner_units ?? new List<string>();
+                        break;
+                    case SkyAdsType.Splash:
+                        if (_configDict.ContainsKey("admob_splash_units"))
+                            return _config.admob_splash_units ?? new List<string>();
+                        break;
+                    case SkyAdsType.Native:
+                        if (_configDict.ContainsKey("admob_native_units"))
+                            return _config.admob_native_units ?? new List<string>();
+                        break;
+                    case SkyAdsType.NativeFullscreen:
+                        if (_configDict.ContainsKey("admob_native_fullscreen_units"))
+                            return _config.admob_native_fullscreen_units ?? new List<string>();
+                        break;
+                    case SkyAdsType.NativeSmall:
+                        if (_configDict.ContainsKey("admob_native_small_units"))
+                            return _config.admob_native_small_units ?? new List<string>();
+                        break;
+                }
+                // 在线配置中不存在该 key，继续回退到本地
             }
+
+            // 关闭开关或在线缺失时，使用本地配置
+            var gameConfig = GameConfigOrNull();
+            if (gameConfig == null)
+                return new List<string>();
 
             switch (adType)
             {
-                case SkyAdsType.Banner:
-                    if (_configDict.ContainsKey("admob_banner_units"))
-                        return _config.admob_banner_units ?? new List<string>();
-                    return new List<string>();
                 case SkyAdsType.Rewarded:
-                    if (_configDict.ContainsKey("admob_rewarded_units"))
-                        return _config.admob_rewarded_units ?? new List<string>();
-                    return new List<string>();
-                case SkyAdsType.Native:
-                    if (_configDict.ContainsKey("admob_native_units"))
-                        return _config.admob_native_units ?? new List<string>();
-                    return new List<string>();
-                case SkyAdsType.NativeFullscreen:
-                    if (_configDict.ContainsKey("admob_native_fullscreen_units"))
-                        return _config.admob_native_fullscreen_units ?? new List<string>();
-                    return new List<string>();
-                case SkyAdsType.NativeSmall:
-                    if (_configDict.ContainsKey("admob_native_small_units"))
-                        return _config.admob_native_small_units ?? new List<string>();
-                    return new List<string>();
-                case SkyAdsType.Splash:
-                    if (_configDict.ContainsKey("admob_splash_units"))
-                        return _config.admob_splash_units ?? new List<string>();
-                    return new List<string>();
+                    return gameConfig.GetAdmobRewardedUnits();
                 case SkyAdsType.Interstitial:
-                    if (_configDict.ContainsKey("admob_interstitial_units"))
-                        return _config.admob_interstitial_units ?? new List<string>();
-                    return new List<string>();
+                    return gameConfig.GetAdmobInterstitialUnits();
+                case SkyAdsType.Splash:
+                    return gameConfig.GetAdmobSplashUnits();
+                case SkyAdsType.Banner:
+                    {
+                        var bannerUnit = gameConfig.GetAdmobBannerUnit();
+                        return string.IsNullOrEmpty(bannerUnit) ? new List<string>() : new List<string> { bannerUnit };
+                    }
                 default:
                     return new List<string>();
             }
