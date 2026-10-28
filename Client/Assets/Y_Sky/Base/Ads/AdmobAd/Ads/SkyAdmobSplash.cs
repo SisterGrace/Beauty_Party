@@ -13,7 +13,7 @@ namespace Sky
     /// 使用场景：冷启动或场景切换时展示全屏开屏广告。
     /// 
     /// 关键逻辑：
-    /// - 加载成功后在 OnAdPaid 中将 eCPM 写入 SkyAdmobEcpmCache（用于后续竞价）
+    /// - 加载成功后在 OnAdPaid 中将 eCPM 写入 SkyAdmobRevenueCache（用于后续竞价）
     /// - 加载失败时进行指数退避重试，最多 6 次
     /// - 展示成功后自动重载
     /// - 展示关闭后（无论是否加载成功）触发回调并重载
@@ -111,6 +111,13 @@ namespace Sky
             ad.OnAdFullScreenContentOpened += () =>
             {
                 SkyLogUtils.Debug($"[Admob Splash] {unitId} 展示成功");
+
+                // 兜底逻辑：如果没有历史记录，立即写入 0 作为基准价
+                if (!SkyAdmobRevenueCache.Instance.HasSplashRecord)
+                {
+                    SkyAdmobRevenueCache.Instance.UpdateSplashLastShowRevenue(0, "USD", unitId);
+                    SkyLogUtils.Debug("[Admob Splash] 首次展示且无历史记录，写入 0 基准价打破强制展示循环");
+                }
             };
 
             // 展示关闭（无论用户主动关闭或自动关闭）
@@ -134,17 +141,19 @@ namespace Sky
 
         private void HandleAdPaid(string unitId, AdValue adValue, string adId, string adSource)
         {
-            double ecpm = adValue.Value / 1_000_000.0; // micro USD → USD
+            double rawRevenue = adValue.Value / 1_000_000.0; // micro USD → USD
             string currency = adValue.CurrencyCode;
+			SkyLogUtils.Debug($"[Admob Splash] {unitId} OnAdPaid | 原始值(微美元): {adValue.Value} | 原始收益: ${rawRevenue:F6} {currency} | 精度: {adValue.Precision}");
 
-            SkyLogUtils.Debug($"[Admob Splash] {unitId} OnAdPaid eCPM={ecpm:F4} {currency}");
+            // 货币统一转换：使用全局 SkyCurrencyConverter
+            double revenueInUsd = SkyCurrencyConverter.ToUSD(rawRevenue, currency);
 
-            // 更新缓存（只保存 USD，其他货币丢弃）
-            SkyAdmobEcpmCache.Instance.UpdateSplashLastShowEcpm(ecpm, currency, unitId);
+            // 更新缓存（统一为 USD）
+            SkyAdmobRevenueCache.Instance.UpdateSplashLastShowRevenue(revenueInUsd, "USD", unitId);
 
-            // 上报广告展示事件
+            // 上报广告展示事件（使用转换后的 USD 金额）
             SkyAnalyticsMgr.TrackAdImpressionEvent(
-                ecpm, adSource, adId, unitId,
+				revenueInUsd, adSource, adId, unitId,
                 SkyAdsType.Splash.ToString(), SkyPlatformType.Admob.ToString(),
                 SkyAdsMgr.Instance._spPos ?? ""
             );

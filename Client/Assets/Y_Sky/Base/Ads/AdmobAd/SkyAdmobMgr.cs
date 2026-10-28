@@ -11,7 +11,7 @@ namespace Sky
     /// 竞价价格说明：
     /// AdMob 在 Load 阶段拿不到 eCPM（Google 只在广告展示后通过 OnAdPaid 下发真实收益），
     /// 所以 GetRewardedRevenue / GetInterstitialRevenue 返回的是「上一次实际展示」的 eCPM
-    /// （来自 SkyAdmobEcpmCache，由 OnAdPaid 写入）。
+    /// （来自 SkyAdmobRevenueCache，由 OnAdPaid 写入）。
     ///   - 有历史展示记录：用该价格参与竞价，价格随每次展示自动更新；
     ///   - 无历史记录：返回 0，由 SkyAdsMgr 走首次强制展示逻辑完成价格校准。
     /// </summary>
@@ -102,8 +102,8 @@ namespace Sky
 
         public double GetRewardedRevenue()
         {
-            // 竞价价格 = 上一次实际展示的 eCPM；无记录返回 0
-            return SkyAdmobEcpmCache.Instance.GetRewardedLastShowEcpm();
+            // 竞价价格 = 上一次实际展示的 Revenue（单次收益）；无记录返回 0
+            return SkyAdmobRevenueCache.Instance.GetRewardedLastShowRevenue();
         }
 
         public bool IsRewardedAvailable() => _sdkReady && _reward.IsReady();
@@ -141,8 +141,8 @@ namespace Sky
 
         public double GetInterstitialRevenue()
         {
-            // 竞价价格 = 上一次实际展示的 eCPM；无记录返回 0
-            return SkyAdmobEcpmCache.Instance.GetInterstitialLastShowEcpm();
+            // 竞价价格 = 上一次实际展示的 Revenue（单次收益）；无记录返回 0
+            return SkyAdmobRevenueCache.Instance.GetInterstitialLastShowRevenue();
         }
 
         public bool IsInterstitialAvailable() => _sdkReady && _interstitial.IsReady();
@@ -174,7 +174,7 @@ namespace Sky
         public double GetBannerRevenue()
         {
             // 竞价价格 = 上一次实际展示的 eCPM；无记录返回 0
-            return SkyAdmobEcpmCache.Instance.GetBannerLastShowEcpm();
+            return SkyAdmobRevenueCache.Instance.GetBannerLastShowRevenue();
         }
 
         public bool IsBannerReady() => _sdkReady && _banner.IsReady();
@@ -204,8 +204,8 @@ namespace Sky
 
         public double GetSplashRevenue()
         {
-            // 竞价价格 = 上一次实际展示的 eCPM；无记录返回 0
-            return SkyAdmobEcpmCache.Instance.GetSplashLastShowEcpm();
+            // 竞价价格 = 上一次实际展示的 Revenue（单次收益）；无记录返回 0
+            return SkyAdmobRevenueCache.Instance.GetSplashLastShowRevenue();
         }
 
         public bool IsSplashAvailable() => _sdkReady && _splash.IsReady();

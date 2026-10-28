@@ -16,7 +16,14 @@ namespace Sky
         public string _nativeFullscreenPos = "";
         public string _nativeSmallPos = "";
 
-        public Action _rvShowCallback;
+		// 防止激励视频重复拉起的锁
+		private bool _isRewardedShowing = false;
+		// 记录加锁时间，用于超时解锁
+		private float _rewardLockStartTime = 0f;
+		// 超时时间（5秒）
+		private const float REWARD_LOCK_TIMEOUT = 5f;
+
+		public Action _rvShowCallback;
         public Action<Dictionary<string, object>> _ivShowCallback;
         public Action<Dictionary<string, object>> _rvCloseCallback;
         public Action<Dictionary<string, object>> _rvShowFailCallback;
@@ -96,101 +103,124 @@ namespace Sky
             return _adNetworks.Any(network => network.IsRewardedAvailable());
         }
 
-        public void ShowRewardedVideo(string _pos, Action _closeCallback, Action _showFailCallback)
-        {
-            SkyLogUtils.Debug("[AdsMgr] ShowRewardedVideo " + _pos);
-            SkyAnalyticsMgr.TrackEvent("RV_Button_Click", new Dictionary<string, object>() { { "Position", _pos } });
+		public void ShowRewardedVideo(string _pos, Action _closeCallback, Action _showFailCallback)
+		{
+			// ================== 核心防连点/防死锁逻辑 ==================
+			if (_isRewardedShowing)
+			{
+				// 5秒内，说明广告正在展示或正在加载，直接忽略后续点击
+				if (Time.realtimeSinceStartup - _rewardLockStartTime < REWARD_LOCK_TIMEOUT)
+				{
+					SkyLogUtils.Debug("[AdsMgr] 激励视频正在拉起或展示中，忽略重复请求");
+					return;
+				}
+				// 超过5秒说明底层回调大概率丢失，触发强制解锁放行
+				SkyLogUtils.Warning("[AdsMgr] 激励视频拉起超时（超过5秒），触发强制解锁");
+				_isRewardedShowing = false;
+			}
+
+			SkyAnalyticsMgr.TrackEvent("RV_Button_Click", new Dictionary<string, object>() { { "Position", _pos } });
 #if LAUNCHER_AD
-            LauncherEvents.TriggerADEvent(_pos, "RV");
+    LauncherEvents.TriggerADEvent(_pos, "RV");
 #endif
-            _rvPos = _pos;
+			_rvPos = _pos;
 
-            var rvDidEnterFullscreen = false;
-            _rvShowCallback = () =>
-            {
-                SkyLogUtils.Debug(" [ads] rewarded video show callback");
+			// 【加锁】准备进入流程，记录时间
+			_isRewardedShowing = true;
+			_rewardLockStartTime = Time.realtimeSinceStartup;
+
+			var rvDidEnterFullscreen = false;
+
+			_rvShowCallback = () =>
+			{
+				SkyLogUtils.Debug(" [ads] rewarded video show callback");
 #if LAUNCHER_AD
-                LauncherEvents.AdImpressionEvent(_pos, "RV");
+        LauncherEvents.AdImpressionEvent(_pos, "RV");
 #endif
-                rvDidEnterFullscreen = true;
-                _adActive = true;
-                SkyInterstitialRules.Instance._videoStartTime = Time.realtimeSinceStartup;
-                SkyAdsPrefs.SetFirstShowRvTime();
-            };
+				rvDidEnterFullscreen = true;
+				_adActive = true;
+				SkyInterstitialRules.Instance._videoStartTime = Time.realtimeSinceStartup;
+				SkyAdsPrefs.SetFirstShowRvTime();
+			};
 
-            _rvCloseCallback = (dic) =>
-            {
-                SkyLogUtils.Debug(" [ads] rewarded video close callback");
-                if (rvDidEnterFullscreen)
-                    SkySplashAdsMgr.Instance.SkipNextHotResumeSplashCheck();
-                _adActive = false;
-                SkyAnalyticsMgr.TrackEvent("RV_Close", dic);
-                SkySplashAdsMgr.Instance._backgroundTime = Time.realtimeSinceStartup;
-                _closeCallback?.Invoke();
-            };
+			_rvCloseCallback = (dic) =>
+			{
+				// 【解锁】广告关闭
+				_isRewardedShowing = false;
 
-            _rvShowFailCallback = (dic) =>
-            {
-                SkyLogUtils.Debug(" [ads] rewarded video show fail callback");
-                _adActive = false;
-                SkyAnalyticsMgr.TrackEvent("RV_ShowFail", dic);
-                _showFailCallback?.Invoke();
-            };
+				SkyLogUtils.Debug(" [ads] rewarded video close callback");
+				if (rvDidEnterFullscreen)
+					SkySplashAdsMgr.Instance.SkipNextHotResumeSplashCheck();
+				_adActive = false;
+				SkyAnalyticsMgr.TrackEvent("RV_Close", dic);
+				SkySplashAdsMgr.Instance._backgroundTime = Time.realtimeSinceStartup;
+				_closeCallback?.Invoke();
+			};
+
+			_rvShowFailCallback = (dic) =>
+			{
+				// 【解锁】广告展示失败
+				_isRewardedShowing = false;
+
+				SkyLogUtils.Debug(" [ads] rewarded video show fail callback");
+				_adActive = false;
+				SkyAnalyticsMgr.TrackEvent("RV_ShowFail", dic);
+				_showFailCallback?.Invoke();
+			};
 
 #if UNITY_EDITOR
-            // 编辑器模式：直接模拟激励视频成功
-            SkyLogUtils.Debug("[AdsMgr] Editor mode: simulate rewarded video success");
-            _rvShowCallback?.Invoke();
-            _rvCloseCallback?.Invoke(new Dictionary<string, object>()
-            {
-                { "Position", _pos ?? ""},
-                { "ad_platform", "Editor" },
-                { "isended", true }
-            });
-            return;
+			// 编辑器模式：直接模拟激励视频成功
+			SkyLogUtils.Debug("[AdsMgr] Editor mode: simulate rewarded video success");
+			_rvShowCallback?.Invoke();
+			_rvCloseCallback?.Invoke(new Dictionary<string, object>()
+	{
+		{ "Position", _pos ?? ""},
+		{ "ad_platform", "Editor" },
+		{ "isended", true }
+	});
+			return;
 #endif
 
-            if (IsRewardedVideoAvailable())
-            {
-                SkyLogUtils.Debug("Sky show rewarded video");
-                var results = SelectBestAds(SkyAdsType.Rewarded);
-                var winner = results.Count > 0 ? results[0] : null;
-                SkyLogUtils.Debug("Sky show rewarded video winner:" + winner?.ClientName);
-                if (winner == null)
-                {
-                    _rvShowFailCallback?.Invoke(new Dictionary<string, object>()
-                    {
-                        { "Position", SkyAdsMgr.Instance._rvPos ?? ""},
-                        //{ "show_fail_reason","winner is null"},
-                        { "ad_platform", SkyPlatformType.NULL.ToString() },
-                    });
-                }
-                else
-                {
-                    SkyBidPlatformMgr.Instance.RecordBidSuccess(winner.PlatformType, SkyAdsType.Rewarded);
-                    //SkyAnalyticsMgr.TrackEvent("RV_Winner", BuildBidEventParams(results, _pos));
-                    winner.Client.ShowRewarded(_pos);
-                    CheckAndRefreshExpiredBids(SkyAdsType.Rewarded);
-                }
-            }
-            else
-            {
-                SkyLogUtils.Debug("Sky rewarded not ready");
-                _rvShowFailCallback?.Invoke(new Dictionary<string, object>()
-                {
-                    { "Position", SkyAdsMgr.Instance._rvPos ?? ""},
-                    //{ "show_fail_reason","not ready"},
-                    { "ad_platform", SkyPlatformType.NULL.ToString() },
-                });
+			if (IsRewardedVideoAvailable())
+			{
+				var results = SelectBestAds(SkyAdsType.Rewarded);
+				var winner = results.Count > 0 ? results[0] : null;
 
-                SkyAnalyticsMgr.TrackEvent("RV_ShowFail_Not_Ready", new Dictionary<string, object>() { { "Position", _pos } });
-            }
-        }
-        #endregion
+				if (winner == null)
+				{
+					// 触发失败回调时会自动解锁
+					_rvShowFailCallback?.Invoke(new Dictionary<string, object>()
+			{
+				{ "Position", SkyAdsMgr.Instance._rvPos ?? ""},
+				{ "ad_platform", SkyPlatformType.NULL.ToString() },
+			});
+				}
+				else
+				{
+					SkyBidPlatformMgr.Instance.RecordBidSuccess(winner.PlatformType, SkyAdsType.Rewarded);
+					SkyLogUtils.Debug($"[AdsMgr] 准备展示激励视频, Position: {_pos}, Winner: {winner?.ClientName}");
+					winner.Client.ShowRewarded(_pos);
+					CheckAndRefreshExpiredBids(SkyAdsType.Rewarded);
+				}
+			}
+			else
+			{
+				SkyLogUtils.Debug("Sky rewarded not ready");
+				// 没准备好直接触发失败，会自动解锁
+				_rvShowFailCallback?.Invoke(new Dictionary<string, object>()
+		{
+			{ "Position", SkyAdsMgr.Instance._rvPos ?? ""},
+			{ "ad_platform", SkyPlatformType.NULL.ToString() },
+		});
+
+				SkyAnalyticsMgr.TrackEvent("RV_ShowFail_Not_Ready", new Dictionary<string, object>() { { "Position", _pos } });
+			}
+		}
+		#endregion
 
 
-        #region  Interstitial
-        private bool IsInterstitialAvailable()
+		#region  Interstitial
+		private bool IsInterstitialAvailable()
         {
             return _adNetworks.Any(network => network.IsInterstitialAvailable());
         }
@@ -726,30 +756,32 @@ namespace Sky
             }
             results.Sort();
 
-            SkyLogUtils.Debug($" [ads] Bidding completed for {type}, {results.Count} available ads");
-            if (results.Count > 0)
-            {
-                var bestAd = results[0];
-                SkyLogUtils.Info($" [ads] Best {type} ad: {bestAd.ClientName}, Revenue: {bestAd.Revenue}");
-            }
+			// 处理空列表情况
+			if (results.Count == 0)
+			{
+				SkyLogUtils.Info($" [ads] Bidding completed for {type}: 没有可用广告。");
+				return results;
+			}
 
 #if ADMOB_AD
-            // AdMob 首次可用但还没有任何展示记录（价格未知），先让它展示一次拿到基准价，
-            // 之后所有平台统一按「上一次展示 eCPM」正常竞价。
-            bool admobPriceUnknown = admobAvailable &&
-                ((type == SkyAdsType.Rewarded && !SkyAdmobEcpmCache.Instance.HasRewardedRecord) ||
-                 (type == SkyAdsType.Interstitial && !SkyAdmobEcpmCache.Instance.HasInterstitialRecord) ||
-                 (type == SkyAdsType.Splash && !SkyAdmobEcpmCache.Instance.HasSplashRecord) ||
-                 (type == SkyAdsType.Banner && !SkyAdmobEcpmCache.Instance.HasBannerRecord));
+			// 👇 核心：强制逻辑提前判断！在打印常规竞价日志之前
+			bool admobPriceUnknown = admobAvailable &&
+                ((type == SkyAdsType.Rewarded && !SkyAdmobRevenueCache.Instance.HasRewardedRecord) ||
+                 (type == SkyAdsType.Interstitial && !SkyAdmobRevenueCache.Instance.HasInterstitialRecord) ||
+                 (type == SkyAdsType.Splash && !SkyAdmobRevenueCache.Instance.HasSplashRecord) ||
+                 (type == SkyAdsType.Banner && !SkyAdmobRevenueCache.Instance.HasBannerRecord));
             if (admobPriceUnknown)
             {
-                SkyLogUtils.Debug($" [ads] AdMob {type} 暂无历史展示价格，本次强制优先展示 AdMob 以获取基准 eCPM");
-                SkyAnalyticsMgr.TrackEvent($"{type}_Bidding_ForceAdmobFirst", new Dictionary<string, object>
+				// 这里打印唯一的一句强制展示日志
+				SkyLogUtils.Info($" [ads] Best {type} ad: {admobClient.ClientName}, Revenue: 0 | 原因: AdMob 暂无历史价格，强制展示以获取基准价。");
+				
+				SkyAnalyticsMgr.TrackEvent($"{type}_Bidding_ForceAdmobFirst", new Dictionary<string, object>
                 {
                     { "reason", "no_last_show_record" },
                     { "candidates_count", results.Count },
                     { "candidates", string.Join(",", results.ConvertAll(r => $"{r.ClientName}:{r.Revenue}")) }
                 });
+                
                 return new List<SkyAdsBidResult>
                 {
                     new SkyAdsBidResult
@@ -764,7 +796,30 @@ namespace Sky
             }
 #endif
 
-            return results;
+			// 👇 如果没有触发强制展示，才走正常的胜出逻辑和日志打印
+			var bestAd = results[0];
+			string reasonMsg = "";
+
+			if (results.Count == 1)
+			{
+				reasonMsg = $"只有 {bestAd.ClientName} 一家可用";
+			}
+			else
+			{
+				var secondAd = results[1];
+				if (bestAd.Revenue > secondAd.Revenue)
+				{
+					reasonMsg = $"出价 {bestAd.Revenue:F6} 高于 {secondAd.ClientName} 的 {secondAd.Revenue:F6}";
+				}
+				else
+				{
+					reasonMsg = $"出价 {bestAd.Revenue:F6} 不低于 {secondAd.ClientName} 的 {secondAd.Revenue:F6}";
+				}
+			}
+
+			SkyLogUtils.Info($" [ads] Best {type} ad: {bestAd.ClientName}, Revenue: {bestAd.Revenue:F6} | 原因: {reasonMsg}");
+
+			return results;
         }
         #endregion
 

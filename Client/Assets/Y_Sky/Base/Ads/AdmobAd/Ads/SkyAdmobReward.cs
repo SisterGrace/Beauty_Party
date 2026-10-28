@@ -8,7 +8,7 @@ namespace Sky
 {
     /// <summary>
     /// AdMob 激励视频（直连，支持多广告位）。
-    /// 展示后通过 OnAdPaid 回写「上一次展示价格」到 SkyAdmobEcpmCache，供下一次竞价使用。
+    /// 展示后通过 OnAdPaid 回写「上一次展示价格」到 SkyAdmobRevenueCache，供下一次竞价使用。
     /// </summary>
     public class SkyAdmobReward
     {
@@ -108,7 +108,7 @@ namespace Sky
 
             var adapterInfo = ad.GetResponseInfo()?.GetLoadedAdapterResponseInfo();
             string sourceInstanceId = adapterInfo?.AdSourceInstanceId ?? "";
-            string sourceName = adapterInfo?.AdSourceName ?? "";
+            string sourceName = adapterInfo?.AdSourceName ?? "";//谁填充了这个广告，也就是广告平台
             _adIds[unitId] = sourceInstanceId;
             _adSources[unitId] = sourceName;
 
@@ -131,7 +131,7 @@ namespace Sky
             {
                 SkyLogUtils.Debug($"[Admob] Rewarded 点击 {unitId}");
                 SkyAdsEvents.LogClickEvent(AdLoadType.Reward,
-                    SkyAdmobEcpmCache.Instance.GetRewardedLastShowEcpm(),
+                    SkyAdmobRevenueCache.Instance.GetRewardedLastShowRevenue(),
                     SkyAdsMgr.Instance._rvPos, adId, adSource, PlatformName, unitId);
             };
 
@@ -140,12 +140,20 @@ namespace Sky
                 if (_destroyed) return;
                 SkyLogUtils.Debug($"[Admob] Rewarded 展示开始 {unitId}");
 
+                // 兜底逻辑：如果没有历史记录，立即写入 0 作为基准价
+                // 防止 OnAdPaid 因测试广告、网络延迟等原因不触发时，导致无限强制展示
+                if (!SkyAdmobRevenueCache.Instance.HasRewardedRecord)
+                {
+                    SkyAdmobRevenueCache.Instance.UpdateRewardedLastShowRevenue(0, "USD", unitId);
+                    SkyLogUtils.Debug("[Admob] Rewarded 首次展示且无历史记录，写入 0 基准价打破强制展示循环");
+                }
+
                 string pos = SkyAdsMgr.Instance._rvPos ?? "";
                 int formatNumber = SkyAdsPrefs.GetAndIncrementFormatPlayCount(SkyAdsType.Rewarded.ToString());
                 SkyAdsPrefs.GetAndIncrementPositionPlayCount(pos);
 
                 SkyAdsEvents.LogRvShowEvent(pos, adId, adSource,
-                    SkyAdmobEcpmCache.Instance.GetRewardedLastShowEcpm(),
+                    SkyAdmobRevenueCache.Instance.GetRewardedLastShowRevenue(),
                     formatNumber, SkyAdsPrefs.GetFirstShowRvTime(), PlatformName, unitId);
 
                 SkyAdsMgr.Instance._rvShowCallback?.Invoke();
@@ -195,28 +203,31 @@ namespace Sky
 
         /// <summary>
         /// OnAdPaid：广告产生展示后触发，拿到本次真实收益。
-        /// 这是 AdMob 唯一能拿到 eCPM 的时机，写入缓存供下一次竞价使用。
+        /// 这是 AdMob 唯一能拿到 Revenue 的时机，写入缓存供下一次竞价使用。
         /// </summary>
         private void HandleAdPaid(string unitId, AdValue adValue, string adId, string adSource)
         {
             if (adValue == null) return;
 
-            double ecpm = adValue.Value / 1_000_000.0;
+            double rawRevenue = adValue.Value / 1_000_000.0;
             string currency = adValue.CurrencyCode;
-
-            SkyLogUtils.Debug($"[Admob] Rewarded OnAdPaid {unitId} : ${ecpm:F4} {currency} precision:{adValue.Precision}");
-
-            // 竞价价格来源：本次展示的真实 eCPM
-            SkyAdmobEcpmCache.Instance.UpdateRewardedLastShowEcpm(ecpm, currency, unitId);
+			SkyLogUtils.Debug($"[Admob] Rewarded {unitId} OnAdPaid | 原始值(微美元): {adValue.Value} | 原始收益: ${rawRevenue:F6} {currency} | 精度: {adValue.Precision}");
+            
+            // 货币统一转换：使用全局 SkyCurrencyConverter 将所有货币转为 USD
+            double revenueInUsd = SkyCurrencyConverter.ToUSD(rawRevenue, currency);
+            
+            // 竞价价格来源：本次展示的真实 Revenue（单次收益，已转为 USD）
+            SkyAdmobRevenueCache.Instance.UpdateRewardedLastShowRevenue(revenueInUsd, "USD", unitId);
 
             string pos = SkyAdsMgr.Instance._rvPos ?? "";
             int formatNumber = SkyAdsPrefs.GetAndIncrementFormatPlayCount(SkyAdsType.Rewarded.ToString());
             int positionNumber = SkyAdsPrefs.GetAndIncrementPositionPlayCount(pos);
 
+            // 数据上报使用转换后的 USD 金额
             SkyAnalyticsMgr.TrackAdImpressionEvent(
-                ecpm, adSource, adId, unitId,
+				revenueInUsd, adSource, adId, unitId,
                 SkyAdsType.Rewarded.ToString(), PlatformName,
-                pos, formatNumber, positionNumber, currency);
+                pos, formatNumber, positionNumber, "USD");
         }
 
         #endregion

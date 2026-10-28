@@ -8,7 +8,7 @@ namespace Sky
 {
     /// <summary>
     /// AdMob 插屏（直连，支持多广告位）。
-    /// 展示后通过 OnAdPaid 回写「上一次展示价格」到 SkyAdmobEcpmCache，供下一次竞价使用。
+    /// 展示后通过 OnAdPaid 回写「上一次展示价格」到 SkyAdmobRevenueCache，供下一次竞价使用。
     /// </summary>
     public class SkyAdmobInterstitial
     {
@@ -129,7 +129,7 @@ namespace Sky
             {
                 SkyLogUtils.Debug($"[Admob] Interstitial 点击 {unitId}");
                 SkyAdsEvents.LogClickEvent(AdLoadType.Interstitial,
-                    SkyAdmobEcpmCache.Instance.GetInterstitialLastShowEcpm(),
+                    SkyAdmobRevenueCache.Instance.GetInterstitialLastShowRevenue(),
                     SkyAdsMgr.Instance._ivPos, adId, adSource, PlatformName, unitId);
             };
 
@@ -138,13 +138,20 @@ namespace Sky
                 if (_destroyed) return;
                 SkyLogUtils.Debug($"[Admob] Interstitial 展示开始 {unitId}");
 
+                // 兜底逻辑：如果没有历史记录，立即写入 0 作为基准价
+                if (!SkyAdmobRevenueCache.Instance.HasInterstitialRecord)
+                {
+                    SkyAdmobRevenueCache.Instance.UpdateInterstitialLastShowRevenue(0, "USD", unitId);
+                    SkyLogUtils.Debug("[Admob] Interstitial 首次展示且无历史记录，写入 0 基准价打破强制展示循环");
+                }
+
                 SkyAdsMgr.Instance._ivShowCallback?.Invoke(new Dictionary<string, object>
                 {
                     { "Position", SkyAdsMgr.Instance._ivPos ?? "" },
                     { "ad_platform", PlatformName },
                     { "ad_source", adSource },
                     { "ad_id", adId },
-                    { "ad_ecpm", SkyAdmobEcpmCache.Instance.GetInterstitialLastShowEcpm() }
+                    { "ad_ecpm", SkyAdmobRevenueCache.Instance.GetInterstitialLastShowRevenue() }
                 });
             };
 
@@ -180,21 +187,24 @@ namespace Sky
         {
             if (adValue == null) return;
 
-            double ecpm = adValue.Value / 1_000_000.0;
+            double rawRevenue = adValue.Value / 1_000_000.0;
             string currency = adValue.CurrencyCode;
 
-            SkyLogUtils.Debug($"[Admob] Interstitial OnAdPaid {unitId} : ${ecpm:F4} {currency} precision:{adValue.Precision}");
+			SkyLogUtils.Debug($"[Admob] Interstitial {unitId} OnAdPaid | 原始值(微美元): {adValue.Value} | 原始收益: ${rawRevenue:F6} {currency} | 精度: {adValue.Precision}");
 
-            SkyAdmobEcpmCache.Instance.UpdateInterstitialLastShowEcpm(ecpm, currency, unitId);
+            // 货币统一转换：使用全局 SkyCurrencyConverter
+            double revenueInUsd = SkyCurrencyConverter.ToUSD(rawRevenue, currency);
+
+			SkyAdmobRevenueCache.Instance.UpdateInterstitialLastShowRevenue(revenueInUsd, "USD", unitId);
 
             string pos = SkyAdsMgr.Instance._ivPos ?? "";
             int formatNumber = SkyAdsPrefs.GetAndIncrementFormatPlayCount(SkyAdsType.Interstitial.ToString());
             int positionNumber = SkyAdsPrefs.GetAndIncrementPositionPlayCount(pos);
 
             SkyAnalyticsMgr.TrackAdImpressionEvent(
-                ecpm, adSource, adId, unitId,
+				revenueInUsd, adSource, adId, unitId,
                 SkyAdsType.Interstitial.ToString(), PlatformName,
-                pos, formatNumber, positionNumber, currency);
+                pos, formatNumber, positionNumber, "USD");
         }
 
         #endregion
@@ -240,12 +250,12 @@ namespace Sky
         {
             var unitId = GetAvailableUnit();
             if (string.IsNullOrEmpty(unitId))
-                return ("", PlatformName, SkyAdmobEcpmCache.Instance.GetInterstitialLastShowEcpm());
+                return ("", PlatformName, SkyAdmobRevenueCache.Instance.GetInterstitialLastShowRevenue());
 
             _adIds.TryGetValue(unitId, out var adId);
             _adSources.TryGetValue(unitId, out var adSource);
             return (adId ?? "", string.IsNullOrEmpty(adSource) ? PlatformName : adSource,
-                SkyAdmobEcpmCache.Instance.GetInterstitialLastShowEcpm());
+                SkyAdmobRevenueCache.Instance.GetInterstitialLastShowRevenue());
         }
 
         #endregion

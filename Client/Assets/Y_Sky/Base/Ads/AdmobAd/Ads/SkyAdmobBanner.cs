@@ -11,7 +11,7 @@ namespace Sky
     /// 使用场景：应用底部或顶部的常驻横幅广告。
     /// 
     /// 关键逻辑：
-    /// - 加载成功后在 OnAdPaid 中将 eCPM 写入 SkyAdmobEcpmCache（用于后续竞价）
+    /// - 加载成功后在 OnAdPaid 中将 eCPM 写入 SkyAdmobRevenueCache（用于后续竞价）
     /// - 加载失败时进行指数退避重试，最多 6 次
     /// - 支持显示/隐藏，但不会自动销毁（除非主动调用 DestroyAd）
     /// - Banner 广告通常只使用单个广告位
@@ -75,6 +75,13 @@ namespace Sky
                 SkyLogUtils.Debug($"[Admob Banner] {_unitId} 加载成功");
                 _retryCount = 0; // 重置重试计数
                 _isVisible = false; // 加载成功后默认不可见，等待主动调用 Show
+
+                // 兜底逻辑：Banner 加载成功即可认为参与了竞价
+                if (!SkyAdmobRevenueCache.Instance.HasBannerRecord)
+                {
+                    SkyAdmobRevenueCache.Instance.UpdateBannerLastShowRevenue(0, "USD", _unitId);
+                    SkyLogUtils.Debug("[Admob Banner] 首次加载成功且无历史记录，写入 0 基准价打破强制展示循环");
+                }
             };
 
             // 加载失败
@@ -126,17 +133,20 @@ namespace Sky
 
         private void HandleAdPaid(AdValue adValue)
         {
-            double ecpm = adValue.Value / 1_000_000.0; // micro USD → USD
+            double rawRevenue = adValue.Value / 1_000_000.0; // micro USD → USD
             string currency = adValue.CurrencyCode;
 
-            SkyLogUtils.Debug($"[Admob Banner] {_unitId} OnAdPaid eCPM={ecpm:F4} {currency}");
+			SkyLogUtils.Debug($"[Admob] [Banner] {_unitId} OnAdPaid | 原始值(微美元): {adValue.Value} | 原始收益: ${rawRevenue:F6} {currency} | 精度: {adValue.Precision}");
 
-            // 更新缓存（只保存 USD，其他货币丢弃）
-            SkyAdmobEcpmCache.Instance.UpdateBannerLastShowEcpm(ecpm, currency, _unitId);
+            // 货币统一转换：使用全局 SkyCurrencyConverter
+            double revenueInUsd = SkyCurrencyConverter.ToUSD(rawRevenue, currency);
 
-            // 上报广告展示事件
+			// 更新缓存（统一为 USD）
+			SkyAdmobRevenueCache.Instance.UpdateBannerLastShowRevenue(revenueInUsd, "USD", _unitId);
+
+            // 上报广告展示事件（使用转换后的 USD 金额）
             SkyAnalyticsMgr.TrackAdImpressionEvent(
-                ecpm, "admob", "", _unitId,
+				revenueInUsd, "admob", "", _unitId,
                 SkyAdsType.Banner.ToString(), SkyPlatformType.Admob.ToString(),
                 "" // Banner 通常没有 position 参数
             );

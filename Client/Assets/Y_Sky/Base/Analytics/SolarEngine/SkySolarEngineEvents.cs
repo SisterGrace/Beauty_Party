@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 
 namespace Sky
 {
@@ -51,13 +52,24 @@ namespace Sky
             if (!SkySolarEngineMgr.Instance.TrackingEnable()) return;
             SkySolarEngineMgr.Instance.TrackPresetEvent(eventName, properties);
         }
-        #endregion
+		#endregion
 
-        /// <summary>
-        /// 广告收益事件上报（适配 SolarEngine 预置事件 _appImp）
-        /// 使用官方桥接方法 trackAdImpression
-        /// </summary>
-        public static void TrackAdImpressionEvent(double revenue, string network, string unit, string format, string platform, string pos = "", int formatNumber = 0, int positionNumber = 0, string currency = "USD",string customMediationPlatform = null)
+		/// <summary>
+		/// 广告收益事件上报（适配 SolarEngine 预置事件 _appImp）
+		/// 使用官方桥接方法 trackAdImpression
+		/// </summary>
+		/// <param name="revenue">单次展示收益</param>
+		/// <param name="network">广告平台名（如 "admob" / "applovin"），已由 TopOnRevenueReporter 映射好</param>//这个也是热力引擎后台的变现平台
+		/// <param name="unit">三方广告位 ID（network_placement_id，placementID 下各个平台的 ID ）</param>
+		/// <param name="placementID">TopOn 广告位 ID</param>
+		/// <param name="format">广告类型（banner / inter / reward / splash）</param>
+		/// <param name="platform">聚合平台（"topon"）</param>
+		/// <param name="pos">展示点位，默认空</param>
+		/// <param name="formatNumber">第几次展示该格式的广告</param>
+		/// <param name="positionNumber">第几次展示该点位的广告</param>
+		/// <param name="currency">货币单位，从 TopOn 回调取，取不到由调用方决定是否跳过</param>
+		/// <param name="customMediationPlatform">热力引擎自定义归类（"APL" / "IS"），null 时由 SkySolarEngineEvents 内部回退</param>
+		public static void TrackAdImpressionEvent(double revenue, string network, string unit, string format, string platform, string pos = "", int formatNumber = 0, int positionNumber = 0, string currency = "USD",string customMediationPlatform = null)
         {
             if (!SkySolarEngineMgr.Instance.TrackingEnable()) return;
             
@@ -75,10 +87,8 @@ namespace Sky
                 return;
             }
 
-            // 解析聚合平台!注意！！！目前没有其他聚合！！只解析topon即可！！如果有其他平台这里要重新写！！！
-            string mediationPlatform = !string.IsNullOrEmpty(customMediationPlatform)
-        ? customMediationPlatform
-        : (platform.ToLower() == "tpn" ? "topon" : platform.ToLower());
+            // 解析聚合平台
+            string mediationPlatform = platform.ToLower();
 
             // 映射广告类型
             int adType = 0;
@@ -106,7 +116,25 @@ namespace Sky
                     { "position", pos }
                 }
             );
-        }
+			// 映射广告类型
+			string adTypeStr = "";
+			if (formatLower.Contains("reward")) adTypeStr = "RV";
+			else if (formatLower.Contains("splash")) adTypeStr = "SP";
+			else if (formatLower.Contains("inter")) adTypeStr = "IV";
+			else if (formatLower.Contains("banner")) adTypeStr = "BN";
+			Dictionary<string, object> properties = new Dictionary<string, object>
+			{
+				{"Position",pos },
+				{"Ad_Type",adTypeStr},
+				{"position_number",positionNumber},
+				{"format_number",formatNumber },
+				{"Value", revenue*1000},
+				{"Currency" ,currency}
+			};
+
+			TrackEvent("ad_impression", properties);
+
+		}
 
         /// <summary>
         /// 广告点击事件（_appClick）

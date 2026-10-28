@@ -409,7 +409,7 @@ namespace Sky
         public static void TrackH5AdShowInterstitialAd(string url, SkyH5AdPlatform platform, int closeDelay = 5, bool startOnPageLoaded = true)
             => SkyH5AdsEvents.InvokeShowInterstitialAd(url, platform, closeDelay, startOnPageLoaded);
 
-        /// <summary>
+     /*   /// <summary>
         /// 上报 H5 广告展示（广告收益）。供 H5 广告调用，会同步上报到 Adjust、Firebase、ThinkingData。
         /// currency=USD；format_number/position_number 由 SDK 按格式、点位独立累计（与原生广告共用计数逻辑）。
         /// </summary>
@@ -428,7 +428,7 @@ namespace Sky
             int formatNumber = SkyAdsPrefs.GetAndIncrementFormatPlayCount(adFormat);
             int positionNumber = SkyAdsPrefs.GetAndIncrementPositionPlayCount(pos);
             SkyAnalyticsMgr.TrackAdImpressionEvent(revenue, platform, url, url, adFormat, platform, pos, formatNumber, positionNumber);
-        }
+        }*/
 
         private const string H5AdImpressionCountKeyPrefix = "h5_ad_impression_";
 

@@ -61,14 +61,14 @@ namespace Sky
         {
             if (string.IsNullOrEmpty(placementId)) return;
             
-            // SP_Start_Load 打点
+           /* // SP_Start_Load 打点
             SkySplashAdsMgr.TrackSplashEvent("SP_Start_Load", new Dictionary<string, object>
             {
                 // 加载开始时还没有广告信息，所以这里只能传空值或省略
                 // { "ad_platform", "" },
                 // { "ad_id", "" },
                 // { "ad_ecpm", 0 }
-            });
+            });*/
             
             SkyAdsEvents.LogStartLoadEvent(placementId, PlatformName, AdLoadType.Splash);
             var jsonmap = new Dictionary<string, object>();
@@ -167,6 +167,8 @@ namespace Sky
                     if (status?.adInfo != null)
                     {
                         revenue = status.adInfo.publisher_revenue;
+                        // TopOn 的 checkAdStatus 不返回 currency，默认按 USD 处理
+                        revenue = SkyCurrencyConverter.ToUSD(revenue, "USD");
                         _placementRevenue[placementId] = revenue;
                         adId = status.adInfo.network_placement_id;
                         source = "Topon_" + status.adInfo.network_firm_id.ToString();
@@ -214,7 +216,11 @@ namespace Sky
                 string adId = e?.callbackInfo?.network_placement_id ?? "";
                 double revenue = e?.callbackInfo?.publisher_revenue ?? 0;
                 string currency = e?.callbackInfo?.currency ?? "USD";  // 从 TopOn 回调中获取货币类型
-                if (!_placementRevenue.ContainsKey(placementId)) _placementRevenue[placementId] = revenue;
+                
+                // 货币转换保险：虽然 TopOn 默认返回 USD，但为了防止未来变化，统一转换
+                revenue = SkyCurrencyConverter.ToUSD(revenue, currency);
+                
+                _placementRevenue[placementId] = revenue;
                 string format = SkyAdsType.Splash.ToString();
                 int formatNumber = SkyAdsPrefs.GetAndIncrementFormatPlayCount(format);
                 int positionNumber = SkyAdsPrefs.GetAndIncrementPositionPlayCount(format);

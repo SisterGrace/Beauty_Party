@@ -107,7 +107,7 @@ namespace Sky
             SkyAnalyticsMgr.TrackEvent("RV_Show", new Dictionary<string, object>
             {
                 {"Position", position ?? ""},
-                {"ad_platform", "TPN"},
+                {"ad_platform", adPlatform},
                 {"ad_source", adSource ?? ""},
                 {"ad_id", adId ?? ""},
                 {"ad_ecpm",revenue*1000 },
@@ -124,6 +124,7 @@ namespace Sky
         /// </summary>
         public static void LogClickEvent(AdLoadType loadType, double revenue, string pos, string placement, string network, string platform, string unit)
         {
+			return;//不上报点击事件，并且此方法点击事件热云上报了两次
             // 上报 ThinkingData/Firebase/GA 等统计
             SkyAnalyticsMgr.TrackEvent(ClickEventNames[(int)loadType], new Dictionary<string, object>
             {
