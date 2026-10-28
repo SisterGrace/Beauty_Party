@@ -327,4 +327,52 @@ public final class SolarEngineProxy {
         }
         return null;
     }
+        /**
+     * 设置公共事件属性（官方文档要求一次传一个key，需要循环遍历）
+     */
+    public static void setSuperProperties(String propsJson) {
+        try {
+            Context ctx = getApplicationContext();
+            if (ctx == null) return;
+            JSONObject props = parseJson(propsJson);
+            if (props != null) {
+                Iterator<String> keys = props.keys();
+                while (keys.hasNext()) {
+                    String key = keys.next();
+                    Object value = props.get(key);
+                    SolarEngineManager.getInstance().setSuperProperties(ctx, key, String.valueOf(value));
+                }
+            }
+        } catch (Throwable t) {
+            Log.e(TAG, "setSuperProperties threw exception", t);
+        }
+    }
+
+    /**
+     * 设置用户属性（userInit 对应 setOnce，已存在的属性不更新）
+     */
+    public static void userInit(String propsJson) {
+        try {
+            JSONObject props = parseJson(propsJson);
+            if (props != null) {
+                SolarEngineManager.getInstance().userInit(props);
+            }
+        } catch (Throwable t) {
+            Log.e(TAG, "userInit threw exception", t);
+        }
+    }
+        /**
+     * 设置用户属性（userUpdate 覆盖式更新，已存在则覆盖，不存在则新建）
+     * 文档：https://help.solar-engine.com/cn/docs/set-user-properties
+     */
+    public static void userUpdate(String propsJson) {
+        try {
+            JSONObject props = parseJson(propsJson);
+            if (props != null) {
+                SolarEngineManager.getInstance().userUpdate(props);
+            }
+        } catch (Throwable t) {
+            Log.e(TAG, "userUpdate threw exception", t);
+        }
+    }
 }
