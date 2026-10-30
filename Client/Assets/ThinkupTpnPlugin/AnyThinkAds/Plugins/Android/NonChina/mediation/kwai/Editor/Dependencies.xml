@@ -1,8 +1,8 @@
 <dependencies>
     <androidPackages>
-        <androidPackage spec="com.thinkup.sdk:adapter-tpn-kwai:1.2.21.1.2"/>
-        <androidPackage spec="io.github.kwainetwork:adApi:1.2.21"/>
-        <androidPackage spec="io.github.kwainetwork:adImpl:1.2.21"/>
+        <androidPackage spec="com.thinkup.sdk:adapter-tpn-kwai:1.2.26.1.0"/>
+        <androidPackage spec="io.github.kwainetwork:adApi:1.2.26"/>
+        <androidPackage spec="io.github.kwainetwork:adImpl:1.2.26"/>
         <androidPackage spec="androidx.media3:media3-exoplayer:1.4.1"/>
         <androidPackage spec="androidx.appcompat:appcompat:1.6.1"/>
         <androidPackage spec="com.google.android.material:material:1.2.1"/>

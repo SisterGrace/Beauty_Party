@@ -184,12 +184,12 @@ static NSString *kATInterstitialSizeUsesPixelFlagKey = @"uses_pixel";
     ATShowConfig *config = [[ATShowConfig alloc] initWithScene:scenarioId showCustomExt:showCustomExt customContentResult:contentResult];
       
     if (contentInfoArray.count > 0 || showCustomExt.length > 0) {
-        [[ATAdManager sharedManager] showInterstitialWithPlacementID:placementID showConfig:config inViewController:[UIApplication sharedApplication].delegate.window.rootViewController delegate:self nativeMixViewBlock:^(ATNativeMixInterstitialView * _Nonnull selfRenderingMixInterstitialView) {
+        [[ATAdManager sharedManager] showInterstitialWithPlacementID:placementID showConfig:config inViewController:[ATUnityUtilities topViewController] delegate:self nativeMixViewBlock:^(ATNativeMixInterstitialView * _Nonnull selfRenderingMixInterstitialView) {
             
         }];
         NSLog(@"iOS: ATInterstitialAdWrapper::showInterstitialAdWithPlacementID placementID=%@ scenarioId=%@ showCustomExt=%@ contentInfoArray=%@ showConfig=%@", placementID, scenarioId, showCustomExt, contentInfoArray,  showConfigJsonString);
     } else {
-        [[ATAdManager sharedManager] showInterstitialWithPlacementID:placementID scene:scenarioId inViewController:[UIApplication sharedApplication].delegate.window.rootViewController delegate:self];
+        [[ATAdManager sharedManager] showInterstitialWithPlacementID:placementID scene:scenarioId inViewController:[ATUnityUtilities topViewController] delegate:self];
     }
     
 }
@@ -345,7 +345,7 @@ static NSString *kATInterstitialSizeUsesPixelFlagKey = @"uses_pixel";
     
     ATShowConfig *config = [[ATShowConfig alloc] initWithScene:scenarioId showCustomExt:showCustomExt customContentResult:contentResult];
       
-    [[ATInterstitialAutoAdManager sharedInstance] showAutoLoadInterstitialWithPlacementID:placementID showConfig:config inViewController:[UIApplication sharedApplication].delegate.window.rootViewController delegate:self];
+    [[ATInterstitialAutoAdManager sharedInstance] showAutoLoadInterstitialWithPlacementID:placementID showConfig:config inViewController:[ATUnityUtilities topViewController] delegate:self];
         NSLog(@"iOS: ATInterstitialAdWrapper::showInterstitialAdWithPlacementID placementID=%@ scenarioId=%@ showCustomExt=%@ contentInfoArray=%@ showConfig=%@", placementID, scenarioId, showCustomExt, contentInfoArray,  extraJsonString);
      
 }

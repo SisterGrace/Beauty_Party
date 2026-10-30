@@ -251,11 +251,13 @@ namespace AnyThink.Scripts.Editor
             }
 
             var appId = ATConfig.getAdmobAppIdByOs(ATConfig.OS_ANDROID);
-            // Log error if the App ID is not set.
+            // Fallback to Google sample App ID so local/demo builds are not blocked.
             if (string.IsNullOrEmpty(appId) || !appId.StartsWith("ca-app-pub-"))
             {
-                ATLog.logError("AdMob App ID is not set. Please enter a valid app ID within the ThinkupTpn Integration Manager window.");
-                return;
+                UnityEngine.Debug.LogWarning(
+                    "[AT] AdMob App ID is not set in Integration Manager; using Google sample App ID for this build. " +
+                    "Set a real App ID (ca-app-pub-...) before release.");
+                appId = "ca-app-pub-3940256099942544~3347511713";
             }
 
             // Check if the Google App ID meta data already exists. Update if it already exists.

@@ -169,7 +169,8 @@ static NSString *kATBannerAdLoadingExtraInlineAdaptiveOrientationKey = @"inline_
 }
 
 UIEdgeInsets SafeAreaInsets_ATUnityBanner() {
-    return ([[UIApplication sharedApplication].keyWindow respondsToSelector:@selector(safeAreaInsets)] ? [UIApplication sharedApplication].keyWindow.safeAreaInsets : UIEdgeInsetsZero);
+    UIWindow *window = [ATUnityUtilities keyWindow];
+    return ([window respondsToSelector:@selector(safeAreaInsets)] ? window.safeAreaInsets : UIEdgeInsetsZero);
 }
 
 -(void) showBannerAdWithPlacementID:(NSString*)placementID rect:(NSString*)rect extraJsonString:(NSString*)extraJsonString {
@@ -223,7 +224,7 @@ UIEdgeInsets SafeAreaInsets_ATUnityBanner() {
             [bannerCointainer addTarget:self action:@selector(noop) forControlEvents:UIControlEventTouchUpInside];
             
             NSString *position = rectDict[@"position"];
-            CGSize totalSize = [UIApplication sharedApplication].keyWindow.rootViewController.view.bounds.size;
+            CGSize totalSize = [ATUnityUtilities rootViewController].view.bounds.size;
             UIEdgeInsets safeAreaInsets = SafeAreaInsets_ATUnityBanner();
             if ([@"top" isEqualToString:position]) {
                 bannerCointainer.frame = CGRectMake((totalSize.width - CGRectGetWidth(bannerView.bounds)) / 2.0f, safeAreaInsets.top , CGRectGetWidth(bannerView.bounds), CGRectGetHeight(bannerView.bounds));
@@ -238,7 +239,7 @@ UIEdgeInsets SafeAreaInsets_ATUnityBanner() {
             
 //            bannerCointainer.layer.borderColor = [UIColor redColor].CGColor;
 //            bannerCointainer.layer.borderWidth = .5f;
-            [[UIApplication sharedApplication].keyWindow.rootViewController.view addSubview:bannerCointainer];
+            [[ATUnityUtilities rootViewController].view addSubview:bannerCointainer];
             self->_bannerViewStorage[placementID] = bannerCointainer;
         }
     });
@@ -280,7 +281,7 @@ UIEdgeInsets SafeAreaInsets_ATUnityBanner() {
         UIButton *bannerCointainer = [UIButton buttonWithType:UIButtonTypeCustom];
         [bannerCointainer addTarget:self action:@selector(noop) forControlEvents:UIControlEventTouchUpInside];
          
-        CGSize totalSize = [UIApplication sharedApplication].keyWindow.rootViewController.view.bounds.size;
+        CGSize totalSize = [ATUnityUtilities rootViewController].view.bounds.size;
         UIEdgeInsets safeAreaInsets = SafeAreaInsets_ATUnityBanner();
           
         bannerCointainer.frame = CGRectMake((totalSize.width - CGRectGetWidth(bannerView.bounds)) / 2.0f, safeAreaInsets.top , CGRectGetWidth(bannerView.bounds), CGRectGetHeight(bannerView.bounds));
@@ -288,7 +289,7 @@ UIEdgeInsets SafeAreaInsets_ATUnityBanner() {
         bannerView.frame = bannerCointainer.bounds;
         [bannerCointainer addSubview:bannerView];
         
-        [[UIApplication sharedApplication].keyWindow.rootViewController.view addSubview:bannerCointainer];
+        [[ATUnityUtilities rootViewController].view addSubview:bannerCointainer];
         self.bannerViewStorage[placementID] = bannerCointainer;
         
     });  

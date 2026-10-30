@@ -497,11 +497,11 @@ static NSDictionary *at_policyDictionary(NSDictionary *dict, NSString *key) {
 -(void) showGDPRConsentDialog:(void(*)(const char*))callback appID:(NSString*)appID {
     NSLog(@"iOS: ATUnityManager::showGDPRConsentDialog appID=%@", appID);
     if (appID != nil && [appID length] > 0) {
-        [[ATAPI sharedInstance] showGDPRConsentDialogWithAppID:appID inViewController:[UIApplication sharedApplication].delegate.window.rootViewController dismissalCallback:^{
+        [[ATAPI sharedInstance] showGDPRConsentDialogWithAppID:appID inViewController:[ATUnityUtilities topViewController] dismissalCallback:^{
             if (callback != NULL) { callback(appID.UTF8String); }
         }];
     } else {
-        [[ATAPI sharedInstance] showGDPRConsentDialogInViewController:[UIApplication sharedApplication].delegate.window.rootViewController dismissalCallback:^{
+        [[ATAPI sharedInstance] showGDPRConsentDialogInViewController:[ATUnityUtilities topViewController] dismissalCallback:^{
             if (callback != NULL) {
                 callback(@"".UTF8String);
             }
@@ -515,7 +515,7 @@ static NSDictionary *at_policyDictionary(NSDictionary *dict, NSString *key) {
         appID = @"";
     }
     if ([[ATAPI sharedInstance] respondsToSelector:@selector(showSecondGDPRConsentDialogWithAppID:inViewController:dismissalCallback:)]) {
-        [[ATAPI sharedInstance] showSecondGDPRConsentDialogWithAppID:appID inViewController:[UIApplication sharedApplication].delegate.window.rootViewController dismissalCallback:^{
+        [[ATAPI sharedInstance] showSecondGDPRConsentDialogWithAppID:appID inViewController:[ATUnityUtilities topViewController] dismissalCallback:^{
             BOOL gdprConsent = [ATAPI sharedInstance].dataConsentSet == ATDataConsentSetNonpersonalized;
             NSLog(@"iOS: ATUMPGDPRConsent::UMP二次弹窗展示结束，当前GDPR配置，gdprConsent:%@", gdprConsent ? @"限制" : @"不限制");
         }];
@@ -714,8 +714,7 @@ static NSDictionary *at_policyDictionary(NSDictionary *dict, NSString *key) {
             [invocation setSelector:sel];
             
             // 设置参数
-            UIWindow *keyWindow = [UIApplication sharedApplication].keyWindow;
-            UIViewController *rootViewController = keyWindow.rootViewController;
+            UIViewController *rootViewController = [ATUnityUtilities topViewController];
             NSNumber *showType = @1; // 假设 showType 为1
             
             [invocation setArgument:&rootViewController atIndex:2]; // 注意：参数索引从2开始，0和1被target和selector占用

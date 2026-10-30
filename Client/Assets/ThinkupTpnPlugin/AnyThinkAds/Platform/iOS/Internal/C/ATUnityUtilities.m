@@ -20,6 +20,54 @@ NSString *const kATUnityCheckLoadModelAdInfoKey = @"adInfo";
 +(BOOL)isEmpty:(id)object {
     return (object == nil || [object isKindOfClass:[NSNull class]] || ([object respondsToSelector:@selector(length)] && [(NSData *)object length] == 0) || ([object respondsToSelector:@selector(count)] && [(NSArray *)object count] == 0));
 }
+
++ (UIWindow *)keyWindow {
+    // Aligned with native ATTTActiveKeyWindow: prefer ForegroundActive + isKeyWindow,
+    // then Unity-friendly visible normal window, then AppDelegate.window.
+    UIApplication *application = UIApplication.sharedApplication;
+    if (@available(iOS 13.0, *)) {
+        UIWindow *fallbackWindow = nil;
+        for (UIScene *scene in application.connectedScenes) {
+            if (![scene isKindOfClass:[UIWindowScene class]] ||
+                scene.activationState != UISceneActivationStateForegroundActive) {
+                continue;
+            }
+            for (UIWindow *window in ((UIWindowScene *)scene).windows) {
+                if (window.isKeyWindow) {
+                    return window;
+                }
+                if (fallbackWindow == nil &&
+                    !window.hidden &&
+                    window.alpha > 0.01 &&
+                    window.windowLevel == UIWindowLevelNormal) {
+                    fallbackWindow = window;
+                }
+            }
+        }
+        if (fallbackWindow != nil) {
+            return fallbackWindow;
+        }
+    }
+
+    id<UIApplicationDelegate> delegate = application.delegate;
+    if ([delegate respondsToSelector:@selector(window)]) {
+        UIWindow *window = delegate.window;
+        return [window isKindOfClass:[UIWindow class]] ? window : nil;
+    }
+    return nil;
+}
+
++ (UIViewController *)rootViewController {
+    return [self keyWindow].rootViewController;
+}
+
++ (UIViewController *)topViewController {
+    UIViewController *vc = [self rootViewController];
+    while (vc.presentedViewController) {
+        vc = vc.presentedViewController;
+    }
+    return vc;
+}
 @end
 @implementation NSDictionary (KAKit)
 -(NSString*) jsonString {

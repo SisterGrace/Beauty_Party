@@ -152,7 +152,7 @@
     
     ATShowConfig *config = [[ATShowConfig alloc] initWithScene:scenarioId showCustomExt:showCustomExt customContentResult:contentResult];
     
-    [[ATAdManager sharedManager] showSplashWithPlacementID:placementID config:config window:[UIApplication sharedApplication].delegate.window inViewController:[UIApplication sharedApplication].delegate.window.rootViewController extra:nil delegate:self];
+    [[ATAdManager sharedManager] showSplashWithPlacementID:placementID config:config window:[ATUnityUtilities keyWindow] inViewController:[ATUnityUtilities topViewController] extra:nil delegate:self];
      
 }
 

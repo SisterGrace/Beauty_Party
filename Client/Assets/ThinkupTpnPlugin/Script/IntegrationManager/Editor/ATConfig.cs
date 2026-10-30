@@ -16,7 +16,7 @@ namespace AnyThink.Scripts.IntegrationManager.Editor
 
     public class ATConfig
     {
-public static string PLUGIN_VERSION = "2.1.9";
+public static string PLUGIN_VERSION = "2.2.0";
 public static bool isDebug = false;
 
         public static int PLUGIN_TYPE = 2;

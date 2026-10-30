@@ -184,11 +184,11 @@ NSString *const kLoadExtraMediaExtraKey = @"UserExtraData";
     ATShowConfig *config = [[ATShowConfig alloc] initWithScene:scenarioId showCustomExt:showCustomExt customContentResult:contentResult];
       
     if (showCustomExt.length > 0 || contentInfoArray.count > 0) {
-        [[ATAdManager sharedManager] showRewardedVideoWithPlacementID:placementID config:config inViewController:[UIApplication sharedApplication].delegate.window.rootViewController delegate:self];
+        [[ATAdManager sharedManager] showRewardedVideoWithPlacementID:placementID config:config inViewController:[ATUnityUtilities topViewController] delegate:self];
         NSLog(@"iOS: ATRewardedVideoWrapper::showRewardedVideoWithPlacementID placementID=%@ scenarioId=%@ showCustomExt=%@ contentInfoArray=%@ showConfig=%@", placementID, scenarioId, showCustomExt, contentInfoArray, showConfigJsonString);
     } else {
          
-        [[ATAdManager sharedManager] showRewardedVideoWithPlacementID:placementID scene:scenarioId inViewController:[UIApplication sharedApplication].delegate.window.rootViewController delegate:self];
+        [[ATAdManager sharedManager] showRewardedVideoWithPlacementID:placementID scene:scenarioId inViewController:[ATUnityUtilities topViewController] delegate:self];
     }
     
 }
@@ -344,7 +344,7 @@ NSString *const kLoadExtraMediaExtraKey = @"UserExtraData";
     
     ATShowConfig *config = [[ATShowConfig alloc] initWithScene:scenarioId showCustomExt:showCustomExt customContentResult:contentResult];
       
-    [[ATRewardedVideoAutoAdManager sharedInstance] showAutoLoadRewardedVideoWithPlacementID:placementID showConfig:config inViewController:[UIApplication sharedApplication].delegate.window.rootViewController delegate:self];
+    [[ATRewardedVideoAutoAdManager sharedInstance] showAutoLoadRewardedVideoWithPlacementID:placementID showConfig:config inViewController:[ATUnityUtilities topViewController] delegate:self];
         NSLog(@"iOS: ATRewardedVideoWrapper::showRewardedVideoWithPlacementID placementID=%@ scenarioId=%@ showCustomExt=%@ contentInfoArray=%@ showConfig=%@", placementID, scenarioId, showCustomExt, contentInfoArray, extraJsonString);
 }
 

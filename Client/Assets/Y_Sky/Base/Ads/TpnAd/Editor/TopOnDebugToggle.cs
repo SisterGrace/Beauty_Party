@@ -1,199 +1,146 @@
-using UnityEngine;
-using UnityEditor;
+using System;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
+using System.Xml;
+using UnityEditor;
+using UnityEngine;
 
 public class TopOnDebugToggle
 {
     private const string MenuItemName = "Tools/TopOn Debug";
     private const string XmlFileName = "DebuggerUIDependencies.xml";
     private const string MacroSymbol = "TOPON_TEST";
-
-    private static float _waitTimer = 0f;
-    private static bool _isWaiting = false;
-    private static bool _pendingMacroState = false;
+    private const string ResolvePendingKey = "TopOnDebugToggle.ResolvePending";
 
     [MenuItem(MenuItemName)]
     private static void ToggleDebug()
     {
-        if (_isWaiting)
+        bool enabled = !IsDebugEnabled();
+        if (!SetDebugState(enabled))
         {
-            EditorApplication.update -= WaitAndSetMacro;
-            _isWaiting = false;
+            return;
         }
 
-        bool isEnabled = EditorPrefs.GetBool("TopOnDebugEnabled", false);
-        isEnabled = !isEnabled;
-        EditorPrefs.SetBool("TopOnDebugEnabled", isEnabled);
-
-        SetDebugState(isEnabled);
-        bool forceCalled = ForceResolve();
-
-        _pendingMacroState = isEnabled;
-        _waitTimer = 10f;
-        _isWaiting = true;
-        EditorApplication.update += WaitAndSetMacro;
-        Debug.Log($"已触发 Force Resolve，等待 10 秒后修改宏...");
+        // Keep the request across the domain reload caused by changing scripting symbols.
+        SessionState.SetBool(ResolvePendingKey, true);
+        SetMacro(enabled);
+        ResumePendingResolve();
+        Debug.Log($"TopOn Android Debug 已{(enabled ? "开启" : "关闭")}，等待编译和资源导入完成后解析依赖。");
     }
 
-    private static void WaitAndSetMacro()
+    [InitializeOnLoadMethod]
+    private static void ResumePendingResolve()
     {
-        _waitTimer -= Time.deltaTime;
-        if (_waitTimer <= 0f)
+        if (SessionState.GetBool(ResolvePendingKey, false))
         {
-            EditorApplication.update -= WaitAndSetMacro;
-            _isWaiting = false;
-            SetMacro(_pendingMacroState);
-            Debug.Log($"延迟 10 秒结束，宏已{(_pendingMacroState ? "添加" : "移除")} {MacroSymbol}");
+            EditorApplication.update -= ResolveWhenReady;
+            EditorApplication.update += ResolveWhenReady;
         }
+    }
+
+    private static void ResolveWhenReady()
+    {
+        if (EditorApplication.isCompiling || EditorApplication.isUpdating)
+        {
+            return;
+        }
+
+        EditorApplication.update -= ResolveWhenReady;
+        SessionState.SetBool(ResolvePendingKey, false);
+        ForceResolve();
     }
 
     [MenuItem(MenuItemName, true)]
     private static bool ValidateToggle()
     {
-        Menu.SetChecked(MenuItemName, EditorPrefs.GetBool("TopOnDebugEnabled", false));
-        return true;
+        Menu.SetChecked(MenuItemName, IsDebugEnabled());
+        return !EditorApplication.isCompiling && !EditorApplication.isUpdating;
     }
 
-    // ---------- 修改 XML（最彻底：提取核心内容） ----------
-    private static void SetDebugState(bool enabled)
+    private static bool IsDebugEnabled()
     {
-        string[] guids = AssetDatabase.FindAssets(Path.GetFileNameWithoutExtension(XmlFileName));
-        if (guids.Length == 0)
+        return PlayerSettings.GetScriptingDefineSymbolsForGroup(BuildTargetGroup.Android)
+            .Split(';').Any(symbol => symbol.Trim() == MacroSymbol);
+    }
+
+    private static bool SetDebugState(bool enabled)
+    {
+        string[] paths = AssetDatabase.FindAssets(Path.GetFileNameWithoutExtension(XmlFileName), new[] { "Assets" })
+            .Select(AssetDatabase.GUIDToAssetPath)
+            .Where(path => Path.GetFileName(path) == XmlFileName).ToArray();
+        if (paths.Length != 1)
         {
-            Debug.LogError($"未找到 {XmlFileName} 文件，请确保它存在于Assets目录下。");
-            return;
-        }
-        string path = AssetDatabase.GUIDToAssetPath(guids[0]);
-        if (string.IsNullOrEmpty(path))
-        {
-            Debug.LogError($"无法获取 {XmlFileName} 的路径。");
-            return;
+            Debug.LogError($"需要唯一的 {XmlFileName}，当前找到 {paths.Length} 个。请检查 Assets 下的 TopOn 调试依赖配置。");
+            return false;
         }
 
+        string path = paths[0];
         string fullPath = Path.Combine(Application.dataPath, path.Substring("Assets/".Length));
-        if (!File.Exists(fullPath))
+        try
         {
-            Debug.LogError($"文件不存在: {fullPath}");
-            return;
+            var document = new XmlDocument();
+            document.Load(fullPath);
+            XmlElement root = document.DocumentElement;
+            if (root == null || root.Name != "dependencies")
+            {
+                throw new XmlException("缺少 dependencies 根节点。");
+            }
+
+            XmlNode packages = root.SelectSingleNode("androidPackages");
+            if (enabled && packages == null)
+            {
+                XmlComment disabledPackages = root.ChildNodes.OfType<XmlComment>()
+                    .FirstOrDefault(comment => comment.Value.TrimStart().StartsWith("<androidPackages"));
+                if (disabledPackages == null)
+                {
+                    throw new XmlException("未找到已注释的 androidPackages 调试依赖。");
+                }
+
+                XmlDocumentFragment fragment = document.CreateDocumentFragment();
+                fragment.InnerXml = disabledPackages.Value;
+                root.ReplaceChild(fragment, disabledPackages);
+            }
+            else if (!enabled && packages != null)
+            {
+                // Leave a valid XML root so EDM can still parse the disabled file.
+                root.ReplaceChild(document.CreateComment(packages.OuterXml), packages);
+            }
+
+            document.Save(fullPath);
         }
-
-        string content = File.ReadAllText(fullPath);
-
-        // 用正则提取 <dependencies> ... </dependencies> 核心内容（忽略注释和前缀）
-        string pattern = @"<dependencies\b[^>]*>(.*?)</dependencies>";
-        Match match = Regex.Match(content, pattern, RegexOptions.Singleline);
-        string SkyContent = match.Success ? match.Value : null;
-
-        if (string.IsNullOrEmpty(SkyContent))
+        catch (Exception exception) when (exception is IOException || exception is UnauthorizedAccessException || exception is XmlException)
         {
-            Debug.LogError("无法提取 <dependencies> 核心内容，文件可能已损坏。");
-            return;
-        }
-
-        // 根据状态决定是否注释
-        if (enabled)
-        {
-            // 开启：直接写核心内容（不加注释）
-            File.WriteAllText(fullPath, SkyContent);
-            Debug.Log("TopOn Debug 已开启：取消注释 XML。");
-        }
-        else
-        {
-            // 关闭：用注释包装核心内容
-            File.WriteAllText(fullPath, "<!--" + SkyContent + "-->");
-            Debug.Log("TopOn Debug 已关闭：注释 XML。");
+            Debug.LogError($"修改 TopOn 调试依赖失败：{exception.Message}");
+            return false;
         }
 
         AssetDatabase.ImportAsset(path);
-        AssetDatabase.Refresh();
+        return true;
     }
 
-    // ---------- Force Resolve ----------
-    private static bool ForceResolve()
+    private static void ForceResolve()
     {
-        string[] menuPaths = new string[]
+        const string menuPath = "Assets/External Dependency Manager/Android Resolver/Force Resolve";
+        if (EditorApplication.ExecuteMenuItem(menuPath))
         {
-            "Assets/External Dependency Manager/Android Resolver/Force Resolve",
-            "Assets/External Dependency Manager/Android Resolver/Resolve",
-            "Window/External Dependency Manager/Android Resolver/Force Resolve"
-        };
-        bool executed = false;
-        foreach (var menuPath in menuPaths)
-        {
-            if (EditorApplication.ExecuteMenuItem(menuPath))
-            {
-                Debug.Log($"已通过菜单执行 Force Resolve: {menuPath}");
-                executed = true;
-                break;
-            }
+            Debug.Log("已触发 TopOn Android 依赖 Force Resolve，请等待解析完成。");
         }
-
-        if (!executed)
+        else
         {
-            try
-            {
-                var resolverType = System.Type.GetType("Google.JarResolver.PlayServicesResolver, Google.JarResolver");
-                if (resolverType != null)
-                {
-                    var method = resolverType.GetMethod("ForceResolve", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
-                    if (method != null)
-                    {
-                        method.Invoke(null, null);
-                        Debug.Log("已通过反射执行 ForceResolve。");
-                        executed = true;
-                    }
-                }
-            }
-            catch (System.Exception e)
-            {
-                Debug.LogWarning($"反射调用 ForceResolve 失败: {e.Message}");
-            }
+            Debug.LogWarning($"无法自动解析 TopOn 依赖，请手动执行 {menuPath}。");
         }
-
-        if (!executed)
-        {
-            Debug.LogWarning("无法自动执行 Force Resolve，请手动通过菜单或窗口执行。");
-        }
-        return executed;
     }
 
-    // ---------- 宏定义管理 ----------
     private static void SetMacro(bool enabled)
     {
-        BuildTargetGroup buildTargetGroup = EditorUserBuildSettings.selectedBuildTargetGroup;
-        string currentSymbols = PlayerSettings.GetScriptingDefineSymbolsForGroup(buildTargetGroup);
-        var symbolsList = currentSymbols.Split(';').Select(s => s.Trim()).Where(s => !string.IsNullOrEmpty(s)).ToList();
-
-        bool changed = false;
+        var symbols = PlayerSettings.GetScriptingDefineSymbolsForGroup(BuildTargetGroup.Android)
+            .Split(';').Select(symbol => symbol.Trim())
+            .Where(symbol => !string.IsNullOrEmpty(symbol) && symbol != MacroSymbol).ToList();
         if (enabled)
         {
-            if (!symbolsList.Contains(MacroSymbol))
-            {
-                symbolsList.Add(MacroSymbol);
-                changed = true;
-            }
-        }
-        else
-        {
-            if (symbolsList.Contains(MacroSymbol))
-            {
-                symbolsList.Remove(MacroSymbol);
-                changed = true;
-            }
+            symbols.Add(MacroSymbol);
         }
 
-        if (changed)
-        {
-            string newSymbols = string.Join(";", symbolsList);
-            PlayerSettings.SetScriptingDefineSymbolsForGroup(buildTargetGroup, newSymbols);
-            Debug.Log($"宏定义已更新：{(enabled ? "添加" : "移除")} {MacroSymbol}");
-            AssetDatabase.Refresh();
-        }
-        else
-        {
-            Debug.Log($"宏定义 {MacroSymbol} 状态未变，无需操作。");
-        }
+        PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Android, string.Join(";", symbols));
     }
 }

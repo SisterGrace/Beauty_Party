@@ -84,7 +84,8 @@ NSString *const kATNativeAdAdaptiveHeightKey = @"AdaptiveHeight";
 }
 
 UIEdgeInsets SafeAreaInsets_ATUnityNative() {
-    return ([[UIApplication sharedApplication].keyWindow respondsToSelector:@selector(safeAreaInsets)] ? [UIApplication sharedApplication].keyWindow.safeAreaInsets : UIEdgeInsetsZero);
+    UIWindow *window = [ATUnityUtilities keyWindow];
+    return ([window respondsToSelector:@selector(safeAreaInsets)] ? window.safeAreaInsets : UIEdgeInsetsZero);
 }
 
 - (id)selWrapperClassWithDict:(NSDictionary *)dict callback:(void(*)(const char*, const char*))callback {
@@ -228,7 +229,7 @@ UIEdgeInsets SafeAreaInsets_ATUnityNative() {
         if (showCongifDict[kATNativeAdAdaptiveHeightKey] != nil) {
             configuration.sizeToFit = [showCongifDict[kATNativeAdAdaptiveHeightKey] boolValue];
         }
-        configuration.rootViewController = [UIApplication sharedApplication].delegate.window.rootViewController;
+        configuration.rootViewController = [ATUnityUtilities rootViewController];
         configuration.context = @{
             kATNativeAdConfigurationContextAdOptionsViewFrameKey:[NSValue valueWithCGRect:CGRectMake(CGRectGetWidth([UIScreen mainScreen].bounds) - 43.0f, .0f, 43.0f, 18.0f)],
             kATNativeAdConfigurationContextAdLogoViewFrameKey:[NSValue valueWithCGRect:CGRectMake(.0f, .0f, 54.0f, 18.0f)],
@@ -290,10 +291,10 @@ UIEdgeInsets SafeAreaInsets_ATUnityNative() {
             
             [button addSubview:adview];
             
-            [[UIApplication sharedApplication].keyWindow.rootViewController.view addSubview:button];
+            [[ATUnityUtilities rootViewController].view addSubview:button];
             
             NSString *position = showCongifDict[@"Position"];
-            CGSize totalSize = [UIApplication sharedApplication].keyWindow.rootViewController.view.bounds.size;
+            CGSize totalSize = [ATUnityUtilities rootViewController].view.bounds.size;
             UIEdgeInsets safeAreaInsets = SafeAreaInsets_ATUnityNative();
             
             if ([@"Top" isEqualToString:position]) {
@@ -381,7 +382,7 @@ UIEdgeInsets SafeAreaInsets_ATUnityNative() {
         CGRect frame = [change[@"new"] CGRectValue];
         NSDictionary *contextDict = (__bridge NSDictionary*)context;
         
-        CGSize totalSize = [UIApplication sharedApplication].keyWindow.rootViewController.view.bounds.size;
+        CGSize totalSize = [ATUnityUtilities rootViewController].view.bounds.size;
         UIEdgeInsets safeAreaInsets = SafeAreaInsets_ATUnityNative();
         NSString *position = contextDict[@"position"];
         UIButton *button = contextDict[@"button"];

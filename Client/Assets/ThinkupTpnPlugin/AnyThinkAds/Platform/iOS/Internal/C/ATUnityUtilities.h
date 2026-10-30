@@ -18,6 +18,15 @@ extern NSString *const kATUnityCheckLoadModelAdInfoKey;
 
 @interface ATUnityUtilities : NSObject
 +(BOOL)isEmpty:(id)object;
+
+/// Active key window (UIScene-aware). Prefer this over UIApplication.delegate.window / keyWindow.
++ (UIWindow *)keyWindow;
+
+/// window.rootViewController — for attaching banner/native views to the root view hierarchy.
++ (UIViewController *)rootViewController;
+
+/// Top-most presented VC from root — for presenting interstitial / rewarded / splash / GDPR.
++ (UIViewController *)topViewController;
 @end
 
 @interface NSDictionary (KAKit)

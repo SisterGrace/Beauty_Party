@@ -34,7 +34,7 @@ namespace AnyThinkAds.Api
         /// <summary>
         /// Unity plugin version. Keep in sync with ATConfig.PLUGIN_VERSION.
         /// </summary>
-        public const string Version = "2.1.9";
+        public const string Version = "2.2.0";
 
         public static readonly int kATUserLocationUnknown = 0;
         public static readonly int kATUserLocationInEU = 1;

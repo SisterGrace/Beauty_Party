@@ -32,6 +32,9 @@ namespace Sky
         private string _appId;
         private string _appKey;
         private bool _isInitialized;
+#if TOPON_TEST && UNITY_ANDROID && !UNITY_EDITOR
+        private bool _isReadingDebugGaid;
+#endif
         public string ClientName => SkyPlatformType.TPN.ToString();
         public SkyPlatformType PlatformType => SkyPlatformType.TPN;
 
@@ -94,6 +97,9 @@ namespace Sky
         public void Initialize()
         {
             if (_isInitialized) return;
+#if TOPON_TEST && UNITY_ANDROID && !UNITY_EDITOR
+            if (_isReadingDebugGaid) return;
+#endif
 
             // 直接读取本地参数，配置各广告位（广告 ID 不再走在线参数）
             _appId = SkyAdsConfigParser.GetTpnAppId();
@@ -121,7 +127,8 @@ namespace Sky
 
 #if UNITY_ANDROID || UNITY_IOS
             AnyThinkAds.Api.ATSDKAPI.setLogDebug(SkyLogUtils.Enabled);
-#if TOPON_TEST && UNITY_ANDROID
+#endif
+#if TOPON_TEST && UNITY_ANDROID && !UNITY_EDITOR
             // 海外版/特定版本 SDK 使用混淆，动态获取类路径
             try
             {
@@ -136,10 +143,15 @@ namespace Sky
                 SkyLogUtils.Debug("[SkyTpn] setNetworkLogDebug failed: " + e.Message);
             }
 
-            //SetUMPAndAdDebugMode("CECC96A68B641E880BC8530704249FE9", "2d04bdd5-eb09-4df0-9293-250ab4990c5b");//不能两个一起测试，只能一个一个测试
-            SetTopOnDebugMode("2d04bdd5-eb09-4df0-9293-250ab4990c5b");
-
+            StartCoroutine(InitializeWithTopOnDebugMode());
+#else
+            InitializeSdk();
 #endif
+        }
+
+        private void InitializeSdk()
+        {
+#if UNITY_ANDROID || UNITY_IOS
 #if ADMOB_TEST && UNITY_ANDROID
             SetAdmobTestDevice("CECC96A68B641E880BC8530704249FE9"); // AdMob 设备 hash（从日志获取，非 GAID）
             EnableAdmobDebug();
@@ -388,10 +400,80 @@ namespace Sky
             }
         }
         
+#if UNITY_ANDROID && !UNITY_EDITOR
+        private System.Collections.IEnumerator InitializeWithTopOnDebugMode()
+        {
+            _isReadingDebugGaid = true;
+            var gaidTask = System.Threading.Tasks.Task.Run(ReadDebugGaid);
+            float deadline = Time.realtimeSinceStartup + 5f;
+            while (!gaidTask.IsCompleted && Time.realtimeSinceStartup < deadline)
+                yield return null;
+
+            if (!gaidTask.IsCompleted)
+            {
+                SkyLogUtils.Warning("[SkyTpn] GAID lookup timed out; continuing without TopOn test-device configuration.");
+            }
+            else if (gaidTask.IsFaulted)
+            {
+                SkyLogUtils.Warning("[SkyTpn] GAID lookup failed: " + gaidTask.Exception.GetBaseException().Message);
+            }
+            else
+            {
+                var result = gaidTask.Result;
+                if (string.IsNullOrEmpty(result.Gaid))
+                    SkyLogUtils.Warning("[SkyTpn] TopOn test-device configuration skipped: " + result.Error);
+                else
+                {
+                    SkyLogUtils.Debug("[SkyTpn] GAID lookup succeeded: " + result.Gaid);
+                    SetTopOnDebugMode(result.Gaid);
+                }
+            }
+
+            _isReadingDebugGaid = false;
+            InitializeSdk();
+        }
+
+        // Google Play services requires this blocking API to run off the main thread.
+        private static (string Gaid, string Error) ReadDebugGaid()
+        {
+            bool attached = false;
+            try
+            {
+                if (AndroidJNI.AttachCurrentThread() != 0)
+                    return (null, "could not attach the GAID worker to the Android JVM");
+                attached = true;
+
+                using (var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
+                using (var activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"))
+                using (var context = activity.Call<AndroidJavaObject>("getApplicationContext"))
+                using (var client = new AndroidJavaClass("com.google.android.gms.ads.identifier.AdvertisingIdClient"))
+                using (var info = client.CallStatic<AndroidJavaObject>("getAdvertisingIdInfo", context))
+                {
+                    if (info.Call<bool>("isLimitAdTrackingEnabled"))
+                        return (null, "advertising tracking is limited on this device");
+
+                    string gaid = info.Call<string>("getId");
+                    if (!System.Guid.TryParse(gaid, out var parsedGaid) || parsedGaid == System.Guid.Empty)
+                        return (null, "Google Play services returned an empty or invalid GAID");
+
+                    return (gaid, null);
+                }
+            }
+            catch (System.Exception e)
+            {
+                return (null, e.Message);
+            }
+            finally
+            {
+                if (attached)
+                    AndroidJNI.DetachCurrentThread();
+            }
+        }
+#endif
+
         /// <summary>
-        /// TopOn 调试模式：锁定当前设备仅加载指定广告平台的测试广告。
-        /// 必须在 ATSDK.initSDK 之前调用。
-        /// 使用硬编码 GAID 避免主线程阻塞获取失败的问题（测试阶段专用，上线前删除）。
+        /// Configure the current device for TopOn test ads before SDK initialization.
+        /// The GAID is read from the Android device rather than stored in the project.
         /// </summary>
         private static void SetTopOnDebugMode(string gaid)
         {
